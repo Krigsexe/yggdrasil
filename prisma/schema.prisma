@@ -1,0 +1,366 @@
+// YGGDRASIL Prisma Schema
+// Database: PostgreSQL with pgvector extension
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+// ============================================================================
+// AUTHENTICATION (HEIMDALL)
+// ============================================================================
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  role         Role      @default(USER)
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  lastLoginAt  DateTime? @map("last_login_at")
+
+  // Metadata
+  name         String?
+  organization String?
+  timezone     String?
+  locale       String?
+
+  // Relations
+  refreshTokens RefreshToken[]
+  memories      Memory[]
+  checkpoints   Checkpoint[]
+  auditLogs     AuditLog[]
+  sessions      Session[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+  SYSTEM
+}
+
+model RefreshToken {
+  id              String    @id @default(cuid())
+  token           String    @unique
+  userId          String    @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt       DateTime  @map("expires_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  revokedAt       DateTime? @map("revoked_at")
+  replacedByToken String?   @map("replaced_by_token")
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime @map("expires_at")
+  metadata  Json?
+
+  // Relations
+  memories Memory[]
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// ============================================================================
+// SOURCES (MIMIR, VOLVA, HUGIN)
+// ============================================================================
+
+model Source {
+  id           String          @id @default(cuid())
+  type         SourceType
+  identifier   String
+  url          String
+  title        String
+  authors      String[]
+  publishedAt  DateTime?       @map("published_at")
+  fetchedAt    DateTime        @default(now()) @map("fetched_at")
+  trustScore   Int             @map("trust_score")
+  branch       EpistemicBranch
+  isValid      Boolean         @default(true) @map("is_valid")
+  invalidatedAt DateTime?      @map("invalidated_at")
+
+  // Extended metadata
+  doi          String?
+  isbn         String?
+  issn         String?
+  arxivId      String?         @map("arxiv_id")
+  pubmedId     String?         @map("pubmed_id")
+  abstract     String?
+  keywords     String[]
+  citations    Int?
+  peerReviewed Boolean?        @map("peer_reviewed")
+  journal      String?
+  volume       String?
+  issue        String?
+  pages        String?
+
+  // Relations
+  validations ValidationSource[]
+
+  @@unique([type, identifier])
+  @@index([branch, trustScore])
+  @@index([type])
+  @@map("sources")
+}
+
+enum SourceType {
+  ARXIV
+  PUBMED
+  ISO
+  RFC
+  WIKIDATA
+  WEB
+  BOOK
+  JOURNAL
+  OTHER
+}
+
+enum EpistemicBranch {
+  MIMIR
+  VOLVA
+  HUGIN
+}
+
+// ============================================================================
+// VALIDATION (ODIN)
+// ============================================================================
+
+model Validation {
+  id              String           @id @default(cuid())
+  requestId       String           @map("request_id")
+  content         String
+  isValid         Boolean          @map("is_valid")
+  confidence      Int
+  rejectionReason RejectionReason? @map("rejection_reason")
+  trace           Json
+  processingTimeMs Int             @map("processing_time_ms")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  sources ValidationSource[]
+
+  @@index([requestId])
+  @@index([isValid])
+  @@map("validations")
+}
+
+model ValidationSource {
+  id           String     @id @default(cuid())
+  validationId String     @map("validation_id")
+  validation   Validation @relation(fields: [validationId], references: [id], onDelete: Cascade)
+  sourceId     String     @map("source_id")
+  source       Source     @relation(fields: [sourceId], references: [id])
+
+  @@unique([validationId, sourceId])
+  @@map("validation_sources")
+}
+
+enum RejectionReason {
+  NO_SOURCE
+  CONTRADICTS_MEMORY
+  FAILED_CRITIQUE
+  NO_CONSENSUS
+  INSUFFICIENT_CONFIDENCE
+  CONTAMINATION_DETECTED
+  TIMEOUT
+  INTERNAL_ERROR
+}
+
+// ============================================================================
+// COUNCIL (THING)
+// ============================================================================
+
+model Deliberation {
+  id                  String          @id @default(cuid())
+  requestId           String          @map("request_id")
+  query               String
+  finalProposal       String          @map("final_proposal")
+  verdict             CouncilVerdict
+  processingTimeMs    Int             @map("processing_time_ms")
+  createdAt           DateTime        @default(now()) @map("created_at")
+
+  // Relations
+  responses    CouncilResponse[]
+  challenges   LokiChallenge[]
+
+  @@index([requestId])
+  @@map("deliberations")
+}
+
+model CouncilResponse {
+  id              String        @id @default(cuid())
+  deliberationId  String        @map("deliberation_id")
+  deliberation    Deliberation  @relation(fields: [deliberationId], references: [id], onDelete: Cascade)
+  member          CouncilMember
+  content         String
+  confidence      Int
+  reasoning       String?
+  processingTimeMs Int          @map("processing_time_ms")
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  @@index([deliberationId])
+  @@map("council_responses")
+}
+
+model LokiChallenge {
+  id             String        @id @default(cuid())
+  deliberationId String        @map("deliberation_id")
+  deliberation   Deliberation  @relation(fields: [deliberationId], references: [id], onDelete: Cascade)
+  targetMember   CouncilMember @map("target_member")
+  challenge      String
+  severity       ChallengeSeverity
+  response       String?
+  resolved       Boolean       @default(false)
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  @@index([deliberationId])
+  @@map("loki_challenges")
+}
+
+enum CouncilMember {
+  KVASIR
+  BRAGI
+  NORNES
+  SAGA
+  SYN
+  LOKI
+  TYR
+}
+
+enum CouncilVerdict {
+  CONSENSUS
+  MAJORITY
+  SPLIT
+  DEADLOCK
+}
+
+enum ChallengeSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ============================================================================
+// MEMORY (MUNIN)
+// ============================================================================
+
+model Memory {
+  id                 String      @id @default(cuid())
+  userId             String      @map("user_id")
+  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId          String?     @map("session_id")
+  session            Session?    @relation(fields: [sessionId], references: [id])
+  type               MemoryType
+  content            Json
+  embedding          Unsupported("vector(1536)")?
+
+  // Metadata
+  tags               String[]
+  importance         Int         @default(50)
+  accessCount        Int         @default(0) @map("access_count")
+  lastAccessedAt     DateTime?   @map("last_accessed_at")
+
+  // Lifecycle
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
+  validUntil         DateTime?   @map("valid_until")
+  invalidatedAt      DateTime?   @map("invalidated_at")
+  invalidatedBy      String?     @map("invalidated_by")
+  invalidationReason String?     @map("invalidation_reason")
+
+  // Relations
+  dependsOn    MemoryDependency[] @relation("MemoryDependencies")
+  dependents   MemoryDependency[] @relation("DependentMemories")
+
+  @@index([userId, type])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("memories")
+}
+
+enum MemoryType {
+  INTERACTION
+  DECISION
+  CORRECTION
+  CHECKPOINT
+  INVALIDATION
+}
+
+model MemoryDependency {
+  id             String         @id @default(cuid())
+  memoryId       String         @map("memory_id")
+  memory         Memory         @relation("MemoryDependencies", fields: [memoryId], references: [id], onDelete: Cascade)
+  dependsOnId    String         @map("depends_on_id")
+  dependsOn      Memory         @relation("DependentMemories", fields: [dependsOnId], references: [id], onDelete: Cascade)
+  dependencyType DependencyType @map("dependency_type")
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  @@unique([memoryId, dependsOnId])
+  @@map("memory_dependencies")
+}
+
+enum DependencyType {
+  DERIVES_FROM
+  REFERENCES
+  INVALIDATES
+  SUPERSEDES
+}
+
+model Checkpoint {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String
+  description String?
+  stateHash   String   @map("state_hash")
+  memoryIds   String[] @map("memory_ids")
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("checkpoints")
+}
+
+// ============================================================================
+// AUDIT (HEIMDALL)
+// ============================================================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  userId     String?  @map("user_id")
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  resourceType String @map("resource_type")
+  resourceId String?  @map("resource_id")
+  method     String
+  path       String
+  statusCode Int      @map("status_code")
+  durationMs Int      @map("duration_ms")
+  ip         String?
+  userAgent  String?  @map("user_agent")
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([action])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
+}
