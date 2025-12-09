@@ -1,0 +1,59 @@
+MIT License with Copyleft Clause for Derivatives
+
+Copyright (c) 2024 YGGDRASIL Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+2. COPYLEFT CLAUSE FOR DERIVATIVES: Any derivative work that substantially 
+   modifies the core validation, truth-verification, or epistemic separation 
+   mechanisms of YGGDRASIL must be released under the same license terms and 
+   made publicly available as open-source software. This clause ensures that 
+   improvements to YGGDRASIL's fundamental truth-guaranteeing architecture 
+   remain a public good.
+
+3. ANTI-CLOSURE CLAUSE: No entity may patent, trademark, or otherwise restrict 
+   access to the fundamental algorithms, architectures, or methodologies 
+   described in this Software as they pertain to:
+   - Epistemic separation (MÍMIR/VÖLVA/HUGIN branching)
+   - Multi-model consortium orchestration (THING)
+   - Chrono-semantic memory systems (MUNIN)
+   - Truth-validation mechanisms (ODIN)
+
+4. ATTRIBUTION: When using YGGDRASIL in production systems or research, 
+   appropriate credit must be given to the YGGDRASIL project and its 
+   contributors.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+YGGDRASIL ETHICAL USE ADDENDUM
+
+Users of this Software agree to:
+
+1. NOT use YGGDRASIL to deliberately spread misinformation or propaganda
+2. NOT use YGGDRASIL to harm, manipulate, or deceive individuals or groups
+3. NOT use YGGDRASIL to circumvent its truth-verification mechanisms
+4. REPORT any vulnerabilities in the truth-verification system responsibly
+
+This addendum is not legally binding but represents the ethical expectations
+of the YGGDRASIL community. Violations may result in exclusion from the
+community and public disclosure.
+
+---
+
+For questions about licensing, contact: license@yggdrasil.dev (placeholder)
