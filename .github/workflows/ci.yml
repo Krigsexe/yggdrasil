@@ -108,14 +108,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: pnpm prisma generate
-        working-directory: ./prisma
+        run: npx prisma generate
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:54322/postgres
 
       - name: Run migrations
-        run: pnpm prisma migrate deploy
-        working-directory: ./prisma
+        run: npx prisma db push --skip-generate
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:54322/postgres
 

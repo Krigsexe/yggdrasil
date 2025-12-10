@@ -58,5 +58,11 @@ coverage/
 secrets/
 credentials/
 
+# Database backups (contain sensitive data)
+*.sql
+!prisma/migrations/**/*.sql
+!packages/bifrost/supabase/migrations/**/*.sql
+!scripts/init-db.sql
+
 # Claude Code local settings
 .claude/settings.local.json
