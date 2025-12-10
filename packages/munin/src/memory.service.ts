@@ -16,7 +16,7 @@ import {
   NotFoundError,
 } from '@yggdrasil/shared';
 import { DatabaseService } from '@yggdrasil/shared/database';
-import { EmbeddingService } from './embedding.service.js';
+import { EmbeddingService } from '@yggdrasil/shared/embedding';
 
 const logger = createLogger('MemoryService', 'info');
 
@@ -92,8 +92,8 @@ export class MemoryService {
     const contentString = typeof content === 'string'
       ? content
       : JSON.stringify(content);
-    const embedding = this.embeddingService.generate(contentString);
-    const embeddingVector = `[${embedding.join(',')}]`;
+    const embeddingResult = await this.embeddingService.generate(contentString, 'RETRIEVAL_DOCUMENT');
+    const embeddingVector = `[${embeddingResult.embedding.join(',')}]`;
 
     // Use raw SQL to handle pgvector type
     await this.db.$executeRaw`
@@ -121,7 +121,7 @@ export class MemoryService {
       sessionId: options?.sessionId,
       type,
       content,
-      embedding,
+      embedding: embeddingResult.embedding,
       metadata: {
         tags: options?.tags ?? [],
         importance: options?.importance ?? 50,
@@ -207,9 +207,9 @@ export class MemoryService {
     let semanticScores: Map<string, number> | undefined;
 
     if (query.semanticQuery) {
-      // Semantic search using pgvector cosine similarity
-      const queryEmbedding = this.embeddingService.generate(query.semanticQuery);
-      const queryVector = `[${queryEmbedding.join(',')}]`;
+      // Semantic search using pgvector cosine similarity (RETRIEVAL_QUERY optimized)
+      const queryResult = await this.embeddingService.generate(query.semanticQuery, 'RETRIEVAL_QUERY');
+      const queryVector = `[${queryResult.embedding.join(',')}]`;
 
       results = await this.db.$queryRawUnsafe<MemoryWithSimilarity[]>(`
         SELECT id, user_id, session_id, type, content, tags, importance,

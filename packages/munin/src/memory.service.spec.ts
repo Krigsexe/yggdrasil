@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MemoryService } from './memory.service.js';
-import { EmbeddingService } from './embedding.service.js';
+import { EmbeddingService } from '@yggdrasil/shared/embedding';
 import { MemoryType } from '@yggdrasil/shared';
 
 // Mock DatabaseService
@@ -47,7 +47,7 @@ describe('MemoryService', () => {
   let mockDb: ReturnType<typeof createMockDb>;
 
   beforeEach(() => {
-    const embedding = new EmbeddingService();
+    const embedding = new EmbeddingService({ devMode: true });
     mockDb = createMockDb();
     service = new MemoryService(mockDb as any, embedding);
   });

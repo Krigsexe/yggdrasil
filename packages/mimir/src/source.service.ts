@@ -16,7 +16,7 @@ import {
   isMimirEligible,
 } from '@yggdrasil/shared';
 import { DatabaseService } from '@yggdrasil/shared/database';
-import { EmbeddingService } from './embedding.service.js';
+import { EmbeddingService } from '@yggdrasil/shared/embedding';
 
 const logger = createLogger('SourceService', 'info');
 
@@ -172,8 +172,8 @@ export class SourceService {
       input.metadata?.abstract ?? '',
       ...(input.metadata?.keywords ?? []),
     ].join(' ');
-    const embedding = this.embeddingService.generate(contentForEmbedding);
-    const embeddingVector = `[${embedding.join(',')}]`;
+    const embeddingResult = await this.embeddingService.generate(contentForEmbedding, 'RETRIEVAL_DOCUMENT');
+    const embeddingVector = `[${embeddingResult.embedding.join(',')}]`;
 
     // Insert using raw SQL to handle pgvector type
     await this.db.$executeRaw`
@@ -357,9 +357,9 @@ export class SourceService {
     const limit = options?.limit ?? 20;
     const minSimilarity = options?.minSimilarity ?? 0.5;
 
-    // Generate query embedding
-    const queryEmbedding = this.embeddingService.generate(query);
-    const queryVector = `[${queryEmbedding.join(',')}]`;
+    // Generate query embedding (RETRIEVAL_QUERY optimized for search)
+    const queryResult = await this.embeddingService.generate(query, 'RETRIEVAL_QUERY');
+    const queryVector = `[${queryResult.embedding.join(',')}]`;
 
     const types = options?.types?.map(toPrismaSourceType) ?? [];
 

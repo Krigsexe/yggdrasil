@@ -47,7 +47,8 @@ export default async function Login({
       await supabase.auth.signOut()
       // Continue to show login form
     } else {
-      return redirect(`/${homeWorkspace.id}/chat`)
+      const workspace = homeWorkspace as { id: string }
+      return redirect(`/${workspace.id}/chat`)
     }
   }
 

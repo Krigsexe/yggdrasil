@@ -13,18 +13,17 @@
 
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '@yggdrasil/shared/database';
+import { EmbeddingModule, EmbeddingService } from '@yggdrasil/shared/embedding';
 import { MemoryService } from './memory.service.js';
 import { CheckpointService } from './checkpoint.service.js';
-import { EmbeddingService } from './embedding.service.js';
 import { FactExtractorService } from './fact-extractor.service.js';
 import { MemoryPersistenceService } from './memory-persistence.service.js';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, EmbeddingModule],
   providers: [
     MemoryService,
     CheckpointService,
-    EmbeddingService,
     FactExtractorService,
     MemoryPersistenceService,
   ],

@@ -70,21 +70,22 @@ export default function SetupPage() {
       } else {
         const user = session.user
 
-        const profile = await getProfileByUserId(user.id)
-        setProfile(profile)
+        const profileResult = await getProfileByUserId(user.id)
+        const profile = profileResult as { username: string; has_onboarded: boolean; openrouter_api_key?: string }
+        setProfile(profileResult)
         setUsername(profile.username)
 
         if (!profile.has_onboarded) {
           setLoading(false)
         } else {
-          const data = await fetchHostedModels(profile)
+          const data = await fetchHostedModels(profileResult)
 
           if (!data) return
 
           setEnvKeyMap(data.envKeyMap)
           setAvailableHostedModels(data.hostedModels)
 
-          if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
+          if (profile.openrouter_api_key || data.envKeyMap["openrouter"]) {
             const openRouterModels = await fetchOpenRouterModels()
             if (!openRouterModels) return
             setAvailableOpenRouterModels(openRouterModels)
@@ -118,10 +119,10 @@ export default function SetupPage() {
     }
 
     const user = session.user
-    const profile = await getProfileByUserId(user.id)
+    const profileData = await getProfileByUserId(user.id)
 
     const updateProfilePayload: TablesUpdate<"profiles"> = {
-      ...profile,
+      ...(profileData as Record<string, unknown>),
       has_onboarded: true,
       display_name: displayName,
       username,
@@ -142,10 +143,10 @@ export default function SetupPage() {
       azure_openai_embeddings_id: azureOpenaiEmbeddingsID
     }
 
-    const updatedProfile = await updateProfile(profile.id, updateProfilePayload)
+    const updatedProfile = await updateProfile(profile!.id, updateProfilePayload)
     setProfile(updatedProfile)
 
-    const workspaces = await getWorkspacesByUserId(profile.user_id)
+    const workspaces = await getWorkspacesByUserId(profile!.user_id)
     const homeWorkspace = workspaces.find(w => w.is_home)
 
     // There will always be a home workspace

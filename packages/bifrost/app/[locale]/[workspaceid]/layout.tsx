@@ -88,16 +88,29 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setShowFilesDisplay(false)
   }, [workspaceId])
 
+  // Define workspace type for proper type casting
+  interface WorkspaceData {
+    default_model?: string
+    default_prompt?: string
+    default_temperature?: number
+    default_context_length?: number
+    include_profile_context?: boolean
+    include_workspace_instructions?: boolean
+    embeddings_provider?: string
+  }
+
   const fetchWorkspaceData = async (workspaceId: string) => {
     setLoading(true)
 
-    const workspace = await getWorkspaceById(workspaceId)
-    setSelectedWorkspace(workspace)
+    const workspaceResult = await getWorkspaceById(workspaceId)
+    const workspace = workspaceResult as WorkspaceData | null
+    setSelectedWorkspace(workspaceResult)
 
     const assistantData = await getAssistantWorkspacesByWorkspaceId(workspaceId)
-    setAssistants(assistantData.assistants)
+    const assistants = (assistantData as { assistants: any[] }).assistants || []
+    setAssistants(assistants)
 
-    for (const assistant of assistantData.assistants) {
+    for (const assistant of assistants) {
       let url = ""
 
       if (assistant.image_path) {
@@ -136,25 +149,31 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
     const collectionData =
       await getCollectionWorkspacesByWorkspaceId(workspaceId)
-    setCollections(collectionData.collections)
+    const collections = (collectionData as { collections: any[] }).collections || []
+    setCollections(collections)
 
     const folders = await getFoldersByWorkspaceId(workspaceId)
     setFolders(folders)
 
     const fileData = await getFileWorkspacesByWorkspaceId(workspaceId)
-    setFiles(fileData.files)
+    const files = (fileData as { files: any[] }).files || []
+    setFiles(files)
 
     const presetData = await getPresetWorkspacesByWorkspaceId(workspaceId)
-    setPresets(presetData.presets)
+    const presets = (presetData as { presets: any[] }).presets || []
+    setPresets(presets)
 
     const promptData = await getPromptWorkspacesByWorkspaceId(workspaceId)
-    setPrompts(promptData.prompts)
+    const prompts = (promptData as { prompts: any[] }).prompts || []
+    setPrompts(prompts)
 
     const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
-    setTools(toolData.tools)
+    const tools = (toolData as { tools: any[] }).tools || []
+    setTools(tools)
 
     const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
-    setModels(modelData.models)
+    const models = (modelData as { models: any[] }).models || []
+    setModels(models)
 
     setChatSettings({
       model: (searchParams.get("model") ||

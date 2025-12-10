@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SourceService } from './source.service.js';
-import { EmbeddingService } from './embedding.service.js';
+import { EmbeddingService } from '@yggdrasil/shared/embedding';
 import { SourceType } from '@yggdrasil/shared';
 
 // Mock row returned by database (snake_case)
@@ -66,8 +66,8 @@ describe('SourceService', () => {
     // Create mock db
     mockDb = createMockDatabaseService();
 
-    // Create real embedding service (deterministic, no external dependencies)
-    embeddingService = new EmbeddingService();
+    // Create embedding service in dev mode (deterministic, no external dependencies)
+    embeddingService = new EmbeddingService({ devMode: true });
 
     // Create service with mocked database
     service = new SourceService(mockDb as any, embeddingService);

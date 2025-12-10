@@ -20,7 +20,7 @@ import { Injectable } from '@nestjs/common';
 import { createLogger, MemoryType, generateMemoryId } from '@yggdrasil/shared';
 import { DatabaseService } from '@yggdrasil/shared/database';
 import { FactExtractorService, ExtractedFact, FactType } from './fact-extractor.service.js';
-import { EmbeddingService } from './embedding.service.js';
+import { EmbeddingService } from '@yggdrasil/shared/embedding';
 
 const logger = createLogger('MemoryPersistence', 'info');
 
@@ -288,8 +288,8 @@ export class MemoryPersistenceService {
     const importance = this.getFactImportance(fact.type);
 
     // Generate embedding for semantic search
-    const embedding = this.embeddingService.generate(fact.content);
-    const embeddingVector = `[${embedding.join(',')}]`;
+    const embeddingResult = await this.embeddingService.generate(fact.content, 'RETRIEVAL_DOCUMENT');
+    const embeddingVector = `[${embeddingResult.embedding.join(',')}]`;
 
     try {
       // Store in MUNIN memories table using $queryRawUnsafe for complex types
@@ -462,9 +462,9 @@ export class MemoryPersistenceService {
     // Find identity fact
     const identity = allFacts.find(f => f.factType === FactType.IDENTITY) ?? null;
 
-    // Find relevant facts using semantic search
-    const embedding = this.embeddingService.generate(query);
-    const queryVector = `[${embedding.join(',')}]`;
+    // Find relevant facts using semantic search (RETRIEVAL_QUERY optimized)
+    const queryResult = await this.embeddingService.generate(query, 'RETRIEVAL_QUERY');
+    const queryVector = `[${queryResult.embedding.join(',')}]`;
 
     interface MemoryWithSimilarity {
       id: string;

@@ -33,6 +33,10 @@
     "./database": {
       "types": "./dist/database/index.d.ts",
       "import": "./dist/database/index.js"
+    },
+    "./embedding": {
+      "types": "./dist/embedding/index.d.ts",
+      "import": "./dist/embedding/index.js"
     }
   },
   "files": [

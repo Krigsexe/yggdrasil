@@ -7,16 +7,15 @@
 
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '@yggdrasil/shared/database';
+import { EmbeddingModule, EmbeddingService } from '@yggdrasil/shared/embedding';
 import { SourceService } from './source.service.js';
 import { QueryService } from './query.service.js';
-import { EmbeddingService } from './embedding.service.js';
 import { ArxivAdapter } from './sources/arxiv.adapter.js';
 import { PubmedAdapter } from './sources/pubmed.adapter.js';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, EmbeddingModule],
   providers: [
-    EmbeddingService,
     SourceService,
     QueryService,
     ArxivAdapter,

@@ -1,8 +1,7 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatAPIPayload } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
-import OpenAI from "openai"
-import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+import { createAzure } from "@ai-sdk/azure"
+import { streamText } from "ai"
 
 export const runtime = "edge"
 
@@ -44,24 +43,19 @@ export async function POST(request: Request) {
       )
     }
 
-    const azureOpenai = new OpenAI({
+    const azure = createAzure({
       apiKey: KEY,
-      baseURL: `${ENDPOINT}/openai/deployments/${DEPLOYMENT_ID}`,
-      defaultQuery: { "api-version": "2023-12-01-preview" },
-      defaultHeaders: { "api-key": KEY }
+      resourceName: ENDPOINT.replace("https://", "").replace(".openai.azure.com", "")
     })
 
-    const response = await azureOpenai.chat.completions.create({
-      model: DEPLOYMENT_ID as ChatCompletionCreateParamsBase["model"],
-      messages: messages as ChatCompletionCreateParamsBase["messages"],
+    const result = streamText({
+      model: azure(DEPLOYMENT_ID),
+      messages,
       temperature: chatSettings.temperature,
-      max_tokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : null, // TODO: Fix
-      stream: true
+      maxTokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : undefined
     })
 
-    const stream = OpenAIStream(response)
-
-    return new StreamingTextResponse(stream)
+    return result.toDataStreamResponse()
   } catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
