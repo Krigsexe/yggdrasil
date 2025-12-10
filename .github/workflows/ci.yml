@@ -34,7 +34,6 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
-        working-directory: packages/heimdall
 
       - name: Run ESLint
         run: pnpm lint
@@ -65,7 +64,6 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
-        working-directory: packages/heimdall
 
       - name: Run type check
         run: pnpm typecheck
@@ -157,7 +155,6 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
-        working-directory: packages/heimdall
 
       - name: Build all packages
         run: pnpm build
