@@ -6,6 +6,8 @@
  *
  * MUNIN stores all interactions, decisions, and validations
  * for future reference, learning, and rollback capabilities.
+ *
+ * NEW: Fact extraction and persistence with user verification
  */
 
 import { Injectable } from '@nestjs/common';
@@ -16,6 +18,15 @@ import {
   generateId,
 } from '@yggdrasil/shared';
 import { DatabaseService } from '@yggdrasil/shared/database';
+import {
+  MemoryPersistenceService,
+  FactExtractorService,
+  EmbeddingService,
+  FactType,
+  FactState,
+  StoredFact,
+  PersistenceResult,
+} from '@yggdrasil/munin';
 import type { YggdrasilResponse } from '../yggdrasil.service.js';
 
 const logger = createLogger('MuninBridge', 'info');
@@ -31,7 +42,91 @@ export interface InteractionData {
 
 @Injectable()
 export class MuninBridge {
-  constructor(private readonly db: DatabaseService) {}
+  private readonly memoryPersistence: MemoryPersistenceService;
+  private readonly factExtractor: FactExtractorService;
+  private readonly embeddingService: EmbeddingService;
+
+  constructor(private readonly db: DatabaseService) {
+    this.factExtractor = new FactExtractorService();
+    this.embeddingService = new EmbeddingService();
+    this.memoryPersistence = new MemoryPersistenceService(
+      db,
+      this.factExtractor,
+      this.embeddingService
+    );
+  }
+
+  // ============================================================================
+  // FACT PERSISTENCE (NEW - for absolute memory)
+  // ============================================================================
+
+  /**
+   * Process a message and extract/persist important facts
+   * Only verified users can have identity facts stored as VERIFIED
+   */
+  async processMessageForFacts(
+    userId: string,
+    chatId: string,
+    messageId: string,
+    content: string,
+    userEmail: string
+  ): Promise<PersistenceResult> {
+    logger.info('Processing message for fact extraction', {
+      userId,
+      chatId,
+      contentLength: content.length,
+    });
+
+    return this.memoryPersistence.processMessage(
+      userId,
+      chatId,
+      messageId,
+      content,
+      userEmail
+    );
+  }
+
+  /**
+   * Get user context from stored facts for personalized responses
+   */
+  async getUserContext(
+    userId: string,
+    query: string
+  ): Promise<{
+    identity: StoredFact | null;
+    relevantFacts: StoredFact[];
+  }> {
+    return this.memoryPersistence.getContextForQuery(userId, query);
+  }
+
+  /**
+   * Get all verified facts for a user
+   */
+  async getUserFacts(
+    userId: string,
+    options?: {
+      factTypes?: FactType[];
+      state?: FactState;
+      limit?: number;
+    }
+  ): Promise<StoredFact[]> {
+    return this.memoryPersistence.getUserFacts(userId, options);
+  }
+
+  /**
+   * Admin: Verify or reject a pending fact
+   */
+  async verifyFact(
+    factId: string,
+    verifiedBy: string,
+    approve: boolean
+  ): Promise<void> {
+    return this.memoryPersistence.verifyFact(factId, verifiedBy, approve);
+  }
+
+  // ============================================================================
+  // INTERACTION STORAGE (existing)
+  // ============================================================================
 
   async storeInteraction(data: InteractionData): Promise<void> {
     logger.info('Storing interaction in MUNIN', {

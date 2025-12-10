@@ -8,9 +8,10 @@
  * Epistemic Branch: VERIFIED (100% confidence)
  */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { EpistemicBranch, SourceType, createLogger } from '@yggdrasil/shared';
-import { SourceService } from '@yggdrasil/mimir';
+import { SourceService, EmbeddingService } from '@yggdrasil/mimir';
+import { DatabaseService } from '@yggdrasil/shared/database';
 
 const logger = createLogger('MimirBridge', 'info');
 
@@ -30,8 +31,11 @@ export interface MimirResult {
 export class MimirBridge {
   private readonly sourceService: SourceService;
 
-  constructor() {
-    this.sourceService = new SourceService();
+  constructor(
+    @Inject(DatabaseService) private readonly db: DatabaseService,
+  ) {
+    const embeddingService = new EmbeddingService();
+    this.sourceService = new SourceService(db, embeddingService);
   }
 
   async query(query: string): Promise<MimirResult> {
@@ -40,8 +44,8 @@ export class MimirBridge {
     // Extract keywords from query for source search
     const keywords = this.extractKeywords(query);
 
-    // Search for relevant sources in MIMIR
-    const sourceResults = this.sourceService.search(keywords.join(' '));
+    // Search for relevant sources in MIMIR (now async)
+    const sourceResults = await this.sourceService.search(keywords.join(' '));
 
     if (sourceResults.length === 0) {
       // MIMIR returns nothing if no verified sources found
@@ -89,7 +93,7 @@ export class MimirBridge {
     title: string;
     authors: string[];
   }): Promise<void> {
-    this.sourceService.add({
+    await this.sourceService.add({
       type: source.type,
       identifier: source.identifier,
       url: source.url,
