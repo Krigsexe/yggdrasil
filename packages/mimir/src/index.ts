@@ -8,5 +8,6 @@
 export * from './mimir.module.js';
 export * from './source.service.js';
 export * from './query.service.js';
+export * from './embedding.service.js';
 export * from './sources/arxiv.adapter.js';
 export * from './sources/pubmed.adapter.js';

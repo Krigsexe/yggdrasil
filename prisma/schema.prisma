@@ -112,12 +112,18 @@ model Source {
   issue        String?
   pages        String?
 
+  // Semantic search embedding (pgvector)
+  embedding          Unsupported("vector(1536)")? @map("embedding")
+  embeddingUpdatedAt DateTime? @map("embedding_updated_at")
+
   // Relations
   validations ValidationSource[]
 
   @@unique([type, identifier])
   @@index([branch, trustScore])
   @@index([type])
+  @@index([arxivId])
+  @@index([pubmedId])
   @@map("sources")
 }
 

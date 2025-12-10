@@ -36,7 +36,7 @@ export class QueryService {
     const startTime = Date.now();
 
     // Search local sources first
-    const sources = this.sourceService.search(query);
+    const sources = await this.sourceService.search(query);
 
     // If no local sources, try external adapters
     if (sources.length === 0) {
@@ -48,7 +48,7 @@ export class QueryService {
       // Add fetched sources to MIMIR
       for (const source of [...arxivResults, ...pubmedResults]) {
         try {
-          const added = this.sourceService.add(source);
+          const added = await this.sourceService.add(source);
           sources.push(added);
         } catch {
           // Skip sources that fail validation
@@ -86,13 +86,13 @@ export class QueryService {
     return result;
   }
 
-  verifyStatement(statement: string): {
+  async verifyStatement(statement: string): Promise<{
     verified: boolean;
     confidence: 100 | 0;
     supportingSources: Source[];
     contradictingSources: Source[];
-  } {
-    const sources = this.sourceService.search(statement);
+  }> {
+    const sources = await this.sourceService.search(statement);
 
     // In a real implementation, this would:
     // 1. Parse the statement into claims
