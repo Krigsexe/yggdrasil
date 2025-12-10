@@ -1,0 +1,363 @@
+// ============================================================================
+// YGGDRASIL - Système de Classification Temporelle
+// ============================================================================
+// Ce fichier contient les ADDITIONS au schema.prisma existant
+// NE PAS REMPLACER le schema existant, AJOUTER ces définitions
+// ============================================================================
+// Date: 2025-12-10
+// Version: 1.0.0
+// Référence: docs/VISION.md - Section "Système de Classification Temporelle"
+// ============================================================================
+
+// ============================================================================
+// ENUMS - Statuts de Connaissance
+// ============================================================================
+
+/// Statut temporel d'une connaissance dans YGGDRASIL
+/// Chaque connaissance évolue à travers ces statuts au fil du temps
+enum KnowledgeStatus {
+  // --- FAITS ÉTABLIS ---
+  VERIFIED              // Fait vérifié par ODIN, consensus multi-LLM atteint
+  VERIFIED_TEMPORAL     // Fait vérifié MAIS dépendant du temps/contexte
+  
+  // --- EXPLORATION ACTIVE ---
+  THEORIZED_ACTIVE      // Hypothèse en cours d'exploration par VÖLVA
+  THEORIZED_STALLED     // Hypothèse dont l'exploration est bloquée
+  
+  // --- EXPLORATION TERMINÉE ---
+  THEORIZED_CONCLUDED   // Exploration terminée, conclusions tirées
+  CLASSIFIED_EXHAUSTED  // Sujet entièrement épuisé, aucune nouvelle piste
+  
+  // --- STATUTS SPÉCIAUX ---
+  REVIEW_SCHEDULED      // Marqué pour re-examen futur
+  CONTRADICTED          // Fait précédemment VERIFIED maintenant contredit
+  SUPERSEDED            // Remplacé par une compréhension plus complète
+  PENDING_VALIDATION    // En attente de validation ODIN
+  REJECTED              // Rejeté après validation (faux ou non vérifiable)
+}
+
+/// Niveau de confiance d'une source
+enum SourceTrustLevel {
+  ACADEMIC_PEER_REVIEWED  // Publication académique peer-reviewed
+  ACADEMIC_PREPRINT       // Preprint (arXiv, bioRxiv, etc.)
+  INSTITUTIONAL           // Source institutionnelle (gouvernement, ONG reconnue)
+  VERIFIED_JOURNALISM     // Journalisme vérifié (fact-checking)
+  EXPERT_OPINION          // Opinion d'expert identifié
+  COMMUNITY_VERIFIED      // Vérifié par la communauté
+  UNVERIFIED              // Source non vérifiée
+  USER_CONTRIBUTED        // Contribution utilisateur (PUBLIC instance)
+  UNKNOWN                 // Niveau inconnu
+}
+
+/// Type de révision planifiée
+enum ReviewType {
+  PERIODIC              // Révision périodique automatique
+  TRIGGERED             // Déclenchée par nouvelle donnée
+  CONTRADICTION_CHECK   // Vérification après contradiction détectée
+  USER_REQUESTED        // Demandée par un utilisateur
+  SYSTEM_AUDIT          // Audit système automatique
+}
+
+/// Instance YGGDRASIL (pour architecture multi-instance future)
+enum YggdrasilInstance {
+  CORE                  // Instance recherche (haute confiance requise)
+  PUBLIC                // Instance grand public
+  SANDBOX               // Instance de test/développement
+}
+
+// ============================================================================
+// MODÈLES - Système de Classification Temporelle
+// ============================================================================
+
+/// Entrée de connaissance avec classification temporelle
+/// C'est le modèle central pour le système de classification
+model Knowledge {
+  id                    String            @id @default(cuid())
+  
+  // --- Contenu ---
+  content               String            // Contenu de la connaissance
+  summary               String?           // Résumé court
+  domain                String            // Domaine (physique, médical, etc.)
+  subdomain             String?           // Sous-domaine
+  tags                  String[]          // Tags pour recherche
+  
+  // --- Classification Temporelle ---
+  status                KnowledgeStatus   @default(PENDING_VALIDATION)
+  previousStatus        KnowledgeStatus?  // Statut précédent (pour historique)
+  statusReason          String?           // Raison du changement de statut
+  
+  // --- Timestamps Critiques ---
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  verifiedAt            DateTime?         // Date de vérification ODIN
+  lastReviewedAt        DateTime?         // Dernière révision
+  scheduledReviewAt     DateTime?         // Prochaine révision planifiée
+  
+  // --- Contexte Temporel ---
+  validFrom             DateTime          @default(now()) // Début de validité
+  validUntil            DateTime?         // Fin de validité (si connue)
+  temporalContext       String?           // Ex: "Présidence Macron 2022-2027"
+  isTimeSensitive       Boolean           @default(false) // Nécessite re-vérification périodique
+  
+  // --- Scores et Métriques ---
+  confidenceScore       Float             @default(0) // 0-1, score de confiance global
+  exhaustionScore       Float             @default(0) // 0-100, niveau d'épuisement du sujet
+  citationCount         Int               @default(0) // Nombre de citations
+  contradictionCount    Int               @default(0) // Nombre de contradictions
+  
+  // --- Instance ---
+  instance              YggdrasilInstance @default(CORE)
+  
+  // --- Relations ---
+  sources               KnowledgeSource[]
+  statusHistory         StatusChange[]
+  contradictions        Contradiction[]   @relation("ContradictedKnowledge")
+  contradictedBy        Contradiction[]   @relation("ContradictingKnowledge")
+  explorationBranches   ExplorationBranch[]
+  reviews               ScheduledReview[]
+  relatedTo             KnowledgeRelation[] @relation("RelatedFrom")
+  relatedFrom           KnowledgeRelation[] @relation("RelatedTo")
+  
+  // --- Indexes ---
+  @@index([status])
+  @@index([domain])
+  @@index([instance])
+  @@index([verifiedAt])
+  @@index([scheduledReviewAt])
+  @@index([confidenceScore])
+  @@index([createdAt])
+  
+  @@map("knowledge")
+}
+
+/// Source d'une connaissance
+model KnowledgeSource {
+  id                    String            @id @default(cuid())
+  
+  // --- Référence ---
+  knowledgeId           String
+  knowledge             Knowledge         @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
+  
+  // --- Détails Source ---
+  url                   String?           // URL si disponible
+  title                 String            // Titre de la source
+  authors               String[]          // Auteurs
+  publicationDate       DateTime?         // Date de publication
+  publisher             String?           // Éditeur/Publication
+  doi                   String?           // DOI si académique
+  
+  // --- Confiance ---
+  trustLevel            SourceTrustLevel  @default(UNKNOWN)
+  trustScore            Float             @default(0) // 0-1
+  verificationDate      DateTime?         // Quand la source a été vérifiée
+  verifiedBy            String?           // Qui/quoi a vérifié (ODIN, humain, etc.)
+  
+  // --- Métadonnées ---
+  excerpt               String?           // Extrait pertinent
+  notes                 String?           // Notes additionnelles
+  createdAt             DateTime          @default(now())
+  
+  @@index([knowledgeId])
+  @@index([trustLevel])
+  @@index([trustScore])
+  
+  @@map("knowledge_sources")
+}
+
+/// Historique des changements de statut
+model StatusChange {
+  id                    String            @id @default(cuid())
+  
+  // --- Référence ---
+  knowledgeId           String
+  knowledge             Knowledge         @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
+  
+  // --- Changement ---
+  fromStatus            KnowledgeStatus?  // Null si création initiale
+  toStatus              KnowledgeStatus
+  reason                String            // Raison du changement
+  
+  // --- Contexte ---
+  changedBy             String            // Module ou utilisateur (ODIN, THING, user:xxx)
+  changedAt             DateTime          @default(now())
+  metadata              Json?             // Données additionnelles
+  
+  @@index([knowledgeId])
+  @@index([changedAt])
+  
+  @@map("status_changes")
+}
+
+/// Contradiction entre deux connaissances
+model Contradiction {
+  id                    String            @id @default(cuid())
+  
+  // --- Relations ---
+  contradictedId        String            // Connaissance originale
+  contradicted          Knowledge         @relation("ContradictedKnowledge", fields: [contradictedId], references: [id])
+  contradictingId       String            // Nouvelle connaissance qui contredit
+  contradicting         Knowledge         @relation("ContradictingKnowledge", fields: [contradictingId], references: [id])
+  
+  // --- Détails ---
+  description           String            // Description de la contradiction
+  severity              String            // MINOR, MAJOR, CRITICAL
+  resolution            String?           // Comment elle a été résolue
+  resolvedAt            DateTime?
+  
+  // --- Métadonnées ---
+  detectedBy            String            // Module qui a détecté (ODIN, THING, etc.)
+  detectedAt            DateTime          @default(now())
+  
+  @@index([contradictedId])
+  @@index([contradictingId])
+  
+  @@map("contradictions")
+}
+
+/// Branche d'exploration pour VÖLVA
+model ExplorationBranch {
+  id                    String            @id @default(cuid())
+  
+  // --- Référence ---
+  knowledgeId           String
+  knowledge             Knowledge         @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
+  
+  // --- Exploration ---
+  question              String            // Question exploratoire
+  hypothesis            String?           // Hypothèse générée
+  findings              String?           // Découvertes
+  conclusion            String?           // Conclusion si terminée
+  
+  // --- Statut ---
+  status                String            @default("OPEN") // OPEN, IN_PROGRESS, CONCLUDED, ABANDONED
+  priority              Int               @default(0) // 0-100
+  
+  // --- Timestamps ---
+  createdAt             DateTime          @default(now())
+  startedAt             DateTime?
+  concludedAt           DateTime?
+  
+  // --- Relations ---
+  parentBranchId        String?           // Branche parente si sous-exploration
+  parentBranch          ExplorationBranch? @relation("SubBranches", fields: [parentBranchId], references: [id])
+  subBranches           ExplorationBranch[] @relation("SubBranches")
+  
+  @@index([knowledgeId])
+  @@index([status])
+  @@index([priority])
+  
+  @@map("exploration_branches")
+}
+
+/// Révision planifiée
+model ScheduledReview {
+  id                    String            @id @default(cuid())
+  
+  // --- Référence ---
+  knowledgeId           String
+  knowledge             Knowledge         @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
+  
+  // --- Planification ---
+  reviewType            ReviewType
+  scheduledFor          DateTime
+  reason                String            // Pourquoi cette révision
+  
+  // --- Exécution ---
+  executedAt            DateTime?
+  result                String?           // Résultat de la révision
+  newStatusAfterReview  KnowledgeStatus?
+  
+  // --- Métadonnées ---
+  createdAt             DateTime          @default(now())
+  createdBy             String            // Module ou utilisateur
+  
+  @@index([knowledgeId])
+  @@index([scheduledFor])
+  @@index([reviewType])
+  
+  @@map("scheduled_reviews")
+}
+
+/// Relation entre connaissances
+model KnowledgeRelation {
+  id                    String            @id @default(cuid())
+  
+  // --- Relations ---
+  fromId                String
+  from                  Knowledge         @relation("RelatedFrom", fields: [fromId], references: [id])
+  toId                  String
+  to                    Knowledge         @relation("RelatedTo", fields: [toId], references: [id])
+  
+  // --- Type de relation ---
+  relationType          String            // SUPPORTS, EXTENDS, REFINES, CONTRADICTS, etc.
+  strength              Float             @default(0.5) // 0-1, force de la relation
+  description           String?
+  
+  // --- Métadonnées ---
+  createdAt             DateTime          @default(now())
+  createdBy             String
+  
+  @@unique([fromId, toId, relationType])
+  @@index([fromId])
+  @@index([toId])
+  @@index([relationType])
+  
+  @@map("knowledge_relations")
+}
+
+// ============================================================================
+// MODÈLE POUR ARCHITECTURE MULTI-INSTANCE
+// ============================================================================
+
+/// Configuration d'instance pour architecture multi-instance future
+model InstanceConfig {
+  id                    String            @id @default(cuid())
+  
+  instance              YggdrasilInstance @unique
+  
+  // --- Configuration ---
+  minimumConfidenceRequired Float         @default(0.85) // Pour CORE
+  allowUserContributions    Boolean       @default(false)
+  requireHumanReview        Boolean       @default(true)
+  quarantineDays            Int           @default(30)
+  
+  // --- Flux de données ---
+  canReceiveFromPublic      Boolean       @default(false)
+  canSendToPublic           Boolean       @default(true)
+  publicConfidenceDiscount  Float         @default(0.7) // Réduction confiance pour données PUBLIC
+  
+  // --- Domaines autorisés ---
+  allowedDomains            String[]      // Vide = tous
+  excludedDomains           String[]
+  
+  // --- Métadonnées ---
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt
+  
+  @@map("instance_configs")
+}
+
+// ============================================================================
+// INSTRUCTIONS D'INTÉGRATION
+// ============================================================================
+// 
+// 1. AJOUTER ces définitions au fichier prisma/schema.prisma existant
+// 
+// 2. EXÉCUTER les migrations :
+//    npx prisma migrate dev --name add_temporal_classification
+// 
+// 3. METTRE À JOUR les services :
+//    - packages/munin/src/memory.service.ts
+//    - packages/volva/src/hypothesis.service.ts (si existe)
+//    - packages/odin/src/validation.service.ts
+// 
+// 4. CRÉER les services de gestion :
+//    - packages/shared/src/services/knowledge.service.ts
+//    - packages/shared/src/services/classification.service.ts
+// 
+// 5. VÉRIFIER la non-duplication avec les modèles existants :
+//    - Memory (MUNIN) : Ajouter relation vers Knowledge?
+//    - Claim (ODIN) : Utiliser KnowledgeStatus?
+//    - Hypothesis (VÖLVA) : Utiliser ExplorationBranch?
+// 
+// ============================================================================
