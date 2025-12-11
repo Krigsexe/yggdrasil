@@ -13,8 +13,11 @@ import { ChatSettings } from "@/types"
 // Use Edge runtime for streaming support
 export const runtime = "edge"
 
+// Server-side API URL (for Docker: use internal network, else use public URL)
 const YGGDRASIL_API_URL =
-  process.env.NEXT_PUBLIC_YGGDRASIL_API_URL || "http://localhost:3000"
+  process.env.YGGDRASIL_INTERNAL_API_URL ||
+  process.env.NEXT_PUBLIC_YGGDRASIL_API_URL ||
+  "http://localhost:3000"
 
 /**
  * Phase labels (no emojis)

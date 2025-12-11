@@ -9,11 +9,14 @@ FROM node:20-slim AS builder
 ARG NEXT_PUBLIC_SUPABASE_URL=http://host.docker.internal:54321
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG NEXT_PUBLIC_YGGDRASIL_API_URL=http://localhost:3000
+# Server-side API URL for SSR/API routes (uses Docker internal network)
+ARG YGGDRASIL_INTERNAL_API_URL=http://host.docker.internal:3000
 
 # Set as env vars for build process
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_YGGDRASIL_API_URL=$NEXT_PUBLIC_YGGDRASIL_API_URL
+ENV YGGDRASIL_INTERNAL_API_URL=$YGGDRASIL_INTERNAL_API_URL
 
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
@@ -57,6 +60,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3001
 ENV NEXT_TELEMETRY_DISABLED=1
+# Server-side API URL for SSR/API routes
+ENV YGGDRASIL_INTERNAL_API_URL=http://host.docker.internal:3000
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
