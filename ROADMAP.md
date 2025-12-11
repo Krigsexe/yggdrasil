@@ -127,7 +127,7 @@ Construire les composants principaux et atteindre un systeme fonctionnel.
 - [x] **MUNIN** : Graphe de dependances avec forces
 - [x] **MUNIN** : Systeme de checkpoints complet (CheckpointService)
 - [x] **MUNIN** : Rollback fonctionnel (state restoration + audit trail)
-- [ ] Tests de persistance et coherence
+- [x] Tests de persistance et coherence
 
 #### M2.5 : Qualite et Securite (Q2 2026)
 
