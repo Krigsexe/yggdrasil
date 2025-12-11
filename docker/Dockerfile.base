@@ -1,0 +1,46 @@
+# =============================================================================
+# YGGDRASIL Base Image
+# =============================================================================
+# Base image with Node.js and pnpm for all services
+
+FROM node:20-alpine AS base
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+
+# Install dependencies for native modules
+RUN apk add --no-cache libc6-compat openssl
+
+WORKDIR /app
+
+# Copy workspace configuration
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY turbo.json ./
+
+# Copy all package.json files for dependency resolution
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/heimdall/package.json ./packages/heimdall/
+COPY packages/bifrost/package.json ./packages/bifrost/
+COPY packages/ratatosk/package.json ./packages/ratatosk/
+COPY packages/mimir/package.json ./packages/mimir/
+COPY packages/volva/package.json ./packages/volva/
+COPY packages/hugin/package.json ./packages/hugin/
+COPY packages/thing/package.json ./packages/thing/
+COPY packages/odin/package.json ./packages/odin/
+COPY packages/munin/package.json ./packages/munin/
+
+# Install all dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy Prisma schema
+COPY prisma ./prisma/
+
+# Generate Prisma client
+RUN pnpm db:generate
+
+# Copy source code
+COPY packages ./packages/
+COPY tsconfig.json ./
+
+# Build all packages
+RUN pnpm build

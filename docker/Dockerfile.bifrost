@@ -1,0 +1,71 @@
+# =============================================================================
+# BIFROST - Web Interface
+# =============================================================================
+
+# Use Debian-based image for compatibility with native modules
+FROM node:20-slim AS builder
+
+RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy workspace configuration
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+
+# Copy package.json files
+COPY packages/bifrost/package.json ./packages/bifrost/
+COPY packages/shared/package.json ./packages/shared/
+
+# Install dependencies (skip native modules that cause build issues)
+ENV NEXT_SHARP_PATH=/app/node_modules/sharp
+RUN pnpm install --frozen-lockfile
+
+# Copy Prisma schema and generate client
+COPY prisma ./prisma/
+RUN pnpm db:generate
+
+# Copy source code
+COPY packages/bifrost ./packages/bifrost/
+COPY packages/shared ./packages/shared/
+COPY tsconfig.json ./
+
+# Build bifrost with disabled problematic features
+WORKDIR /app/packages/bifrost
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV DISABLE_ONNX=true
+RUN pnpm build
+
+# =============================================================================
+# Production image
+# =============================================================================
+FROM node:20-slim AS runner
+
+RUN apt-get update && apt-get install -y curl ca-certificates && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3001
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copy built application
+COPY --from=builder /app/packages/bifrost/.next/standalone ./
+COPY --from=builder /app/packages/bifrost/.next/static ./packages/bifrost/.next/static
+COPY --from=builder /app/packages/bifrost/public ./packages/bifrost/public
+
+# Set permissions
+RUN chown -R nextjs:nodejs /app
+
+USER nextjs
+
+EXPOSE 3001
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:3001 || exit 1
+
+CMD ["node", "packages/bifrost/server.js"]
