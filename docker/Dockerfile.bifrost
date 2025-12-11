@@ -5,6 +5,16 @@
 # Use Debian-based image for compatibility with native modules
 FROM node:20-slim AS builder
 
+# Build arguments for Next.js public env vars (baked at build time)
+ARG NEXT_PUBLIC_SUPABASE_URL=http://host.docker.internal:54321
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_YGGDRASIL_API_URL=http://localhost:3000
+
+# Set as env vars for build process
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_YGGDRASIL_API_URL=$NEXT_PUBLIC_YGGDRASIL_API_URL
+
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
@@ -17,7 +27,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY packages/bifrost/package.json ./packages/bifrost/
 COPY packages/shared/package.json ./packages/shared/
 
-# Install dependencies (skip native modules that cause build issues)
+# Install dependencies
 ENV NEXT_SHARP_PATH=/app/node_modules/sharp
 RUN pnpm install --frozen-lockfile
 
@@ -30,10 +40,9 @@ COPY packages/bifrost ./packages/bifrost/
 COPY packages/shared ./packages/shared/
 COPY tsconfig.json ./
 
-# Build bifrost with disabled problematic features
+# Build bifrost
 WORKDIR /app/packages/bifrost
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DISABLE_ONNX=true
 RUN pnpm build
 
 # =============================================================================

@@ -78,6 +78,11 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.bifrost
+      args:
+        # NEXT_PUBLIC vars are baked at build time
+        NEXT_PUBLIC_SUPABASE_URL: http://host.docker.internal:54321
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH}
+        NEXT_PUBLIC_YGGDRASIL_API_URL: http://localhost:3000
     container_name: yggdrasil-bifrost
     restart: unless-stopped
     ports:
