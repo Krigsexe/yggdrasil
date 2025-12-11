@@ -245,16 +245,17 @@ flowchart LR
 - Gerer le consensus
 - Soumettre a la critique de LOKI
 
-**Membres du conseil :**
+**Membres du conseil (Configuration Actuelle) :**
 
-| Membre | Modele      | Specialite   | Poids      |
-| ------ | ----------- | ------------ | ---------- |
-| KVASIR | Claude      | Raisonnement | Variable   |
-| BRAGI  | Grok        | Creativite   | Variable   |
-| NORNES | DeepSeek    | Calcul       | Variable   |
-| SAGA   | Llama       | Connaissance | Variable   |
-| LOKI   | Adversarial | Critique     | Veto power |
-| TYR    | Voting      | Arbitrage    | Final      |
+| Membre     | Modele                   | Provider | Specialite            |
+| ---------- | ------------------------ | -------- | --------------------- |
+| **KVASIR** | Gemini 2.5 Pro           | Google   | Raisonnement profond  |
+| **BRAGI**  | Gemini 2.5 Flash         | Google   | Synthese creative     |
+| **SYN**    | Gemini 2.5 Pro           | Google   | Vision multimodale    |
+| **NORNES** | Qwen QWQ-32B             | Groq     | Raisonnement avance   |
+| **SAGA**   | Llama 3.3 70B            | Groq     | Connaissance generale |
+| **LOKI**   | DeepSeek R1 Distill 70B  | Groq     | Critique adversariale |
+| **TYR**    | Systeme de vote          | Local    | Arbitrage final       |
 
 **Processus de deliberation :**
 
@@ -485,18 +486,34 @@ sequenceDiagram
 
 ---
 
-## Prochaines Etapes
+## Etat Actuel (Decembre 2025)
 
-1. **Implementer HEIMDALL** — Gateway de base
-2. **Implementer RATATOSK** — Routage simple
-3. **Integrer MIMIR** — Avec arXiv comme premiere source
-4. **Construire THING** — Orchestration de 2 modeles
-5. **Developper ODIN** — Validation basique
+### Composants Implementes
+
+- [x] **HEIMDALL** — Gateway complete (auth JWT, rate limiting, audit)
+- [x] **RATATOSK** — Routage intelligent avec classification
+- [x] **MIMIR** — Integration arXiv + PubMed, embeddings Gemini
+- [x] **VOLVA** — Gestion des hypotheses avec flagging
+- [x] **HUGIN** — Recherche web avec filtrage basique
+- [x] **THING** — Conseil 6 membres (Gemini + Groq)
+- [x] **ODIN** — Validation avec ancrage sources
+- [x] **MUNIN** — Memoire chrono-semantique PGVector
+- [x] **BIFROST** — Interface chat Next.js avec streaming
+
+### Prochaines Etapes
+
+1. **Tests** — Couverture >80% sur tous les packages
+2. **HUGIN** — Detection de desinformation avancee
+3. **MUNIN** — Graphe de dependances et rollback
+4. **Documentation** — API OpenAPI complete
+5. **Benchmarks** — Mesurer taux de hallucination et validation
 
 ---
 
 <div align="center">
 
 _"L'architecture est le squelette. Les principes sont l'ame."_
+
+_Derniere mise a jour : Decembre 2025_
 
 </div>

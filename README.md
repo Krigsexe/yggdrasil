@@ -349,7 +349,7 @@ YGGDRASIL est un projet communautaire. Nous cherchons :
 
 ## Roadmap
 
-### Phase 1 : Fondations (2024-2025)
+### Phase 1 : Fondations (2024-2025) - COMPLETE
 
 - [x] Publication du Manifeste
 - [x] Repository public
@@ -357,19 +357,24 @@ YGGDRASIL est un projet communautaire. Nous cherchons :
 - [x] THING Council operationnel (Gemini + Groq)
 - [x] BIFROST frontend integre
 - [x] Streaming temps reel des reflexions
-- [ ] Documentation complete
-- [ ] Tests et validation
+- [x] CI/CD complet (lint, typecheck, test, build)
+- [ ] Documentation API complete
+- [ ] Tests >80% coverage
 
-### Phase 2 : Construction (2025-2026)
+### Phase 2 : Construction (2025-2026) - EN COURS
 
-- [ ] MIMIR : Integration sources scientifiques (arXiv, PubMed)
-- [ ] ODIN : Validation 100% avec ancrage sources
-- [ ] MUNIN : Memoire chrono-semantique complete
+- [x] MIMIR : Integration sources scientifiques (arXiv, PubMed)
+- [x] ODIN : Validation avec ancrage sources et traces
+- [x] MUNIN : Memoire chrono-semantique (PGVector + Gemini embeddings)
+- [x] VOLVA : Gestion des hypotheses
+- [x] HUGIN : Recherche web avec filtrage
+- [ ] Detection de desinformation avancee
+- [ ] Benchmarks de performance
 - [ ] Tests publics et bug bounty
 
 ### Phase 3 : Ouverture (2026-2027)
 
-- [ ] API publique
+- [ ] API publique et SDKs
 - [ ] Instances federees
 - [ ] Gouvernance communautaire formalisee
 - [ ] Partenariats academiques

@@ -36,7 +36,7 @@ Etablir les bases du projet : vision, communaute, et premier prototype fonctionn
 - [x] Code de conduite
 - [x] Politique de securite
 - [x] Architecture complete implementee
-- [ ] Documentation d'architecture detaillee
+- [x] Documentation d'architecture detaillee
 - [ ] Les Sept Piliers (documentation approfondie)
 - [ ] Les Sept Lois (documentation approfondie)
 
@@ -46,24 +46,32 @@ Etablir les bases du projet : vision, communaute, et premier prototype fonctionn
 - [ ] Canal Discord / Matrix
 - [ ] Premieres discussions GitHub
 - [x] Template d'issues et PRs
-- [x] CI/CD de base
+- [x] CI/CD complet (lint, typecheck, test, build)
+- [x] CodeQL security scanning
 
-#### M1.3 : Prototype Alpha (Q1-Q2 2025)
+#### M1.3 : Prototype Alpha (Q1-Q2 2025) - COMPLETE
 
-- [x] Structure monorepo fonctionnelle
-- [x] HEIMDALL : Gateway basique (auth, rate limiting)
-- [x] RATATOSK : Routage simple
-- [x] THING : Orchestration de 2+ modeles
-- [x] ODIN : Validation basique (ancrage sources)
-- [ ] Tests unitaires pour chaque composant
-- [ ] Documentation API initiale
+- [x] Structure monorepo fonctionnelle (pnpm + Turborepo)
+- [x] HEIMDALL : Gateway complete (auth JWT, rate limiting, audit)
+- [x] RATATOSK : Routage intelligent (classification, contexte)
+- [x] THING : Conseil multi-modeles (Gemini + Groq, 6 membres)
+- [x] ODIN : Validation avec ancrage sources
+- [x] MUNIN : Memoire chrono-semantique (PGVector)
+- [x] MIMIR : Integration sources (arXiv, PubMed)
+- [x] VOLVA : Gestion hypotheses
+- [x] HUGIN : Recherche web avec filtrage
+- [x] BIFROST : Interface chat Next.js
+- [x] Streaming temps reel des reflexions
+- [x] Base de donnees Supabase PostgreSQL
+- [ ] Tests unitaires complets (>80% coverage)
+- [ ] Documentation API OpenAPI
 
 ### Livrables Phase 1
 
 - [x] Manifeste public
 - [x] Repository avec documentation
-- [ ] Communaute active
-- [ ] Prototype demonstrant l'orchestration + validation
+- [x] Prototype fonctionnel demonstrant orchestration + validation
+- [ ] Communaute active (10+ contributeurs)
 
 ---
 
@@ -77,37 +85,42 @@ Construire les composants principaux et atteindre un systeme fonctionnel.
 
 ### Milestones
 
-#### M2.1 : Les Trois Branches (Q2-Q3 2025)
+#### M2.1 : Les Trois Branches (Q2-Q3 2025) - EN COURS
 
-- [ ] **MIMIR** : Integration arXiv
-- [ ] **MIMIR** : Integration PubMed
-- [ ] **MIMIR** : Pipeline de validation de sources
-- [ ] **VOLVA** : Espace hypotheses avec flagging
-- [ ] **HUGIN** : Recherche web avec filtrage
-- [ ] **HUGIN** : Detection de desinformation basique
-- [ ] Separation stricte des bases de donnees
+- [x] **MIMIR** : Integration arXiv
+- [x] **MIMIR** : Integration PubMed
+- [x] **MIMIR** : Pipeline de validation de sources
+- [x] **MIMIR** : EmbeddingService partage (Gemini)
+- [x] **VOLVA** : Espace hypotheses avec flagging
+- [x] **HUGIN** : Recherche web avec filtrage
+- [ ] **HUGIN** : Detection de desinformation avancee
+- [x] Separation stricte des bases de donnees (epistemique)
 
-#### M2.2 : Le Conseil (Q3-Q4 2025)
+#### M2.2 : Le Conseil (Q3-Q4 2025) - COMPLETE
 
-- [ ] **THING** : Integration Claude (KVASIR)
-- [ ] **THING** : Integration Llama (SAGA)
-- [ ] **THING** : Integration DeepSeek (NORNES)
-- [ ] **THING** : Systeme de vote/consensus (TYR)
-- [ ] **LOKI** : Module critique/adversarial
-- [ ] Benchmarks de performance
+- [x] **THING** : Integration Gemini Pro (KVASIR - raisonnement)
+- [x] **THING** : Integration Gemini Flash (BRAGI - synthese)
+- [x] **THING** : Integration Qwen QWQ-32B (NORNES - calcul)
+- [x] **THING** : Integration Llama 3.3 70B (SAGA - connaissance)
+- [x] **THING** : Integration DeepSeek R1 (LOKI - critique)
+- [x] **THING** : Systeme de vote/consensus (TYR)
+- [ ] Benchmarks de performance formels
 
-#### M2.3 : Le Maestro (Q4 2025 - Q1 2026)
+#### M2.3 : Le Maestro (Q4 2025 - Q1 2026) - EN COURS
 
-- [ ] **ODIN** : Validation multi-criteres
-- [ ] **ODIN** : Ancrage systematique a MIMIR
-- [ ] **ODIN** : Rejet explicite avec raisons
-- [ ] Taux de validation >99% sur faits verifiables
-- [ ] Taux de hallucination <1%
+- [x] **ODIN** : Validation multi-criteres
+- [x] **ODIN** : Ancrage systematique a MIMIR
+- [x] **ODIN** : Rejet explicite avec raisons
+- [x] **ODIN** : ValidationTrace sur chaque reponse
+- [ ] Taux de validation >99% sur faits verifiables (a mesurer)
+- [ ] Taux de hallucination <1% (a mesurer)
 
-#### M2.4 : La Memoire (Q1-Q2 2026)
+#### M2.4 : La Memoire (Q1-Q2 2026) - EN COURS
 
-- [ ] **MUNIN** : Memoire chrono-semantique (PGVector)
-- [ ] **MUNIN** : Graphe de dependances
+- [x] **MUNIN** : Memoire chrono-semantique (PGVector)
+- [x] **MUNIN** : EmbeddingService partage (Gemini)
+- [x] **MUNIN** : Extraction de faits automatique
+- [ ] **MUNIN** : Graphe de dependances complet
 - [ ] **MUNIN** : Systeme de checkpoints
 - [ ] **MUNIN** : Rollback fonctionnel
 - [ ] Tests de persistance et coherence
@@ -282,6 +295,6 @@ Faire de YGGDRASIL une infrastructure mondiale pour l'IA ethique.
 
 **La route est longue, mais nous la parcourons ensemble.**
 
-_Derniere mise a jour : Decembre 2024_
+_Derniere mise a jour : Decembre 2025_
 
 </div>
