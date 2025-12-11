@@ -2,27 +2,47 @@
  * Audit Service
  *
  * Logs all actions for complete traceability.
+ * Uses Prisma for database persistence.
  */
 
 import { Injectable } from '@nestjs/common';
 import { AuditLog, AuditAction, AuditQuery, createLogger, generateId } from '@yggdrasil/shared';
+import { DatabaseService } from '@yggdrasil/shared/database';
 
 const logger = createLogger('AuditService', 'info');
 
-// In-memory audit store for development
-// TODO: Replace with Prisma when database is set up
-const auditLogs: AuditLog[] = [];
-
 @Injectable()
 export class AuditService {
-  log(entry: Omit<AuditLog, 'id' | 'timestamp'>): AuditLog {
-    const auditLog: AuditLog = {
-      id: generateId(),
-      ...entry,
-      timestamp: new Date(),
-    };
+  constructor(private readonly db: DatabaseService) {}
 
-    auditLogs.push(auditLog);
+  async log(entry: Omit<AuditLog, 'id' | 'timestamp'>): Promise<AuditLog> {
+    const id = generateId();
+    const timestamp = new Date();
+
+    // Store in database
+    await this.db.auditLog.create({
+      data: {
+        id,
+        action: entry.action,
+        userId: entry.userId,
+        resourceType: entry.resourceType,
+        resourceId: entry.resourceId,
+        method: entry.method,
+        path: entry.path,
+        statusCode: entry.statusCode,
+        durationMs: entry.durationMs,
+        ip: entry.ip,
+        userAgent: entry.userAgent,
+        metadata: (entry.metadata ?? undefined) as Parameters<typeof this.db.auditLog.create>[0]['data']['metadata'],
+        createdAt: timestamp,
+      },
+    });
+
+    const auditLog: AuditLog = {
+      id,
+      ...entry,
+      timestamp,
+    };
 
     // Also log to structured logger
     logger.info('Audit log created', {
@@ -37,56 +57,104 @@ export class AuditService {
     return auditLog;
   }
 
-  query(query: AuditQuery): AuditLog[] {
-    let results = [...auditLogs];
+  async query(query: AuditQuery): Promise<AuditLog[]> {
+    const where: Record<string, unknown> = {};
 
     if (query.userId) {
-      results = results.filter((log) => log.userId === query.userId);
+      where['userId'] = query.userId;
     }
 
     if (query.actions && query.actions.length > 0) {
-      results = results.filter((log) => query.actions?.includes(log.action as AuditAction));
+      where['action'] = { in: query.actions };
     }
 
     if (query.resourceType) {
-      results = results.filter((log) => log.resourceType === query.resourceType);
+      where['resourceType'] = query.resourceType;
     }
 
     if (query.resourceId) {
-      results = results.filter((log) => log.resourceId === query.resourceId);
+      where['resourceId'] = query.resourceId;
     }
 
-    if (query.fromDate) {
-      results = results.filter((log) => log.timestamp >= query.fromDate!);
-    }
-
-    if (query.toDate) {
-      results = results.filter((log) => log.timestamp <= query.toDate!);
+    if (query.fromDate || query.toDate) {
+      where['createdAt'] = {};
+      if (query.fromDate) {
+        (where['createdAt'] as Record<string, Date>)['gte'] = query.fromDate;
+      }
+      if (query.toDate) {
+        (where['createdAt'] as Record<string, Date>)['lte'] = query.toDate;
+      }
     }
 
     if (query.statusCode) {
-      results = results.filter((log) => log.statusCode === query.statusCode);
+      where['statusCode'] = query.statusCode;
     }
 
-    // Sort by timestamp descending
-    results.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    const results = await this.db.auditLog.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: query.offset ?? 0,
+      take: query.limit ?? 100,
+    });
 
-    // Apply pagination
-    const offset = query.offset ?? 0;
-    const limit = query.limit ?? 100;
-    results = results.slice(offset, offset + limit);
-
-    return results;
+    return results.map((row) => ({
+      id: row.id,
+      action: row.action as AuditAction,
+      userId: row.userId ?? undefined,
+      resourceType: row.resourceType,
+      resourceId: row.resourceId ?? undefined,
+      method: row.method,
+      path: row.path,
+      statusCode: row.statusCode,
+      durationMs: row.durationMs,
+      ip: row.ip ?? undefined,
+      userAgent: row.userAgent ?? undefined,
+      metadata: row.metadata as Record<string, unknown> | undefined,
+      timestamp: row.createdAt,
+    }));
   }
 
-  getById(id: string): AuditLog | undefined {
-    return auditLogs.find((log) => log.id === id);
+  async getById(id: string): Promise<AuditLog | undefined> {
+    const row = await this.db.auditLog.findUnique({
+      where: { id },
+    });
+
+    if (!row) {
+      return undefined;
+    }
+
+    return {
+      id: row.id,
+      action: row.action as AuditAction,
+      userId: row.userId ?? undefined,
+      resourceType: row.resourceType,
+      resourceId: row.resourceId ?? undefined,
+      method: row.method,
+      path: row.path,
+      statusCode: row.statusCode,
+      durationMs: row.durationMs,
+      ip: row.ip ?? undefined,
+      userAgent: row.userAgent ?? undefined,
+      metadata: row.metadata as Record<string, unknown> | undefined,
+      timestamp: row.createdAt,
+    };
   }
 
-  getStats(fromDate: Date, toDate: Date) {
-    const logsInRange = auditLogs.filter(
-      (log) => log.timestamp >= fromDate && log.timestamp <= toDate
-    );
+  async getStats(fromDate: Date, toDate: Date) {
+    // Get logs in date range
+    const logsInRange = await this.db.auditLog.findMany({
+      where: {
+        createdAt: {
+          gte: fromDate,
+          lte: toDate,
+        },
+      },
+      select: {
+        action: true,
+        durationMs: true,
+        statusCode: true,
+      },
+    });
 
     const actionCounts: Record<string, number> = {};
     let totalResponseTime = 0;
@@ -107,5 +175,22 @@ export class AuditService {
       errorRate: logsInRange.length > 0 ? errorCount / logsInRange.length : 0,
       period: { from: fromDate, to: toDate },
     };
+  }
+
+  /**
+   * Delete old audit logs (retention policy)
+   */
+  async deleteOldLogs(retentionDays: number): Promise<number> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
+
+    const result = await this.db.auditLog.deleteMany({
+      where: {
+        createdAt: { lt: cutoffDate },
+      },
+    });
+
+    logger.info('Deleted old audit logs', { count: result.count, retentionDays });
+    return result.count;
   }
 }

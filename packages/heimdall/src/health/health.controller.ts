@@ -1,17 +1,22 @@
 /**
  * Health Controller
+ *
+ * Provides real health checks for database and services.
  */
 
 import { Controller, Get } from '@nestjs/common';
 import { HealthStatus, ComponentHealth, YGGDRASIL_VERSION } from '@yggdrasil/shared';
+import { DatabaseService } from '@yggdrasil/shared/database';
 
 @Controller('health')
 export class HealthController {
   private readonly startTime = Date.now();
 
+  constructor(private readonly db: DatabaseService) {}
+
   @Get()
-  check(): HealthStatus {
-    const components = this.checkComponents();
+  async check(): Promise<HealthStatus> {
+    const components = await this.checkComponents();
     const overallStatus = this.determineOverallStatus(components);
 
     return {
@@ -24,9 +29,9 @@ export class HealthController {
   }
 
   @Get('ready')
-  ready(): { ready: boolean } {
+  async ready(): Promise<{ ready: boolean }> {
     // Check if all critical components are healthy
-    const components = this.checkComponents();
+    const components = await this.checkComponents();
     const ready = components.every((c) => c.status === 'healthy' || c.status === 'degraded');
     return { ready };
   }
@@ -37,7 +42,7 @@ export class HealthController {
     return { live: true };
   }
 
-  private checkComponents(): ComponentHealth[] {
+  private async checkComponents(): Promise<ComponentHealth[]> {
     const components: ComponentHealth[] = [];
 
     // HEIMDALL (self)
@@ -48,23 +53,46 @@ export class HealthController {
       message: 'Gateway operational',
     });
 
-    // Database check (placeholder)
-    components.push({
-      name: 'DATABASE',
-      status: 'healthy', // TODO: Actual check when Prisma is set up
-      latencyMs: 1,
-      message: 'In-memory store active',
-    });
+    // Database check (real Prisma connection)
+    const dbHealth = await this.checkDatabase();
+    components.push(dbHealth);
 
-    // Redis check (placeholder)
+    // Redis check (placeholder for now - would need Redis client injection)
     components.push({
       name: 'REDIS',
-      status: 'healthy', // TODO: Actual check when Redis is set up
-      latencyMs: 1,
-      message: 'Not configured',
+      status: 'degraded',
+      latencyMs: 0,
+      message: 'Redis client not configured',
     });
 
     return components;
+  }
+
+  private async checkDatabase(): Promise<ComponentHealth> {
+    const startTime = Date.now();
+
+    try {
+      // Execute a simple query to test the connection
+      await this.db.$queryRaw`SELECT 1`;
+      const latencyMs = Date.now() - startTime;
+
+      return {
+        name: 'DATABASE',
+        status: 'healthy',
+        latencyMs,
+        message: 'PostgreSQL connected',
+      };
+    } catch (error) {
+      const latencyMs = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      return {
+        name: 'DATABASE',
+        status: 'unhealthy',
+        latencyMs,
+        message: `PostgreSQL error: ${errorMessage}`,
+      };
+    }
   }
 
   private determineOverallStatus(

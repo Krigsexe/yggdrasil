@@ -2,6 +2,7 @@
  * Auth Service
  *
  * Handles authentication logic: login, registration, token management.
+ * Uses Prisma for database persistence.
  */
 
 import { Injectable } from '@nestjs/common';
@@ -18,13 +19,9 @@ import {
   InvalidCredentialsError,
   TokenExpiredError,
 } from '@yggdrasil/shared';
+import { DatabaseService } from '@yggdrasil/shared/database';
 
 const logger = createLogger('AuthService', 'info');
-
-// In-memory user store for development
-// TODO: Replace with Prisma when database is set up
-const users = new Map<string, { id: string; email: string; passwordHash: string; role: Role }>();
-const refreshTokens = new Map<string, { userId: string; expiresAt: Date }>();
 
 @Injectable()
 export class AuthService {
@@ -33,6 +30,7 @@ export class AuthService {
   private readonly refreshExpiresIn: string;
 
   constructor(
+    private readonly db: DatabaseService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
   ) {
@@ -42,37 +40,43 @@ export class AuthService {
   }
 
   async register(email: string, password: string): Promise<User> {
-    const existingUser = Array.from(users.values()).find((u) => u.email === email);
+    // Check if user already exists
+    const existingUser = await this.db.user.findUnique({
+      where: { email },
+    });
+
     if (existingUser) {
       throw new Error('User already exists');
     }
 
     const passwordHash = await bcrypt.hash(password, this.bcryptRounds);
-    const id = generateId();
 
-    const user = {
-      id,
-      email,
-      passwordHash,
-      role: Role.USER,
-    };
+    const user = await this.db.user.create({
+      data: {
+        email,
+        passwordHash,
+        role: Role.USER,
+        isActive: true,
+      },
+    });
 
-    users.set(id, user);
-
-    logger.info('User registered', { userId: id, email });
+    logger.info('User registered', { userId: user.id, email });
 
     return {
-      id,
-      email,
-      role: Role.USER,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isActive: true,
+      id: user.id,
+      email: user.email,
+      role: user.role as Role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      isActive: user.isActive,
     };
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
-    const user = Array.from(users.values()).find((u) => u.email === email);
+    const user = await this.db.user.findUnique({
+      where: { email },
+    });
+
     if (!user) {
       return null;
     }
@@ -82,13 +86,19 @@ export class AuthService {
       return null;
     }
 
+    // Update last login
+    await this.db.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    });
+
     return {
       id: user.id,
       email: user.email,
-      role: user.role,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isActive: true,
+      role: user.role as Role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      isActive: user.isActive,
     };
   }
 
@@ -98,7 +108,7 @@ export class AuthService {
       throw new InvalidCredentialsError();
     }
 
-    const tokens = this.generateTokens(user);
+    const tokens = await this.generateTokens(user);
 
     logger.info('User logged in', { userId: user.id });
 
@@ -106,42 +116,65 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string): Promise<TokenPair> {
-    const tokenData = refreshTokens.get(refreshToken);
+    // Find the refresh token in database
+    const tokenData = await this.db.refreshToken.findUnique({
+      where: { token: refreshToken },
+      include: { user: true },
+    });
+
     if (!tokenData) {
       throw new TokenExpiredError('refresh');
     }
 
+    // Check if token is expired
     if (tokenData.expiresAt < new Date()) {
-      refreshTokens.delete(refreshToken);
+      // Delete expired token
+      await this.db.refreshToken.delete({
+        where: { id: tokenData.id },
+      });
       throw new TokenExpiredError('refresh');
     }
 
-    const userData = users.get(tokenData.userId);
-    if (!userData) {
+    // Check if token was revoked
+    if (tokenData.revokedAt) {
       throw new TokenExpiredError('refresh');
     }
 
-    // Invalidate old refresh token
-    refreshTokens.delete(refreshToken);
+    // Revoke the old token (rotate tokens)
+    await this.db.refreshToken.update({
+      where: { id: tokenData.id },
+      data: { revokedAt: new Date() },
+    });
 
     const user: User = {
-      id: userData.id,
-      email: userData.email,
-      role: userData.role,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isActive: true,
+      id: tokenData.user.id,
+      email: tokenData.user.email,
+      role: tokenData.user.role as Role,
+      createdAt: tokenData.user.createdAt,
+      updatedAt: tokenData.user.updatedAt,
+      isActive: tokenData.user.isActive,
     };
 
-    return Promise.resolve(this.generateTokens(user));
+    return this.generateTokens(user);
   }
 
-  logout(refreshToken: string): void {
-    refreshTokens.delete(refreshToken);
+  async logout(refreshToken: string): Promise<void> {
+    // Revoke the refresh token
+    const token = await this.db.refreshToken.findUnique({
+      where: { token: refreshToken },
+    });
+
+    if (token) {
+      await this.db.refreshToken.update({
+        where: { id: token.id },
+        data: { revokedAt: new Date() },
+      });
+    }
+
     logger.info('User logged out');
   }
 
-  private generateTokens(user: User): TokenPair {
+  private async generateTokens(user: User): Promise<TokenPair> {
     const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
       sub: user.id,
       email: user.email,
@@ -154,9 +187,13 @@ export class AuthService {
     const refreshToken = generateId();
     const refreshExpiresMs = this.parseExpiration(this.refreshExpiresIn);
 
-    refreshTokens.set(refreshToken, {
-      userId: user.id,
-      expiresAt: new Date(Date.now() + refreshExpiresMs),
+    // Store refresh token in database
+    await this.db.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + refreshExpiresMs),
+      },
     });
 
     return {
@@ -190,19 +227,36 @@ export class AuthService {
     }
   }
 
-  getUserById(id: string): User | null {
-    const userData = users.get(id);
-    if (!userData) {
+  async getUserById(id: string): Promise<User | null> {
+    const user = await this.db.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
       return null;
     }
 
     return {
-      id: userData.id,
-      email: userData.email,
-      role: userData.role,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isActive: true,
+      id: user.id,
+      email: user.email,
+      role: user.role as Role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      isActive: user.isActive,
     };
+  }
+
+  /**
+   * Clean up expired refresh tokens (maintenance task)
+   */
+  async cleanupExpiredTokens(): Promise<number> {
+    const result = await this.db.refreshToken.deleteMany({
+      where: {
+        OR: [{ expiresAt: { lt: new Date() } }, { revokedAt: { not: null } }],
+      },
+    });
+
+    logger.info('Cleaned up expired tokens', { count: result.count });
+    return result.count;
   }
 }
