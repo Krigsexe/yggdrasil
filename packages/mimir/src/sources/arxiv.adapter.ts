@@ -77,9 +77,7 @@ export class ArxivAdapter {
   /**
    * Fetch a specific paper by its arXiv ID
    */
-  async getByArxivId(
-    arxivId: string
-  ): Promise<Omit<Source, 'id' | 'fetchedAt' | 'branch'> | null> {
+  async getByArxivId(arxivId: string): Promise<Omit<Source, 'id' | 'fetchedAt' | 'branch'> | null> {
     try {
       await this.respectRateLimit();
 
@@ -200,9 +198,7 @@ export class ArxivAdapter {
   /**
    * Convert arXiv entry to YGGDRASIL Source format
    */
-  private arxivToSource(
-    entry: ArxivEntry
-  ): Omit<Source, 'id' | 'fetchedAt' | 'branch'> {
+  private arxivToSource(entry: ArxivEntry): Omit<Source, 'id' | 'fetchedAt' | 'branch'> {
     // Find PDF link
     const pdfLink = entry.links.find(
       (l) => l.type === 'application/pdf' || l.href.includes('/pdf/')

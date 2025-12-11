@@ -45,14 +45,18 @@ export async function POST(request: Request) {
 
     const azure = createAzure({
       apiKey: KEY,
-      resourceName: ENDPOINT.replace("https://", "").replace(".openai.azure.com", "")
+      resourceName: ENDPOINT.replace("https://", "").replace(
+        ".openai.azure.com",
+        ""
+      )
     })
 
     const result = streamText({
       model: azure(DEPLOYMENT_ID),
       messages,
       temperature: chatSettings.temperature,
-      maxTokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : undefined
+      maxTokens:
+        chatSettings.model === "gpt-4-vision-preview" ? 4096 : undefined
     })
 
     return result.toDataStreamResponse()

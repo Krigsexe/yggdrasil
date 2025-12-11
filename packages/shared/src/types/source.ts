@@ -85,10 +85,10 @@ export const SOURCE_TRUST_SCORES: Record<SourceType, { min: number; max: number 
  */
 export function isMimirEligible(type: SourceType): boolean {
   return [
-    SourceType.ARXIV,    // Peer-reviewed preprints
-    SourceType.PUBMED,   // Medical research
-    SourceType.ISO,      // International standards
-    SourceType.RFC,      // Internet standards
-    SourceType.JOURNAL,  // Peer-reviewed journals
+    SourceType.ARXIV, // Peer-reviewed preprints
+    SourceType.PUBMED, // Medical research
+    SourceType.ISO, // International standards
+    SourceType.RFC, // Internet standards
+    SourceType.JOURNAL, // Peer-reviewed journals
   ].includes(type);
 }

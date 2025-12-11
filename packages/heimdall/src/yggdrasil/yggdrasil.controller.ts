@@ -32,7 +32,7 @@ import { FactState, StoredFact, PersistenceResult } from '@yggdrasil/munin';
 
 interface QueryDto {
   query: string;
-  userId?: string;  // For public endpoint
+  userId?: string; // For public endpoint
   sessionId?: string;
   context?: Record<string, unknown>;
   includeTrace?: boolean;
@@ -141,7 +141,9 @@ export class YggdrasilController {
    */
   @Post('query/thinking')
   @HttpCode(HttpStatus.OK)
-  async queryWithThinking(@Body() dto: QueryDto): Promise<YggdrasilResponse & { thinking: ThinkingStep[] }> {
+  async queryWithThinking(
+    @Body() dto: QueryDto
+  ): Promise<YggdrasilResponse & { thinking: ThinkingStep[] }> {
     if (!dto.userId) {
       throw new BadRequestException('userId is required');
     }

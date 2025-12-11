@@ -16,11 +16,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { CouncilMember, createLogger } from '@yggdrasil/shared';
-import {
-  ILLMAdapter,
-  CouncilMemberResponse,
-  COUNCIL_SYSTEM_PROMPTS,
-} from './llm.adapter.js';
+import { ILLMAdapter, CouncilMemberResponse, COUNCIL_SYSTEM_PROMPTS } from './llm.adapter.js';
 
 const logger = createLogger('GroqAdapter', 'info');
 
@@ -157,7 +153,14 @@ export class GroqAdapter implements ILLMAdapter {
 
   private estimateConfidence(content: string): number {
     const uncertainWords = ['might', 'maybe', 'possibly', 'uncertain', 'unclear', 'perhaps'];
-    const confidentWords = ['definitely', 'certainly', 'clearly', 'verified', 'proven', 'confirmed'];
+    const confidentWords = [
+      'definitely',
+      'certainly',
+      'clearly',
+      'verified',
+      'proven',
+      'confirmed',
+    ];
 
     const lowerContent = content.toLowerCase();
     let confidence = 70;

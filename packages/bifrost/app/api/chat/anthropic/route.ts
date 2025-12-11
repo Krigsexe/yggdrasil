@@ -57,7 +57,8 @@ export async function POST(request: NextRequest) {
         model: anthropic(chatSettings.model),
         messages: formattedMessages,
         temperature: chatSettings.temperature,
-        maxTokens: CHAT_SETTING_LIMITS[chatSettings.model]?.MAX_TOKEN_OUTPUT_LENGTH
+        maxTokens:
+          CHAT_SETTING_LIMITS[chatSettings.model]?.MAX_TOKEN_OUTPUT_LENGTH
       })
 
       return result.toDataStreamResponse()

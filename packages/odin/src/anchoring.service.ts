@@ -6,11 +6,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import {
-  Source,
-  EpistemicBranch,
-  createLogger,
-} from '@yggdrasil/shared';
+import { Source, EpistemicBranch, createLogger } from '@yggdrasil/shared';
 
 const logger = createLogger('AnchoringService', 'info');
 
@@ -71,7 +67,10 @@ export class AnchoringService {
 
     // Verify trust score is 100
     if (source.trustScore !== 100) {
-      logger.warn('Source trust score not 100', { sourceId: source.id, trustScore: source.trustScore });
+      logger.warn('Source trust score not 100', {
+        sourceId: source.id,
+        trustScore: source.trustScore,
+      });
       return false;
     }
 

@@ -22,15 +22,14 @@ import { KvasirAdapter } from './members/kvasir.adapter.js';
 import { SagaAdapter } from './members/saga.adapter.js';
 import { LokiAdapter } from './members/loki.adapter.js';
 import { AnthropicAdapter } from './adapters/anthropic.adapter.js';
-import { NornesAdapter as NornesOpenAIAdapter, BragiAdapter as BragiOpenAIAdapter } from './adapters/openai.adapter.js';
+import {
+  NornesAdapter as NornesOpenAIAdapter,
+  BragiAdapter as BragiOpenAIAdapter,
+} from './adapters/openai.adapter.js';
 import { OllamaAdapter } from './adapters/ollama.adapter.js';
 
 // New Groq adapters (NORNES, SAGA, LOKI)
-import {
-  NornesGroqAdapter,
-  SagaGroqAdapter,
-  LokiGroqAdapter,
-} from './adapters/groq.adapter.js';
+import { NornesGroqAdapter, SagaGroqAdapter, LokiGroqAdapter } from './adapters/groq.adapter.js';
 
 // New Gemini adapters (KVASIR, BRAGI, SYN)
 import {

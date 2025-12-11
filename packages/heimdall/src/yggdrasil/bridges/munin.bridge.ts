@@ -11,11 +11,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import {
-  ValidationResult,
-  createLogger,
-  generateId,
-} from '@yggdrasil/shared';
+import { ValidationResult, createLogger, generateId } from '@yggdrasil/shared';
 import { DatabaseService } from '@yggdrasil/shared/database';
 import {
   MemoryPersistenceService,
@@ -76,13 +72,7 @@ export class MuninBridge {
       contentLength: content.length,
     });
 
-    return this.memoryPersistence.processMessage(
-      userId,
-      chatId,
-      messageId,
-      content,
-      userEmail
-    );
+    return this.memoryPersistence.processMessage(userId, chatId, messageId, content, userEmail);
   }
 
   /**
@@ -115,11 +105,7 @@ export class MuninBridge {
   /**
    * Admin: Verify or reject a pending fact
    */
-  async verifyFact(
-    factId: string,
-    verifiedBy: string,
-    approve: boolean
-  ): Promise<void> {
+  async verifyFact(factId: string, verifiedBy: string, approve: boolean): Promise<void> {
     return this.memoryPersistence.verifyFact(factId, verifiedBy, approve);
   }
 
@@ -258,10 +244,7 @@ export class MuninBridge {
   /**
    * Create a checkpoint for rollback capability
    */
-  async createCheckpoint(
-    userId: string,
-    reason: string
-  ): Promise<{ checkpointId: string }> {
+  async createCheckpoint(userId: string, reason: string): Promise<{ checkpointId: string }> {
     const now = new Date();
     const checkpointId = generateId();
 
@@ -383,9 +366,7 @@ export class MuninBridge {
       where: {
         userId,
         invalidatedAt: null,
-        OR: [
-          { tags: { hasSome: query.toLowerCase().split(' ') } },
-        ],
+        OR: [{ tags: { hasSome: query.toLowerCase().split(' ') } }],
       },
       orderBy: { createdAt: 'desc' },
       take: limit,

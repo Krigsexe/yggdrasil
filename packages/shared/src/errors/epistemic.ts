@@ -19,36 +19,24 @@ export class EpistemicContaminationError extends EpistemicError {
   public readonly toBranch: EpistemicBranch;
 
   constructor(from: EpistemicBranch, to: EpistemicBranch) {
-    super(
-      `Attempted contamination from ${from} to ${to}`,
-      'EPISTEMIC_CONTAMINATION',
-      { from, to }
-    );
+    super(`Attempted contamination from ${from} to ${to}`, 'EPISTEMIC_CONTAMINATION', { from, to });
     this.fromBranch = from;
     this.toBranch = to;
   }
 }
 
 export class InvalidPromotionError extends EpistemicError {
-  constructor(
-    from: EpistemicBranch,
-    to: EpistemicBranch,
-    reason: string
-  ) {
-    super(
-      `Cannot promote from ${from} to ${to}: ${reason}`,
-      'INVALID_PROMOTION',
-      { from, to, reason }
-    );
+  constructor(from: EpistemicBranch, to: EpistemicBranch, reason: string) {
+    super(`Cannot promote from ${from} to ${to}: ${reason}`, 'INVALID_PROMOTION', {
+      from,
+      to,
+      reason,
+    });
   }
 }
 
 export class BranchMismatchError extends EpistemicError {
-  constructor(
-    expected: EpistemicBranch,
-    actual: EpistemicBranch,
-    operation: string
-  ) {
+  constructor(expected: EpistemicBranch, actual: EpistemicBranch, operation: string) {
     super(
       `Branch mismatch in ${operation}: expected ${expected}, got ${actual}`,
       'BRANCH_MISMATCH',
@@ -63,11 +51,11 @@ export class ConfidenceOutOfRangeError extends EpistemicError {
     branch: EpistemicBranch,
     expectedRange: { min: number; max: number }
   ) {
-    super(
-      `Confidence ${confidence} out of range for branch ${branch}`,
-      'CONFIDENCE_OUT_OF_RANGE',
-      { confidence, branch, expectedRange }
-    );
+    super(`Confidence ${confidence} out of range for branch ${branch}`, 'CONFIDENCE_OUT_OF_RANGE', {
+      confidence,
+      branch,
+      expectedRange,
+    });
   }
 }
 

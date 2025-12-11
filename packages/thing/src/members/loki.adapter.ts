@@ -108,9 +108,7 @@ export class LokiAdapter {
 
   private checkUnsupportedClaims(response: CouncilResponse): LokiChallenge | null {
     // Check for claims that should have sources but don't
-    const claimPatterns = [
-      /according to|research shows|data indicates|statistics show/i,
-    ];
+    const claimPatterns = [/according to|research shows|data indicates|statistics show/i];
 
     for (const pattern of claimPatterns) {
       if (pattern.test(response.content) && (!response.sources || response.sources.length === 0)) {

@@ -7,11 +7,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { CouncilMember, createLogger } from '@yggdrasil/shared';
-import {
-  ILLMAdapter,
-  CouncilMemberResponse,
-  COUNCIL_SYSTEM_PROMPTS,
-} from './llm.adapter.js';
+import { ILLMAdapter, CouncilMemberResponse, COUNCIL_SYSTEM_PROMPTS } from './llm.adapter.js';
 
 const logger = createLogger('AnthropicAdapter', 'info');
 

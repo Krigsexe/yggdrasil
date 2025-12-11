@@ -25,17 +25,17 @@ import { EmbeddingService } from '@yggdrasil/shared/embedding';
 const logger = createLogger('MemoryPersistence', 'info');
 
 export enum UserVerificationLevel {
-  UNVERIFIED = 'UNVERIFIED',     // Anonymous or unverified user
-  VERIFIED = 'VERIFIED',         // Email verified user
-  TRUSTED = 'TRUSTED',           // Trusted contributor
-  ADMIN = 'ADMIN',               // System administrator
-  CREATOR = 'CREATOR',           // System creator (highest trust)
+  UNVERIFIED = 'UNVERIFIED', // Anonymous or unverified user
+  VERIFIED = 'VERIFIED', // Email verified user
+  TRUSTED = 'TRUSTED', // Trusted contributor
+  ADMIN = 'ADMIN', // System administrator
+  CREATOR = 'CREATOR', // System creator (highest trust)
 }
 
 export enum FactState {
-  PENDING = 'PENDING',           // Awaiting verification
-  VERIFIED = 'VERIFIED',         // Confirmed as true
-  REJECTED = 'REJECTED',         // Marked as false
+  PENDING = 'PENDING', // Awaiting verification
+  VERIFIED = 'VERIFIED', // Confirmed as true
+  REJECTED = 'REJECTED', // Marked as false
 }
 
 export interface StoredFact {
@@ -91,10 +91,7 @@ export class MemoryPersistenceService {
       // Try to find existing user by email first
       let user = await this.db.user.findFirst({
         where: {
-          OR: [
-            { id: userId },
-            { email: userEmail },
-          ],
+          OR: [{ id: userId }, { email: userEmail }],
         },
       });
 
@@ -163,7 +160,7 @@ export class MemoryPersistenceService {
       };
     }
 
-    logger.info('Facts extracted', { count: facts.length, types: facts.map(f => f.type) });
+    logger.info('Facts extracted', { count: facts.length, types: facts.map((f) => f.type) });
 
     // Store facts based on verification level
     const storedFacts: StoredFact[] = [];
@@ -171,13 +168,7 @@ export class MemoryPersistenceService {
     let factsPending = 0;
 
     for (const fact of facts) {
-      const stored = await this.storeFact(
-        dbUserId,
-        chatId,
-        messageId,
-        fact,
-        verification
-      );
+      const stored = await this.storeFact(dbUserId, chatId, messageId, fact, verification);
 
       if (stored) {
         storedFacts.push(stored);
@@ -222,10 +213,7 @@ export class MemoryPersistenceService {
     try {
       const user = await this.db.user.findFirst({
         where: {
-          OR: [
-            { id: userId },
-            { email: userEmail },
-          ],
+          OR: [{ id: userId }, { email: userEmail }],
         },
       });
 
@@ -275,7 +263,10 @@ export class MemoryPersistenceService {
       verification.level === UserVerificationLevel.TRUSTED
     ) {
       state = FactState.VERIFIED;
-    } else if (verification.level === UserVerificationLevel.VERIFIED && !fact.requiresVerification) {
+    } else if (
+      verification.level === UserVerificationLevel.VERIFIED &&
+      !fact.requiresVerification
+    ) {
       state = FactState.VERIFIED;
     } else {
       state = FactState.PENDING;
@@ -288,7 +279,10 @@ export class MemoryPersistenceService {
     const importance = this.getFactImportance(fact.type);
 
     // Generate embedding for semantic search
-    const embeddingResult = await this.embeddingService.generate(fact.content, 'RETRIEVAL_DOCUMENT');
+    const embeddingResult = await this.embeddingService.generate(
+      fact.content,
+      'RETRIEVAL_DOCUMENT'
+    );
     const embeddingVector = `[${embeddingResult.embedding.join(',')}]`;
 
     try {
@@ -306,11 +300,12 @@ export class MemoryPersistenceService {
       });
 
       // Format tags array for PostgreSQL
-      const tagsArray = `{${fact.keywords.map(k => `"${k.replace(/"/g, '\\"')}"`).join(',')}}`;
+      const tagsArray = `{${fact.keywords.map((k) => `"${k.replace(/"/g, '\\"')}"`).join(',')}}`;
 
       // Note: session_id is NULL because chatId from BIFROST/Supabase doesn't exist in sessions table
       // The chatId is stored in content.source.chatId for reference
-      await this.db.$queryRawUnsafe(`
+      await this.db.$queryRawUnsafe(
+        `
         INSERT INTO memories (
           id, user_id, session_id, type, content, tags, importance,
           access_count, created_at, updated_at, embedding
@@ -327,7 +322,15 @@ export class MemoryPersistenceService {
           $6,
           $7::vector
         )
-      `, id, userId, contentJson, tagsArray, importance, now, embeddingVector);
+      `,
+        id,
+        userId,
+        contentJson,
+        tagsArray,
+        importance,
+        now,
+        embeddingVector
+      );
 
       const storedFact: StoredFact = {
         id,
@@ -371,13 +374,13 @@ export class MemoryPersistenceService {
    */
   private getFactImportance(type: FactType): number {
     const importanceMap: Record<FactType, number> = {
-      [FactType.IDENTITY]: 100,      // Highest priority - who is talking
-      [FactType.RELATIONSHIP]: 95,   // System relationships
-      [FactType.INSTRUCTION]: 90,    // Direct instructions
-      [FactType.GOAL]: 80,           // User objectives
-      [FactType.CONTEXT]: 70,        // Background info
-      [FactType.PREFERENCE]: 60,     // Preferences
-      [FactType.DECLARATION]: 50,    // General declarative facts
+      [FactType.IDENTITY]: 100, // Highest priority - who is talking
+      [FactType.RELATIONSHIP]: 95, // System relationships
+      [FactType.INSTRUCTION]: 90, // Direct instructions
+      [FactType.GOAL]: 80, // User objectives
+      [FactType.CONTEXT]: 70, // Background info
+      [FactType.PREFERENCE]: 60, // Preferences
+      [FactType.DECLARATION]: 50, // General declarative facts
     };
 
     return importanceMap[type] ?? 50;
@@ -423,7 +426,7 @@ export class MemoryPersistenceService {
     `;
 
     return results
-      .map(row => ({
+      .map((row) => ({
         id: row.id,
         userId: row.user_id,
         chatId: row.session_id ?? '',
@@ -435,7 +438,7 @@ export class MemoryPersistenceService {
         keywords: row.tags,
         createdAt: row.created_at,
       }))
-      .filter(fact => {
+      .filter((fact) => {
         if (options?.factTypes && !options.factTypes.includes(fact.factType)) {
           return false;
         }
@@ -460,7 +463,7 @@ export class MemoryPersistenceService {
     const allFacts = await this.getUserFacts(userId, { state: FactState.VERIFIED });
 
     // Find identity fact
-    const identity = allFacts.find(f => f.factType === FactType.IDENTITY) ?? null;
+    const identity = allFacts.find((f) => f.factType === FactType.IDENTITY) ?? null;
 
     // Find relevant facts using semantic search (RETRIEVAL_QUERY optimized)
     const queryResult = await this.embeddingService.generate(query, 'RETRIEVAL_QUERY');
@@ -482,7 +485,8 @@ export class MemoryPersistenceService {
       similarity: number;
     }
 
-    const relevantResults = await this.db.$queryRawUnsafe<MemoryWithSimilarity[]>(`
+    const relevantResults = await this.db.$queryRawUnsafe<MemoryWithSimilarity[]>(
+      `
       SELECT id, user_id, session_id, content, tags, created_at,
              1 - (embedding <=> '${queryVector}'::vector) as similarity
       FROM memories
@@ -493,11 +497,13 @@ export class MemoryPersistenceService {
         AND embedding IS NOT NULL
       ORDER BY embedding <=> '${queryVector}'::vector
       LIMIT 10
-    `, userId);
+    `,
+      userId
+    );
 
     const relevantFacts: StoredFact[] = relevantResults
-      .filter(r => r.similarity > 0.3) // Only include if similarity > 30%
-      .map(row => ({
+      .filter((r) => r.similarity > 0.3) // Only include if similarity > 30%
+      .map((row) => ({
         id: row.id,
         userId: row.user_id,
         chatId: row.session_id ?? '',
@@ -516,11 +522,7 @@ export class MemoryPersistenceService {
   /**
    * Admin: Verify a pending fact
    */
-  async verifyFact(
-    factId: string,
-    verifiedBy: string,
-    approve: boolean
-  ): Promise<void> {
+  async verifyFact(factId: string, verifiedBy: string, approve: boolean): Promise<void> {
     const newState = approve ? FactState.VERIFIED : FactState.REJECTED;
     const now = new Date();
 

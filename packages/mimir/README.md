@@ -36,15 +36,15 @@ MIMIR/
 
 Only the following source types can be stored in MIMIR:
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `ARXIV` | arXiv preprints | arxiv:2301.00001 |
-| `PUBMED` | PubMed medical literature | PMID:12345678 |
-| `ISO` | ISO standards | ISO-9001 |
-| `RFC` | IETF RFCs | RFC-7231 |
-| `WIKIDATA` | Wikidata verified entities | Q42 |
-| `BOOK` | Published books with ISBN | ISBN-978-3-16-148410-0 |
-| `JOURNAL` | Peer-reviewed journals | DOI:10.1000/xyz123 |
+| Type       | Description                | Example                |
+| ---------- | -------------------------- | ---------------------- |
+| `ARXIV`    | arXiv preprints            | arxiv:2301.00001       |
+| `PUBMED`   | PubMed medical literature  | PMID:12345678          |
+| `ISO`      | ISO standards              | ISO-9001               |
+| `RFC`      | IETF RFCs                  | RFC-7231               |
+| `WIKIDATA` | Wikidata verified entities | Q42                    |
+| `BOOK`     | Published books with ISBN  | ISBN-978-3-16-148410-0 |
+| `JOURNAL`  | Peer-reviewed journals     | DOI:10.1000/xyz123     |
 
 **Not eligible**: `WEB`, `OTHER` (these belong to HUGIN or VOLVA)
 
@@ -180,6 +180,7 @@ CREATE INDEX sources_pubmed_id_idx ON sources(pubmed_id);
 ### Soft Delete
 
 Sources are invalidated (soft delete) rather than hard deleted:
+
 ```typescript
 await sourceService.invalidate(sourceId, 'Retracted by publisher');
 ```
@@ -201,6 +202,7 @@ pnpm --filter @yggdrasil/mimir test:e2e
 ```
 
 11 E2E tests with real PostgreSQL:
+
 - Persistence verification
 - Duplicate handling
 - Search functionality
@@ -256,6 +258,7 @@ MIMIR sources -> ODIN (validation) -> Response to user
 ### THING Council Usage
 
 When the THING Council needs verified facts:
+
 1. KVASIR queries MIMIR for peer-reviewed sources
 2. LOKI challenges claims against MIMIR evidence
 3. TYR uses MIMIR sources for final arbitration
@@ -274,4 +277,4 @@ MIT License - See LICENSE in repository root.
 
 ---
 
-*"The well of MIMIR contains all wisdom. Odin sacrificed his eye to drink from it."*
+_"The well of MIMIR contains all wisdom. Odin sacrificed his eye to drink from it."_

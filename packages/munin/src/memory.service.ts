@@ -37,11 +37,11 @@ function toPrismaMemoryType(type: MemoryType): PrismaMemoryType {
 
 function fromPrismaMemoryType(type: PrismaMemoryType): MemoryType {
   const mapping: Record<PrismaMemoryType, MemoryType> = {
-    'INTERACTION': MemoryType.INTERACTION,
-    'DECISION': MemoryType.DECISION,
-    'CORRECTION': MemoryType.CORRECTION,
-    'CHECKPOINT': MemoryType.CHECKPOINT,
-    'INVALIDATION': MemoryType.CORRECTION, // Map INVALIDATION to CORRECTION
+    INTERACTION: MemoryType.INTERACTION,
+    DECISION: MemoryType.DECISION,
+    CORRECTION: MemoryType.CORRECTION,
+    CHECKPOINT: MemoryType.CHECKPOINT,
+    INVALIDATION: MemoryType.CORRECTION, // Map INVALIDATION to CORRECTION
   };
   return mapping[type] ?? MemoryType.INTERACTION;
 }
@@ -89,10 +89,11 @@ export class MemoryService {
     const now = new Date();
 
     // Generate embedding for semantic search
-    const contentString = typeof content === 'string'
-      ? content
-      : JSON.stringify(content);
-    const embeddingResult = await this.embeddingService.generate(contentString, 'RETRIEVAL_DOCUMENT');
+    const contentString = typeof content === 'string' ? content : JSON.stringify(content);
+    const embeddingResult = await this.embeddingService.generate(
+      contentString,
+      'RETRIEVAL_DOCUMENT'
+    );
     const embeddingVector = `[${embeddingResult.embedding.join(',')}]`;
 
     // Use raw SQL to handle pgvector type
@@ -173,9 +174,7 @@ export class MemoryService {
     }
 
     if (query.types && query.types.length > 0) {
-      const typeConditions = query.types
-        .map(() => `$${paramIndex++}`)
-        .join(', ');
+      const typeConditions = query.types.map(() => `$${paramIndex++}`).join(', ');
       conditions.push(`type IN (${typeConditions})`);
       params.push(...query.types.map(toPrismaMemoryType));
     }
@@ -208,10 +207,14 @@ export class MemoryService {
 
     if (query.semanticQuery) {
       // Semantic search using pgvector cosine similarity (RETRIEVAL_QUERY optimized)
-      const queryResult = await this.embeddingService.generate(query.semanticQuery, 'RETRIEVAL_QUERY');
+      const queryResult = await this.embeddingService.generate(
+        query.semanticQuery,
+        'RETRIEVAL_QUERY'
+      );
       const queryVector = `[${queryResult.embedding.join(',')}]`;
 
-      results = await this.db.$queryRawUnsafe<MemoryWithSimilarity[]>(`
+      results = await this.db.$queryRawUnsafe<MemoryWithSimilarity[]>(
+        `
         SELECT id, user_id, session_id, type, content, tags, importance,
                access_count, last_accessed_at, created_at, updated_at,
                valid_until, invalidated_at, invalidated_by, invalidation_reason,
@@ -220,7 +223,9 @@ export class MemoryService {
         WHERE ${whereClause} AND embedding IS NOT NULL
         ORDER BY embedding <=> '${queryVector}'::vector
         LIMIT ${limit} OFFSET ${offset}
-      `, ...params);
+      `,
+        ...params
+      );
 
       semanticScores = new Map();
       for (const row of results) {
@@ -230,7 +235,8 @@ export class MemoryService {
       }
     } else {
       // Regular query, order by creation date
-      results = await this.db.$queryRawUnsafe<MemoryRow[]>(`
+      results = await this.db.$queryRawUnsafe<MemoryRow[]>(
+        `
         SELECT id, user_id, session_id, type, content, tags, importance,
                access_count, last_accessed_at, created_at, updated_at,
                valid_until, invalidated_at, invalidated_by, invalidation_reason
@@ -238,15 +244,20 @@ export class MemoryService {
         WHERE ${whereClause}
         ORDER BY created_at DESC
         LIMIT ${limit} OFFSET ${offset}
-      `, ...params);
+      `,
+        ...params
+      );
     }
 
     // Get total count
-    const countResult = await this.db.$queryRawUnsafe<{ count: bigint }[]>(`
+    const countResult = await this.db.$queryRawUnsafe<{ count: bigint }[]>(
+      `
       SELECT COUNT(*) as count
       FROM memories
       WHERE ${whereClause}
-    `, ...params);
+    `,
+      ...params
+    );
 
     const totalCount = Number(countResult[0]?.count ?? 0);
 
@@ -257,11 +268,7 @@ export class MemoryService {
     };
   }
 
-  async invalidate(
-    id: string,
-    invalidatedBy: string,
-    reason: string
-  ): Promise<void> {
+  async invalidate(id: string, invalidatedBy: string, reason: string): Promise<void> {
     const result = await this.db.memory.update({
       where: { id },
       data: {
@@ -342,16 +349,10 @@ export class MemoryService {
       include: { memory: true },
     });
 
-    return Promise.all(
-      dependencies.map((dep) => this.getById(dep.memoryId))
-    );
+    return Promise.all(dependencies.map((dep) => this.getById(dep.memoryId)));
   }
 
-  async cascadeInvalidate(
-    id: string,
-    invalidatedBy: string,
-    reason: string
-  ): Promise<number> {
+  async cascadeInvalidate(id: string, invalidatedBy: string, reason: string): Promise<number> {
     // First invalidate the target memory
     await this.invalidate(id, invalidatedBy, reason);
 

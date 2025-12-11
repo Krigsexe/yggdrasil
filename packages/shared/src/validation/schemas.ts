@@ -13,11 +13,7 @@ import { MemoryType } from '../types/memory.js';
 // Auth Schemas
 // ============================================================================
 
-export const emailSchema = z
-  .string()
-  .email('Invalid email format')
-  .min(5)
-  .max(255);
+export const emailSchema = z.string().email('Invalid email format').min(5).max(255);
 
 export const passwordSchema = z
   .string()

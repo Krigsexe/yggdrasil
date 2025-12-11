@@ -149,7 +149,8 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
     const collectionData =
       await getCollectionWorkspacesByWorkspaceId(workspaceId)
-    const collections = (collectionData as { collections: any[] }).collections || []
+    const collections =
+      (collectionData as { collections: any[] }).collections || []
     setCollections(collections)
 
     const folders = await getFoldersByWorkspaceId(workspaceId)

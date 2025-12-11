@@ -290,10 +290,7 @@ describe('SourceService', () => {
 
       mockDb.$queryRaw.mockResolvedValue([mockSourceRow]);
 
-      const found = await service.getByIdentifier(
-        SourceType.ARXIV,
-        'arxiv:2301.00001'
-      );
+      const found = await service.getByIdentifier(SourceType.ARXIV, 'arxiv:2301.00001');
 
       expect(found).toBeDefined();
       expect(found?.identifier).toBe('arxiv:2301.00001');

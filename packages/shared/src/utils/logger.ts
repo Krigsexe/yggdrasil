@@ -112,7 +112,8 @@ export class Logger {
 
   child(additionalComponent: string): Logger {
     return new Logger({
-      level: Object.entries(LOG_LEVELS).find(([, v]) => v === this.level)?.[0] as LogLevel ?? 'info',
+      level:
+        (Object.entries(LOG_LEVELS).find(([, v]) => v === this.level)?.[0] as LogLevel) ?? 'info',
       component: `${this.component}:${additionalComponent}`,
       pretty: this.pretty,
     });

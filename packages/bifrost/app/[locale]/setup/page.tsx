@@ -71,7 +71,11 @@ export default function SetupPage() {
         const user = session.user
 
         const profileResult = await getProfileByUserId(user.id)
-        const profile = profileResult as { username: string; has_onboarded: boolean; openrouter_api_key?: string }
+        const profile = profileResult as {
+          username: string
+          has_onboarded: boolean
+          openrouter_api_key?: string
+        }
         setProfile(profileResult)
         setUsername(profile.username)
 
@@ -143,7 +147,10 @@ export default function SetupPage() {
       azure_openai_embeddings_id: azureOpenaiEmbeddingsID
     }
 
-    const updatedProfile = await updateProfile(profile!.id, updateProfilePayload)
+    const updatedProfile = await updateProfile(
+      profile!.id,
+      updateProfilePayload
+    )
     setProfile(updatedProfile)
 
     const workspaces = await getWorkspacesByUserId(profile!.user_id)

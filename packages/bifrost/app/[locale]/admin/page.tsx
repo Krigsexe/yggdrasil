@@ -5,7 +5,7 @@
  * Uses Bifrost components for consistent styling.
  */
 
-'use client';
+"use client"
 
 import {
   IconTree,
@@ -20,101 +20,101 @@ import {
   IconRefresh,
   IconAlertTriangle,
   IconCheck,
-  IconClock,
-} from '@tabler/icons-react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { usePipelineHealth, useMuninMemory } from '@/lib/yggdrasil/hooks';
-import { MuninGraph, MuninStats } from '@/components/yggdrasil';
+  IconClock
+} from "@tabler/icons-react"
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { usePipelineHealth, useMuninMemory } from "@/lib/yggdrasil/hooks"
+import { MuninGraph, MuninStats } from "@/components/yggdrasil"
 
 // Bifrost Components
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
-} from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
+  CardContent
+} from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const componentConfig = {
   heimdall: {
-    label: 'HEIMDALL',
-    description: 'Gateway',
+    label: "HEIMDALL",
+    description: "Gateway",
     icon: IconShield,
-    color: 'text-blue-500',
+    color: "text-blue-500"
   },
   ratatosk: {
-    label: 'RATATOSK',
-    description: 'Router',
+    label: "RATATOSK",
+    description: "Router",
     icon: IconRoute,
-    color: 'text-amber-500',
+    color: "text-amber-500"
   },
   mimir: {
-    label: 'MIMIR',
-    description: 'Validated Knowledge',
+    label: "MIMIR",
+    description: "Validated Knowledge",
     icon: IconBook,
-    color: 'text-emerald-500',
+    color: "text-emerald-500"
   },
   volva: {
-    label: 'VOLVA',
-    description: 'Research',
+    label: "VOLVA",
+    description: "Research",
     icon: IconFlask,
-    color: 'text-yellow-500',
+    color: "text-yellow-500"
   },
   hugin: {
-    label: 'HUGIN',
-    description: 'Web Sources',
+    label: "HUGIN",
+    description: "Web Sources",
     icon: IconWorld,
-    color: 'text-red-500',
+    color: "text-red-500"
   },
   thing: {
-    label: 'THING',
-    description: 'Council',
+    label: "THING",
+    description: "Council",
     icon: IconUsers,
-    color: 'text-purple-500',
+    color: "text-purple-500"
   },
   odin: {
-    label: 'ODIN',
-    description: 'Maestro',
+    label: "ODIN",
+    description: "Maestro",
     icon: IconScale,
-    color: 'text-cyan-500',
+    color: "text-cyan-500"
   },
   munin: {
-    label: 'MUNIN',
-    description: 'Memory',
+    label: "MUNIN",
+    description: "Memory",
     icon: IconBrain,
-    color: 'text-pink-500',
-  },
-};
+    color: "text-pink-500"
+  }
+}
 
 function StatusBadge({ status }: { status: string }) {
-  const isHealthy = status === 'ok' || status === 'healthy';
-  const isDegraded = status === 'degraded';
+  const isHealthy = status === "ok" || status === "healthy"
+  const isDegraded = status === "degraded"
 
   return (
     <Badge
-      variant={isHealthy ? 'default' : isDegraded ? 'secondary' : 'destructive'}
+      variant={isHealthy ? "default" : isDegraded ? "secondary" : "destructive"}
       className="gap-1"
     >
       {isHealthy ? <IconCheck size={12} /> : <IconAlertTriangle size={12} />}
       {status.toUpperCase()}
     </Badge>
-  );
+  )
 }
 
 function ComponentCard({
   name,
-  status,
+  status
 }: {
-  name: keyof typeof componentConfig;
-  status: string;
+  name: keyof typeof componentConfig
+  status: string
 }) {
-  const config = componentConfig[name];
-  const Icon = config.icon;
+  const config = componentConfig[name]
+  const Icon = config.icon
 
   return (
     <Card>
@@ -123,7 +123,7 @@ function ComponentCard({
           <div className="flex items-center gap-3">
             <div
               className={cn(
-                'flex h-10 w-10 items-center justify-center rounded-lg bg-secondary',
+                "flex h-10 w-10 items-center justify-center rounded-lg bg-secondary",
                 config.color
               )}
             >
@@ -140,7 +140,7 @@ function ComponentCard({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function ComponentSkeleton() {
@@ -156,17 +156,17 @@ function ComponentSkeleton() {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 export default function AdminDashboard() {
-  const { health, loading, error, refresh } = usePipelineHealth(30000);
-  const [userId] = useState('admin-dashboard');
+  const { health, loading, error, refresh } = usePipelineHealth(30000)
+  const [userId] = useState("admin-dashboard")
   const {
     graph: memoryGraph,
     loading: graphLoading,
-    refresh: refreshGraph,
-  } = useMuninMemory(userId, { limit: 100 });
+    refresh: refreshGraph
+  } = useMuninMemory(userId, { limit: 100 })
 
   return (
     <div className="min-h-screen bg-background">
@@ -194,15 +194,15 @@ export default function AdminDashboard() {
               )}
               <Button
                 onClick={() => {
-                  refresh();
-                  refreshGraph();
+                  refresh()
+                  refreshGraph()
                 }}
                 disabled={loading}
                 size="sm"
               >
                 <IconRefresh
                   size={16}
-                  className={cn('mr-2', loading && 'animate-spin')}
+                  className={cn("mr-2", loading && "animate-spin")}
                 />
                 Refresh
               </Button>
@@ -238,20 +238,20 @@ export default function AdminDashboard() {
           <CardContent>
             <Badge
               variant={
-                health?.status === 'healthy'
-                  ? 'default'
-                  : health?.status === 'degraded'
-                    ? 'secondary'
-                    : 'destructive'
+                health?.status === "healthy"
+                  ? "default"
+                  : health?.status === "degraded"
+                    ? "secondary"
+                    : "destructive"
               }
               className="text-base px-4 py-2"
             >
-              {health?.status === 'healthy' ? (
+              {health?.status === "healthy" ? (
                 <IconCheck size={18} className="mr-2" />
               ) : (
                 <IconAlertTriangle size={18} className="mr-2" />
               )}
-              {health?.status?.toUpperCase() || 'UNKNOWN'}
+              {health?.status?.toUpperCase() || "UNKNOWN"}
             </Badge>
           </CardContent>
         </Card>
@@ -261,7 +261,7 @@ export default function AdminDashboard() {
           <h2 className="text-lg font-semibold mb-4">Components</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {loading
-              ? Object.keys(componentConfig).map((name) => (
+              ? Object.keys(componentConfig).map(name => (
                   <ComponentSkeleton key={name} />
                 ))
               : health
@@ -272,7 +272,7 @@ export default function AdminDashboard() {
                       status={status}
                     />
                   ))
-                : Object.keys(componentConfig).map((name) => (
+                : Object.keys(componentConfig).map(name => (
                     <ComponentCard
                       key={name}
                       name={name as keyof typeof componentConfig}
@@ -317,13 +317,13 @@ export default function AdminDashboard() {
           <h2 className="text-lg font-semibold mb-4">Seven Pillars</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {[
-              { name: 'Absolute Veracity', icon: IconCheck },
-              { name: 'Total Traceability', icon: IconRoute },
-              { name: 'Epistemic Separation', icon: IconBook },
-              { name: 'Living Memory', icon: IconBrain },
-              { name: 'Reversibility', icon: IconRefresh },
-              { name: 'Sovereignty', icon: IconShield },
-              { name: 'Sustainability', icon: IconTree },
+              { name: "Absolute Veracity", icon: IconCheck },
+              { name: "Total Traceability", icon: IconRoute },
+              { name: "Epistemic Separation", icon: IconBook },
+              { name: "Living Memory", icon: IconBrain },
+              { name: "Reversibility", icon: IconRefresh },
+              { name: "Sovereignty", icon: IconShield },
+              { name: "Sustainability", icon: IconTree }
             ].map((pillar, index) => (
               <Card key={pillar.name}>
                 <CardContent className="p-4">
@@ -347,5 +347,5 @@ export default function AdminDashboard() {
         </div>
       </div>
     </div>
-  );
+  )
 }

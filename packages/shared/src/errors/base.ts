@@ -12,12 +12,7 @@ export abstract class YggdrasilError extends Error {
   public readonly timestamp: Date;
   public readonly isOperational: boolean;
 
-  constructor(
-    message: string,
-    code: string,
-    details?: ErrorDetails,
-    isOperational = true
-  ) {
+  constructor(message: string, code: string, details?: ErrorDetails, isOperational = true) {
     super(message);
     this.name = this.constructor.name;
     this.code = code;
@@ -54,21 +49,21 @@ export class ConfigurationError extends YggdrasilError {
 
 export class TimeoutError extends YggdrasilError {
   constructor(operation: string, timeoutMs: number, details?: ErrorDetails) {
-    super(
-      `Operation '${operation}' timed out after ${timeoutMs}ms`,
-      'TIMEOUT_ERROR',
-      { operation, timeoutMs, ...details }
-    );
+    super(`Operation '${operation}' timed out after ${timeoutMs}ms`, 'TIMEOUT_ERROR', {
+      operation,
+      timeoutMs,
+      ...details,
+    });
   }
 }
 
 export class NotFoundError extends YggdrasilError {
   constructor(resource: string, identifier: string, details?: ErrorDetails) {
-    super(
-      `${resource} not found: ${identifier}`,
-      'NOT_FOUND',
-      { resource, identifier, ...details }
-    );
+    super(`${resource} not found: ${identifier}`, 'NOT_FOUND', {
+      resource,
+      identifier,
+      ...details,
+    });
   }
 }
 

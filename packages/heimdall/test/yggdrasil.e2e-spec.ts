@@ -16,7 +16,17 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Module, Controller, Post, Body, Get, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import {
+  INestApplication,
+  Module,
+  Controller,
+  Post,
+  Body,
+  Get,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
@@ -59,7 +69,9 @@ const mockYggdrasilService = {
 class MockYggdrasilController {
   @Post('query')
   @HttpCode(HttpStatus.CREATED)
-  async publicQuery(@Body() dto: { query?: string; userId?: string }): Promise<MockYggdrasilResponse> {
+  async publicQuery(
+    @Body() dto: { query?: string; userId?: string }
+  ): Promise<MockYggdrasilResponse> {
     if (!dto.userId) {
       throw new BadRequestException('userId is required');
     }
@@ -134,9 +146,7 @@ beforeAll(async () => {
     ],
   }).compile();
 
-  app = moduleFixture.createNestApplication<NestFastifyApplication>(
-    new FastifyAdapter()
-  );
+  app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
   await app.init();
   await app.getHttpAdapter().getInstance().ready();
 });
@@ -180,13 +190,16 @@ describe('YGGDRASIL Pipeline (E2E)', () => {
 
   describe('YGGDRASIL API Structure', () => {
     it('POST /yggdrasil/query should require userId', async () => {
-      const response = await app.getHttpAdapter().getInstance().inject({
-        method: 'POST',
-        url: '/yggdrasil/query',
-        payload: {
-          query: 'Test query without userId',
-        },
-      });
+      const response = await app
+        .getHttpAdapter()
+        .getInstance()
+        .inject({
+          method: 'POST',
+          url: '/yggdrasil/query',
+          payload: {
+            query: 'Test query without userId',
+          },
+        });
 
       expect(response.statusCode).toBe(400);
       const result = JSON.parse(response.payload);
@@ -194,26 +207,32 @@ describe('YGGDRASIL Pipeline (E2E)', () => {
     });
 
     it('POST /yggdrasil/query should require query', async () => {
-      const response = await app.getHttpAdapter().getInstance().inject({
-        method: 'POST',
-        url: '/yggdrasil/query',
-        payload: {
-          userId: 'test-user',
-        },
-      });
+      const response = await app
+        .getHttpAdapter()
+        .getInstance()
+        .inject({
+          method: 'POST',
+          url: '/yggdrasil/query',
+          payload: {
+            userId: 'test-user',
+          },
+        });
 
       expect(response.statusCode).toBe(400);
     });
 
     it('POST /yggdrasil/query should accept valid request and return YGGDRASIL response', async () => {
-      const response = await app.getHttpAdapter().getInstance().inject({
-        method: 'POST',
-        url: '/yggdrasil/query',
-        payload: {
-          query: 'What is 2 + 2?',
-          userId: 'test-user-e2e',
-        },
-      });
+      const response = await app
+        .getHttpAdapter()
+        .getInstance()
+        .inject({
+          method: 'POST',
+          url: '/yggdrasil/query',
+          payload: {
+            query: 'What is 2 + 2?',
+            userId: 'test-user-e2e',
+          },
+        });
 
       expect(response.statusCode).toBe(201);
       const result = JSON.parse(response.payload);
@@ -255,14 +274,17 @@ describe('YGGDRASIL Pipeline (E2E)', () => {
 describe('Seven Pillars Validation (E2E)', () => {
   describe('Pillar 1: Absolute Veracity', () => {
     it('should return null answer when no verified sources exist', async () => {
-      const response = await app.getHttpAdapter().getInstance().inject({
-        method: 'POST',
-        url: '/yggdrasil/query',
-        payload: {
-          query: 'What is the meaning of life?',
-          userId: 'test-user',
-        },
-      });
+      const response = await app
+        .getHttpAdapter()
+        .getInstance()
+        .inject({
+          method: 'POST',
+          url: '/yggdrasil/query',
+          payload: {
+            query: 'What is the meaning of life?',
+            userId: 'test-user',
+          },
+        });
 
       expect(response.statusCode).toBe(201);
       const result = JSON.parse(response.payload);
@@ -288,14 +310,17 @@ describe('Seven Pillars Validation (E2E)', () => {
     });
 
     it('should include requestId in every response', async () => {
-      const response = await app.getHttpAdapter().getInstance().inject({
-        method: 'POST',
-        url: '/yggdrasil/query',
-        payload: {
-          query: 'Test query',
-          userId: 'test-user',
-        },
-      });
+      const response = await app
+        .getHttpAdapter()
+        .getInstance()
+        .inject({
+          method: 'POST',
+          url: '/yggdrasil/query',
+          payload: {
+            query: 'Test query',
+            userId: 'test-user',
+          },
+        });
 
       const result = JSON.parse(response.payload);
       expect(result).toHaveProperty('requestId');
@@ -305,14 +330,17 @@ describe('Seven Pillars Validation (E2E)', () => {
 
   describe('Pillar 3: Epistemic Separation', () => {
     it('should classify response by epistemic branch', async () => {
-      const response = await app.getHttpAdapter().getInstance().inject({
-        method: 'POST',
-        url: '/yggdrasil/query',
-        payload: {
-          query: 'Scientific fact query',
-          userId: 'test-user',
-        },
-      });
+      const response = await app
+        .getHttpAdapter()
+        .getInstance()
+        .inject({
+          method: 'POST',
+          url: '/yggdrasil/query',
+          payload: {
+            query: 'Scientific fact query',
+            userId: 'test-user',
+          },
+        });
 
       const result = JSON.parse(response.payload);
       expect(result).toHaveProperty('epistemicBranch');
@@ -331,14 +359,17 @@ describe('Seven Pillars Validation (E2E)', () => {
     });
 
     it('should start and process requests without LLM API keys', async () => {
-      const response = await app.getHttpAdapter().getInstance().inject({
-        method: 'POST',
-        url: '/yggdrasil/query',
-        payload: {
-          query: 'Test without API keys',
-          userId: 'test-user',
-        },
-      });
+      const response = await app
+        .getHttpAdapter()
+        .getInstance()
+        .inject({
+          method: 'POST',
+          url: '/yggdrasil/query',
+          payload: {
+            query: 'Test without API keys',
+            userId: 'test-user',
+          },
+        });
 
       // Should return a valid response structure even without API keys
       expect(response.statusCode).toBe(201);
@@ -347,14 +378,17 @@ describe('Seven Pillars Validation (E2E)', () => {
 
   describe('Pillar 7: Sustainability', () => {
     it('should include processing time in response', async () => {
-      const response = await app.getHttpAdapter().getInstance().inject({
-        method: 'POST',
-        url: '/yggdrasil/query',
-        payload: {
-          query: 'Performance test',
-          userId: 'test-user',
-        },
-      });
+      const response = await app
+        .getHttpAdapter()
+        .getInstance()
+        .inject({
+          method: 'POST',
+          url: '/yggdrasil/query',
+          payload: {
+            query: 'Performance test',
+            userId: 'test-user',
+          },
+        });
 
       const result = JSON.parse(response.payload);
       expect(result).toHaveProperty('processingTimeMs');

@@ -21,7 +21,16 @@ import { EmbeddingService } from '@yggdrasil/shared/embedding';
 const logger = createLogger('SourceService', 'info');
 
 // Prisma SourceType enum values as string literals
-type PrismaSourceType = 'ARXIV' | 'PUBMED' | 'ISO' | 'RFC' | 'WIKIDATA' | 'WEB' | 'BOOK' | 'JOURNAL' | 'OTHER';
+type PrismaSourceType =
+  | 'ARXIV'
+  | 'PUBMED'
+  | 'ISO'
+  | 'RFC'
+  | 'WIKIDATA'
+  | 'WEB'
+  | 'BOOK'
+  | 'JOURNAL'
+  | 'OTHER';
 type PrismaEpistemicBranch = 'MIMIR' | 'VOLVA' | 'HUGIN';
 
 // Map between YGGDRASIL SourceType and Prisma SourceType
@@ -42,24 +51,24 @@ function toPrismaSourceType(type: SourceType): PrismaSourceType {
 
 function fromPrismaSourceType(type: PrismaSourceType): SourceType {
   const mapping: Record<PrismaSourceType, SourceType> = {
-    'ARXIV': SourceType.ARXIV,
-    'PUBMED': SourceType.PUBMED,
-    'ISO': SourceType.ISO,
-    'RFC': SourceType.RFC,
-    'WIKIDATA': SourceType.WIKIDATA,
-    'WEB': SourceType.WEB,
-    'BOOK': SourceType.BOOK,
-    'JOURNAL': SourceType.JOURNAL,
-    'OTHER': SourceType.OTHER,
+    ARXIV: SourceType.ARXIV,
+    PUBMED: SourceType.PUBMED,
+    ISO: SourceType.ISO,
+    RFC: SourceType.RFC,
+    WIKIDATA: SourceType.WIKIDATA,
+    WEB: SourceType.WEB,
+    BOOK: SourceType.BOOK,
+    JOURNAL: SourceType.JOURNAL,
+    OTHER: SourceType.OTHER,
   };
   return mapping[type] ?? SourceType.OTHER;
 }
 
 function fromPrismaEpistemicBranch(branch: PrismaEpistemicBranch): EpistemicBranch {
   const mapping: Record<PrismaEpistemicBranch, EpistemicBranch> = {
-    'MIMIR': EpistemicBranch.MIMIR,
-    'VOLVA': EpistemicBranch.VOLVA,
-    'HUGIN': EpistemicBranch.HUGIN,
+    MIMIR: EpistemicBranch.MIMIR,
+    VOLVA: EpistemicBranch.VOLVA,
+    HUGIN: EpistemicBranch.HUGIN,
   };
   return mapping[branch] ?? EpistemicBranch.MIMIR;
 }
@@ -163,7 +172,10 @@ export class SourceService {
       input.metadata?.abstract ?? '',
       ...(input.metadata?.keywords ?? []),
     ].join(' ');
-    const embeddingResult = await this.embeddingService.generate(contentForEmbedding, 'RETRIEVAL_DOCUMENT');
+    const embeddingResult = await this.embeddingService.generate(
+      contentForEmbedding,
+      'RETRIEVAL_DOCUMENT'
+    );
     const embeddingVector = `[${embeddingResult.embedding.join(',')}]`;
 
     // Insert using raw SQL to handle pgvector type
@@ -285,10 +297,13 @@ export class SourceService {
   /**
    * Search sources using text matching.
    */
-  async search(query: string, options?: {
-    types?: SourceType[];
-    limit?: number;
-  }): Promise<Source[]> {
+  async search(
+    query: string,
+    options?: {
+      types?: SourceType[];
+      limit?: number;
+    }
+  ): Promise<Source[]> {
     const limit = options?.limit ?? 100;
     const types = options?.types?.map(toPrismaSourceType) ?? [];
     const normalizedQuery = `%${query.toLowerCase()}%`;
@@ -296,7 +311,8 @@ export class SourceService {
     let results: SourceRow[];
 
     if (types.length > 0) {
-      results = await this.db.$queryRawUnsafe<SourceRow[]>(`
+      results = await this.db.$queryRawUnsafe<SourceRow[]>(
+        `
         SELECT id, type, identifier, url, title, authors,
                published_at, fetched_at, trust_score, branch, is_valid,
                invalidated_at, doi, isbn, issn, arxiv_id, pubmed_id,
@@ -313,9 +329,15 @@ export class SourceService {
           )
         ORDER BY published_at DESC NULLS LAST
         LIMIT $4
-      `, types, normalizedQuery, query.toLowerCase(), limit);
+      `,
+        types,
+        normalizedQuery,
+        query.toLowerCase(),
+        limit
+      );
     } else {
-      results = await this.db.$queryRawUnsafe<SourceRow[]>(`
+      results = await this.db.$queryRawUnsafe<SourceRow[]>(
+        `
         SELECT id, type, identifier, url, title, authors,
                published_at, fetched_at, trust_score, branch, is_valid,
                invalidated_at, doi, isbn, issn, arxiv_id, pubmed_id,
@@ -331,20 +353,27 @@ export class SourceService {
           )
         ORDER BY published_at DESC NULLS LAST
         LIMIT $3
-      `, normalizedQuery, query.toLowerCase(), limit);
+      `,
+        normalizedQuery,
+        query.toLowerCase(),
+        limit
+      );
     }
 
-    return results.map(row => this.rowToSource(row));
+    return results.map((row) => this.rowToSource(row));
   }
 
   /**
    * Semantic search using pgvector embeddings.
    */
-  async semanticSearch(query: string, options?: {
-    types?: SourceType[];
-    limit?: number;
-    minSimilarity?: number;
-  }): Promise<Array<{ source: Source; similarity: number }>> {
+  async semanticSearch(
+    query: string,
+    options?: {
+      types?: SourceType[];
+      limit?: number;
+      minSimilarity?: number;
+    }
+  ): Promise<Array<{ source: Source; similarity: number }>> {
     const limit = options?.limit ?? 20;
     const minSimilarity = options?.minSimilarity ?? 0.5;
 
@@ -357,7 +386,8 @@ export class SourceService {
     let results: SourceWithSimilarity[];
 
     if (types.length > 0) {
-      results = await this.db.$queryRawUnsafe<SourceWithSimilarity[]>(`
+      results = await this.db.$queryRawUnsafe<SourceWithSimilarity[]>(
+        `
         SELECT id, type, identifier, url, title, authors,
                published_at, fetched_at, trust_score, branch, is_valid,
                invalidated_at, doi, isbn, issn, arxiv_id, pubmed_id,
@@ -371,9 +401,13 @@ export class SourceService {
           AND type = ANY($1::"SourceType"[])
         ORDER BY embedding <=> '${queryVector}'::vector
         LIMIT $2
-      `, types, limit);
+      `,
+        types,
+        limit
+      );
     } else {
-      results = await this.db.$queryRawUnsafe<SourceWithSimilarity[]>(`
+      results = await this.db.$queryRawUnsafe<SourceWithSimilarity[]>(
+        `
         SELECT id, type, identifier, url, title, authors,
                published_at, fetched_at, trust_score, branch, is_valid,
                invalidated_at, doi, isbn, issn, arxiv_id, pubmed_id,
@@ -386,12 +420,14 @@ export class SourceService {
           AND embedding IS NOT NULL
         ORDER BY embedding <=> '${queryVector}'::vector
         LIMIT $1
-      `, limit);
+      `,
+        limit
+      );
     }
 
     return results
-      .filter(row => (row.similarity ?? 0) >= minSimilarity)
-      .map(row => ({
+      .filter((row) => (row.similarity ?? 0) >= minSimilarity)
+      .map((row) => ({
         source: this.rowToSource(row),
         similarity: row.similarity ?? 0,
       }));

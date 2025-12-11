@@ -11,14 +11,14 @@ import type {
   YggdrasilResponseWithThinking,
   PipelineHealth,
   MemoryGraph,
-  ThinkingStep,
-} from './types';
+  ThinkingStep
+} from "./types"
 
 const YGGDRASIL_API_BASE =
-  process.env.NEXT_PUBLIC_YGGDRASIL_API_URL || 'http://localhost:3000';
+  process.env.NEXT_PUBLIC_YGGDRASIL_API_URL || "http://localhost:3000"
 
 /** Full API URL with prefix */
-const YGGDRASIL_API_URL = `${YGGDRASIL_API_BASE}/api/v1`;
+const YGGDRASIL_API_URL = `${YGGDRASIL_API_BASE}/api/v1`
 
 /** API error with structured details */
 export class YggdrasilApiError extends Error {
@@ -28,25 +28,25 @@ export class YggdrasilApiError extends Error {
     public requestId?: string,
     public details?: unknown
   ) {
-    super(message);
-    this.name = 'YggdrasilApiError';
+    super(message)
+    this.name = "YggdrasilApiError"
   }
 }
 
 /** Parse response and handle errors */
 async function handleResponse<T>(response: Response): Promise<T> {
-  const data = await response.json();
+  const data = await response.json()
 
   if (!response.ok) {
     throw new YggdrasilApiError(
-      data.message || 'Request failed',
+      data.message || "Request failed",
       response.status,
       data.requestId,
       data
-    );
+    )
   }
 
-  return data as T;
+  return data as T
 }
 
 /**
@@ -74,20 +74,20 @@ export async function queryYggdrasil(
   query: YggdrasilQuery
 ): Promise<YggdrasilResponse> {
   const response = await fetch(`${YGGDRASIL_API_URL}/yggdrasil/query`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify(query),
-  });
+    body: JSON.stringify(query)
+  })
 
-  const data = await handleResponse<YggdrasilResponse>(response);
+  const data = await handleResponse<YggdrasilResponse>(response)
 
   // Convert timestamp string to Date
   return {
     ...data,
-    timestamp: new Date(data.timestamp),
-  };
+    timestamp: new Date(data.timestamp)
+  }
 }
 
 /**
@@ -115,25 +115,28 @@ export async function queryYggdrasil(
 export async function queryYggdrasilWithThinking(
   query: YggdrasilQuery
 ): Promise<YggdrasilResponseWithThinking> {
-  const response = await fetch(`${YGGDRASIL_API_URL}/yggdrasil/query/thinking`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(query),
-  });
+  const response = await fetch(
+    `${YGGDRASIL_API_URL}/yggdrasil/query/thinking`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(query)
+    }
+  )
 
-  const data = await handleResponse<YggdrasilResponseWithThinking>(response);
+  const data = await handleResponse<YggdrasilResponseWithThinking>(response)
 
   // Convert timestamps
   return {
     ...data,
     timestamp: new Date(data.timestamp),
-    thinking: data.thinking.map((step) => ({
+    thinking: data.thinking.map(step => ({
       ...step,
-      timestamp: new Date(step.timestamp),
-    })),
-  };
+      timestamp: new Date(step.timestamp)
+    }))
+  }
 }
 
 /**
@@ -150,54 +153,54 @@ export async function streamYggdrasilQuery(
   onChunk: (chunk: string) => void
 ): Promise<YggdrasilResponse> {
   const response = await fetch(`${YGGDRASIL_API_URL}/yggdrasil/query/stream`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify(query),
-  });
+    body: JSON.stringify(query)
+  })
 
   if (!response.ok) {
-    const error = await response.json();
+    const error = await response.json()
     throw new YggdrasilApiError(
-      error.message || 'Stream request failed',
+      error.message || "Stream request failed",
       response.status,
       error.requestId,
       error
-    );
+    )
   }
 
-  const reader = response.body?.getReader();
+  const reader = response.body?.getReader()
   if (!reader) {
-    throw new YggdrasilApiError('No response body', 500);
+    throw new YggdrasilApiError("No response body", 500)
   }
 
-  const decoder = new TextDecoder();
-  let fullContent = '';
-  let finalResponse: YggdrasilResponse | null = null;
+  const decoder = new TextDecoder()
+  let fullContent = ""
+  let finalResponse: YggdrasilResponse | null = null
 
   while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+    const { done, value } = await reader.read()
+    if (done) break
 
-    const chunk = decoder.decode(value, { stream: true });
-    const lines = chunk.split('\n');
+    const chunk = decoder.decode(value, { stream: true })
+    const lines = chunk.split("\n")
 
     for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const data = line.slice(6);
-        if (data === '[DONE]') continue;
+      if (line.startsWith("data: ")) {
+        const data = line.slice(6)
+        if (data === "[DONE]") continue
 
         try {
-          const parsed = JSON.parse(data);
-          if (parsed.type === 'chunk') {
-            fullContent += parsed.content;
-            onChunk(parsed.content);
-          } else if (parsed.type === 'final') {
+          const parsed = JSON.parse(data)
+          if (parsed.type === "chunk") {
+            fullContent += parsed.content
+            onChunk(parsed.content)
+          } else if (parsed.type === "final") {
             finalResponse = {
               ...parsed.response,
-              timestamp: new Date(parsed.response.timestamp),
-            };
+              timestamp: new Date(parsed.response.timestamp)
+            }
           }
         } catch {
           // Skip invalid JSON lines
@@ -207,10 +210,10 @@ export async function streamYggdrasilQuery(
   }
 
   if (!finalResponse) {
-    throw new YggdrasilApiError('No final response received', 500);
+    throw new YggdrasilApiError("No final response received", 500)
   }
 
-  return finalResponse;
+  return finalResponse
 }
 
 /**
@@ -220,18 +223,18 @@ export async function streamYggdrasilQuery(
  */
 export async function checkPipelineHealth(): Promise<PipelineHealth> {
   const response = await fetch(`${YGGDRASIL_API_URL}/yggdrasil/health`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+      "Content-Type": "application/json"
+    }
+  })
 
-  const data = await handleResponse<PipelineHealth>(response);
+  const data = await handleResponse<PipelineHealth>(response)
 
   return {
     ...data,
-    timestamp: new Date(data.timestamp),
-  };
+    timestamp: new Date(data.timestamp)
+  }
 }
 
 /**
@@ -244,35 +247,35 @@ export async function checkPipelineHealth(): Promise<PipelineHealth> {
 export async function getMemoryGraph(
   userId: string,
   options?: {
-    limit?: number;
-    since?: Date;
-    types?: string[];
+    limit?: number
+    since?: Date
+    types?: string[]
   }
 ): Promise<MemoryGraph> {
-  const params = new URLSearchParams();
-  params.set('userId', userId);
+  const params = new URLSearchParams()
+  params.set("userId", userId)
 
   if (options?.limit) {
-    params.set('limit', options.limit.toString());
+    params.set("limit", options.limit.toString())
   }
   if (options?.since) {
-    params.set('since', options.since.toISOString());
+    params.set("since", options.since.toISOString())
   }
   if (options?.types) {
-    params.set('types', options.types.join(','));
+    params.set("types", options.types.join(","))
   }
 
   const response = await fetch(
     `${YGGDRASIL_API_URL}/munin/graph?${params.toString()}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-      },
+        "Content-Type": "application/json"
+      }
     }
-  );
+  )
 
-  return handleResponse<MemoryGraph>(response);
+  return handleResponse<MemoryGraph>(response)
 }
 
 /**
@@ -289,14 +292,14 @@ export async function createCheckpoint(
   description?: string
 ): Promise<{ checkpointId: string }> {
   const response = await fetch(`${YGGDRASIL_API_URL}/munin/checkpoint`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({ userId, label, description }),
-  });
+    body: JSON.stringify({ userId, label, description })
+  })
 
-  return handleResponse<{ checkpointId: string }>(response);
+  return handleResponse<{ checkpointId: string }>(response)
 }
 
 /**
@@ -311,14 +314,14 @@ export async function rollbackToCheckpoint(
   checkpointId: string
 ): Promise<{ success: boolean; restoredMemories: number }> {
   const response = await fetch(`${YGGDRASIL_API_URL}/munin/rollback`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({ userId, checkpointId }),
-  });
+    body: JSON.stringify({ userId, checkpointId })
+  })
 
   return handleResponse<{ success: boolean; restoredMemories: number }>(
     response
-  );
+  )
 }

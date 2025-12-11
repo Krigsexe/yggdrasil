@@ -20,19 +20,19 @@ import { createLogger } from '@yggdrasil/shared';
 const logger = createLogger('FactExtractor', 'info');
 
 export enum FactType {
-  IDENTITY = 'IDENTITY',           // Who the user is
-  RELATIONSHIP = 'RELATIONSHIP',   // How user relates to system
-  PREFERENCE = 'PREFERENCE',       // User preferences
-  CONTEXT = 'CONTEXT',             // Background information
-  GOAL = 'GOAL',                   // User objectives
-  INSTRUCTION = 'INSTRUCTION',     // Direct instructions to remember
-  DECLARATION = 'DECLARATION',     // General declarative facts
+  IDENTITY = 'IDENTITY', // Who the user is
+  RELATIONSHIP = 'RELATIONSHIP', // How user relates to system
+  PREFERENCE = 'PREFERENCE', // User preferences
+  CONTEXT = 'CONTEXT', // Background information
+  GOAL = 'GOAL', // User objectives
+  INSTRUCTION = 'INSTRUCTION', // Direct instructions to remember
+  DECLARATION = 'DECLARATION', // General declarative facts
 }
 
 export interface ExtractedFact {
   type: FactType;
   content: string;
-  confidence: number;      // 0-100
+  confidence: number; // 0-100
   keywords: string[];
   requiresVerification: boolean;
 }
@@ -153,7 +153,7 @@ export class FactExtractorService {
         return this.extractWithRegex(message);
       }
 
-      const data = await response.json() as {
+      const data = (await response.json()) as {
         content: Array<{ type: string; text: string }>;
       };
 
@@ -183,7 +183,7 @@ export class FactExtractorService {
 
       logger.info('Facts extracted via LLM', {
         count: facts.length,
-        types: facts.map(f => f.type),
+        types: facts.map((f) => f.type),
       });
 
       return facts;
@@ -231,7 +231,8 @@ export class FactExtractorService {
       },
       // Relationship patterns
       {
-        pattern: /(?:tu\s+es\s+(?:maintenant\s+)?(?:relié|connecté)\s+à|you\s+are\s+(?:now\s+)?connected\s+to)\s+([^.,!?]+)/i,
+        pattern:
+          /(?:tu\s+es\s+(?:maintenant\s+)?(?:relié|connecté)\s+à|you\s+are\s+(?:now\s+)?connected\s+to)\s+([^.,!?]+)/i,
         type: FactType.RELATIONSHIP,
         confidence: 80,
         requiresVerification: true,
@@ -251,7 +252,8 @@ export class FactExtractorService {
       },
       // Goal patterns
       {
-        pattern: /(?:je\s+(?:veux|souhaite|cherche\s+à)|i\s+want\s+to|my\s+goal\s+is)\s+([^.,!?]+)/i,
+        pattern:
+          /(?:je\s+(?:veux|souhaite|cherche\s+à)|i\s+want\s+to|my\s+goal\s+is)\s+([^.,!?]+)/i,
         type: FactType.GOAL,
         confidence: 85,
         requiresVerification: false,
@@ -287,23 +289,105 @@ export class FactExtractorService {
    */
   private extractKeywords(content: string): string[] {
     const stopWords = new Set([
-      'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'à', 'au', 'aux',
-      'et', 'ou', 'mais', 'donc', 'car', 'ni', 'que', 'qui', 'quoi',
-      'ce', 'cet', 'cette', 'ces', 'mon', 'ton', 'son', 'notre', 'votre',
-      'je', 'tu', 'il', 'elle', 'nous', 'vous', 'ils', 'elles', 'on',
-      'est', 'sont', 'suis', 'es', 'sommes', 'êtes', 'être', 'avoir',
-      'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-      'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
-      'should', 'may', 'might', 'must', 'can', 'to', 'of', 'in', 'for',
-      'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through', 'during',
-      'and', 'but', 'or', 'nor', 'so', 'yet', 'both', 'either', 'neither',
+      'le',
+      'la',
+      'les',
+      'un',
+      'une',
+      'des',
+      'de',
+      'du',
+      'à',
+      'au',
+      'aux',
+      'et',
+      'ou',
+      'mais',
+      'donc',
+      'car',
+      'ni',
+      'que',
+      'qui',
+      'quoi',
+      'ce',
+      'cet',
+      'cette',
+      'ces',
+      'mon',
+      'ton',
+      'son',
+      'notre',
+      'votre',
+      'je',
+      'tu',
+      'il',
+      'elle',
+      'nous',
+      'vous',
+      'ils',
+      'elles',
+      'on',
+      'est',
+      'sont',
+      'suis',
+      'es',
+      'sommes',
+      'êtes',
+      'être',
+      'avoir',
+      'the',
+      'a',
+      'an',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'being',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+      'will',
+      'would',
+      'could',
+      'should',
+      'may',
+      'might',
+      'must',
+      'can',
+      'to',
+      'of',
+      'in',
+      'for',
+      'on',
+      'with',
+      'at',
+      'by',
+      'from',
+      'as',
+      'into',
+      'through',
+      'during',
+      'and',
+      'but',
+      'or',
+      'nor',
+      'so',
+      'yet',
+      'both',
+      'either',
+      'neither',
     ]);
 
     return content
       .toLowerCase()
       .replace(/[^a-zàâäéèêëïîôùûüç\s]/g, ' ')
       .split(/\s+/)
-      .filter(word => word.length > 2 && !stopWords.has(word))
+      .filter((word) => word.length > 2 && !stopWords.has(word))
       .slice(0, 20);
   }
 }

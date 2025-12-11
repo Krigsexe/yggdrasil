@@ -1,6 +1,6 @@
 # HEIMDALL
 
-> *"Heimdall voit a cent lieues, de jour comme de nuit. Il entend l'herbe pousser sur la terre et la laine sur les moutons."*
+> _"Heimdall voit a cent lieues, de jour comme de nuit. Il entend l'herbe pousser sur la terre et la laine sur les moutons."_
 
 ## Description
 
@@ -37,14 +37,14 @@ pnpm build
 
 Variables d'environnement :
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Port d'ecoute | `3000` |
-| `JWT_SECRET` | Cle secrete JWT | — |
-| `JWT_EXPIRY` | Duree de validite | `15m` |
-| `REDIS_URL` | URL Redis | `redis://localhost:6379` |
-| `RATE_LIMIT_TTL` | Fenetre de rate limit | `60` |
-| `RATE_LIMIT_MAX` | Requetes max par fenetre | `100` |
+| Variable         | Description              | Default                  |
+| ---------------- | ------------------------ | ------------------------ |
+| `PORT`           | Port d'ecoute            | `3000`                   |
+| `JWT_SECRET`     | Cle secrete JWT          | —                        |
+| `JWT_EXPIRY`     | Duree de validite        | `15m`                    |
+| `REDIS_URL`      | URL Redis                | `redis://localhost:6379` |
+| `RATE_LIMIT_TTL` | Fenetre de rate limit    | `60`                     |
+| `RATE_LIMIT_MAX` | Requetes max par fenetre | `100`                    |
 
 ## API
 
@@ -104,6 +104,6 @@ HEIMDALL implemente les protections suivantes :
 
 <div align="center">
 
-*"Je suis le gardien. Nul ne passe sans etre vu."*
+_"Je suis le gardien. Nul ne passe sans etre vu."_
 
 </div>

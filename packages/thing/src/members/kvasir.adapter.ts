@@ -39,7 +39,10 @@ export class KvasirAdapter {
     };
   }
 
-  analyze(content: string, _context?: string): {
+  analyze(
+    content: string,
+    _context?: string
+  ): {
     claims: string[];
     confidence: number;
     concerns: string[];

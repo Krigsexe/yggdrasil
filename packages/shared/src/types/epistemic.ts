@@ -64,10 +64,7 @@ export function getConfidenceLabel(branch: EpistemicBranch): ConfidenceLabel {
 /**
  * Validates that a confidence value is within valid range for a branch
  */
-export function isValidConfidenceForBranch(
-  confidence: number,
-  branch: EpistemicBranch
-): boolean {
+export function isValidConfidenceForBranch(confidence: number, branch: EpistemicBranch): boolean {
   const threshold = CONFIDENCE_THRESHOLDS[branch];
   return confidence >= threshold.min && confidence <= threshold.max;
 }

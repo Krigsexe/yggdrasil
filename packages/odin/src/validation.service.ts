@@ -42,50 +42,26 @@ export class ValidationService {
     // Step 1: Source anchoring check
     const anchoringResult = this.checkAnchoring(input, stepNumber++, steps);
     if (!anchoringResult.passed && input.requireMimirAnchor !== false) {
-      return this.createRejectionResult(
-        input,
-        'NO_SOURCE',
-        steps,
-        traceId,
-        startTime
-      );
+      return this.createRejectionResult(input, 'NO_SOURCE', steps, traceId, startTime);
     }
 
     // Step 2: Memory consistency check
     const memoryResult = this.checkMemoryConsistency(input, stepNumber++, steps);
     if (!memoryResult.passed) {
-      return this.createRejectionResult(
-        input,
-        'CONTRADICTS_MEMORY',
-        steps,
-        traceId,
-        startTime
-      );
+      return this.createRejectionResult(input, 'CONTRADICTS_MEMORY', steps, traceId, startTime);
     }
 
     // Step 3: Council consensus check
     if (input.deliberation) {
       const consensusResult = this.checkConsensus(input.deliberation, stepNumber++, steps);
       if (!consensusResult.passed) {
-        return this.createRejectionResult(
-          input,
-          'NO_CONSENSUS',
-          steps,
-          traceId,
-          startTime
-        );
+        return this.createRejectionResult(input, 'NO_CONSENSUS', steps, traceId, startTime);
       }
 
       // Step 4: LOKI challenges check
       const lokiResult = this.checkLokiChallenges(input.deliberation, stepNumber++, steps);
       if (!lokiResult.passed) {
-        return this.createRejectionResult(
-          input,
-          'FAILED_CRITIQUE',
-          steps,
-          traceId,
-          startTime
-        );
+        return this.createRejectionResult(input, 'FAILED_CRITIQUE', steps, traceId, startTime);
       }
     }
 

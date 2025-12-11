@@ -80,11 +80,7 @@ export class ThinkingService {
   /**
    * Generate thought for classification
    */
-  thinkClassifying(
-    requestId: string,
-    queryType: string,
-    isConversational: boolean
-  ): void {
+  thinkClassifying(requestId: string, queryType: string, isConversational: boolean): void {
     if (isConversational) {
       this.emit(requestId, {
         phase: 'routing',
@@ -132,7 +128,7 @@ export class ThinkingService {
         thought: 'Je réfléchis à la meilleure façon de répondre...',
       });
     } else {
-      const memberNames = members.map(m => {
+      const memberNames = members.map((m) => {
         const names: Record<CouncilMember, string> = {
           [CouncilMember.KVASIR]: 'le Sage',
           [CouncilMember.BRAGI]: 'le Poète',
@@ -190,11 +186,7 @@ export class ThinkingService {
   /**
    * Generate thought for validation result
    */
-  thinkValidationResult(
-    requestId: string,
-    isValid: boolean,
-    confidence: number
-  ): void {
+  thinkValidationResult(requestId: string, isValid: boolean, confidence: number): void {
     if (isValid) {
       this.emit(requestId, {
         phase: 'validating',

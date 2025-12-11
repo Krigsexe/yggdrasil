@@ -1,6 +1,6 @@
 <div align="center">
 
-# YGGDRASIL  [![Visitors Badge](https://api.visitorbadge.io/api/VisitorHit?user=Krigsexe&repo=yggdrasil&countColor=%237B1E7A)](https://github.com/Krigsexe/yggdrasil)
+# YGGDRASIL [![Visitors Badge](https://api.visitorbadge.io/api/VisitorHit?user=Krigsexe&repo=yggdrasil&countColor=%237B1E7A)](https://github.com/Krigsexe/yggdrasil)
 
 ### L'Arbre-Monde de l'Intelligence Artificielle
 
@@ -36,14 +36,14 @@ Dans la mythologie nordique, **Yggdrasil** est l'Arbre-Monde — le frene cosmiq
 
 YGGDRASIL est une architecture d'AGI qui :
 
-| Principe | Approche Actuelle | Approche YGGDRASIL |
-|----------|-------------------|---------------------|
-| **Verite** | "Probablement vrai" | "Verifie + sources" ou "Je ne sais pas" |
-| **Memoire** | Reset a chaque session | Memoire chrono-semantique persistante |
-| **Sources** | Melange opaque | Separation stricte : Valide / Recherche / Internet |
-| **Modeles** | Un geant monolithique | Consortium de specialistes orchestres |
-| **Controle** | Corporations privees | Open-source, auto-hebergeable, federable |
-| **Energie** | Entrainer toujours plus | Mutualiser l'existant |
+| Principe     | Approche Actuelle       | Approche YGGDRASIL                                 |
+| ------------ | ----------------------- | -------------------------------------------------- |
+| **Verite**   | "Probablement vrai"     | "Verifie + sources" ou "Je ne sais pas"            |
+| **Memoire**  | Reset a chaque session  | Memoire chrono-semantique persistante              |
+| **Sources**  | Melange opaque          | Separation stricte : Valide / Recherche / Internet |
+| **Modeles**  | Un geant monolithique   | Consortium de specialistes orchestres              |
+| **Controle** | Corporations privees    | Open-source, auto-hebergeable, federable           |
+| **Energie**  | Entrainer toujours plus | Mutualiser l'existant                              |
 
 ---
 
@@ -52,40 +52,48 @@ YGGDRASIL est une architecture d'AGI qui :
 YGGDRASIL repose sur sept principes intransgressibles :
 
 ### 1. Veracite Absolue
-> *"Jamais de probabilite. La certitude ou le silence."*
+
+> _"Jamais de probabilite. La certitude ou le silence."_
 
 YGGDRASIL dit "verifie, voici les sources" ou "je ne sais pas". Jamais "c'est probablement vrai".
 
 ### 2. Tracabilite Totale
-> *"Chaque pensee a une origine. Chaque decision a une trace."*
+
+> _"Chaque pensee a une origine. Chaque decision a une trace."_
 
 Chaque reponse peut etre auditee : d'ou vient l'information, pourquoi cette decision, quel chemin de raisonnement.
 
 ### 3. Separation Epistemique
-> *"Le savoir, l'hypothese et le bruit ne se melangent jamais."*
+
+> _"Le savoir, l'hypothese et le bruit ne se melangent jamais."_
 
 Trois branches strictement separees :
+
 - **MIMIR** — Connaissances scientifiquement prouvees
 - **VOLVA** — Hypotheses et theories en exploration
 - **HUGIN** — Informations internet non verifiees
 
 ### 4. Memoire Vivante
-> *"Une intelligence sans memoire n'est qu'un reflexe."*
+
+> _"Une intelligence sans memoire n'est qu'un reflexe."_
 
 YGGDRASIL se souvient : interactions passees, decisions prises, erreurs corrigees, contextes evolutifs.
 
 ### 5. Reversibilite
-> *"Aucune erreur n'est definitive."*
+
+> _"Aucune erreur n'est definitive."_
 
 Rollback possible vers n'importe quel etat passe. Correction des decisions basees sur des informations ulterieurement invalidees.
 
 ### 6. Souverainete
-> *"Les donnees de l'humanite appartiennent a l'humanite."*
+
+> _"Les donnees de l'humanite appartiennent a l'humanite."_
 
 Open-source, auto-hebergeable, federable, auditable. Aucune dependance a un fournisseur unique.
 
 ### 7. Soutenabilite
-> *"Une intelligence qui detruit sa planete n'est pas intelligente."*
+
+> _"Une intelligence qui detruit sa planete n'est pas intelligente."_
 
 Mutualisation des modeles existants. Zero entrainement de nouveaux modeles. Metriques de consommation transparentes.
 
@@ -100,29 +108,29 @@ MONDE --> HEIMDALL --> RATATOSK --> [MIMIR|VOLVA|HUGIN] --> THING --> ODIN --> M
 
 ### Les Composants
 
-| Composant | Role | Inspiration |
-|-----------|------|-------------|
-| **HEIMDALL** | Gateway — Auth, rate limiting, audit | Le gardien du Bifrost qui voit et entend tout |
-| **RATATOSK** | Routage — Classification, extraction de contexte | L'ecureuil messager qui parcourt l'arbre |
-| **MIMIR** | Branche Validee — Connaissances prouvees (100%) | Le puits de sagesse ou Odin sacrifia son oeil |
-| **VOLVA** | Branche Recherche — Hypotheses, theories | La voyante qui explore l'inconnu |
-| **HUGIN** | Branche Internet — Informations filtrees | "Pensee" — corbeau explorateur d'Odin |
-| **THING** | Consortium — Deliberation multi-modeles | L'assemblee ou les dieux prennent les decisions |
-| **ODIN** | Maestro — Validation finale, synthese | Le Pere-de-Tout, celui qui sait |
-| **MUNIN** | Memoire — Stockage chrono-semantique | "Memoire" — l'autre corbeau d'Odin |
-| **BIFROST** | Interface Chat — Frontend utilisateur | Le pont arc-en-ciel vers les dieux |
+| Composant    | Role                                             | Inspiration                                     |
+| ------------ | ------------------------------------------------ | ----------------------------------------------- |
+| **HEIMDALL** | Gateway — Auth, rate limiting, audit             | Le gardien du Bifrost qui voit et entend tout   |
+| **RATATOSK** | Routage — Classification, extraction de contexte | L'ecureuil messager qui parcourt l'arbre        |
+| **MIMIR**    | Branche Validee — Connaissances prouvees (100%)  | Le puits de sagesse ou Odin sacrifia son oeil   |
+| **VOLVA**    | Branche Recherche — Hypotheses, theories         | La voyante qui explore l'inconnu                |
+| **HUGIN**    | Branche Internet — Informations filtrees         | "Pensee" — corbeau explorateur d'Odin           |
+| **THING**    | Consortium — Deliberation multi-modeles          | L'assemblee ou les dieux prennent les decisions |
+| **ODIN**     | Maestro — Validation finale, synthese            | Le Pere-de-Tout, celui qui sait                 |
+| **MUNIN**    | Memoire — Stockage chrono-semantique             | "Memoire" — l'autre corbeau d'Odin              |
+| **BIFROST**  | Interface Chat — Frontend utilisateur            | Le pont arc-en-ciel vers les dieux              |
 
 ### Le Conseil (THING) — Configuration Actuelle
 
-| Membre | Specialite | Modele | Provider |
-|--------|------------|--------|----------|
-| **KVASIR** | Raisonnement profond | Gemini 2.5 Pro | Google |
-| **BRAGI** | Synthese creative | Gemini 2.5 Flash | Google |
-| **SYN** | Vision multimodale | Gemini 2.5 Pro | Google |
-| **NORNES** | Raisonnement avance | Qwen QWQ-32B | Groq |
-| **SAGA** | Connaissance generale | Llama 3.3 70B | Groq |
-| **LOKI** | Critique adversariale | DeepSeek R1 Distill | Groq |
-| **TYR** | Arbitrage, consensus | Voting system | Local |
+| Membre     | Specialite            | Modele              | Provider |
+| ---------- | --------------------- | ------------------- | -------- |
+| **KVASIR** | Raisonnement profond  | Gemini 2.5 Pro      | Google   |
+| **BRAGI**  | Synthese creative     | Gemini 2.5 Flash    | Google   |
+| **SYN**    | Vision multimodale    | Gemini 2.5 Pro      | Google   |
+| **NORNES** | Raisonnement avance   | Qwen QWQ-32B        | Groq     |
+| **SAGA**   | Connaissance generale | Llama 3.3 70B       | Groq     |
+| **LOKI**   | Critique adversariale | DeepSeek R1 Distill | Groq     |
+| **TYR**    | Arbitrage, consensus  | Voting system       | Local    |
 
 ---
 
@@ -150,9 +158,9 @@ pnpm install
 
 YGGDRASIL utilise deux providers LLM avec **tiers gratuits genereux** :
 
-| Provider | Cles Requises | Lien d'inscription |
-|----------|--------------|---------------------|
-| **Groq** | `GROQ_API_KEY` | [console.groq.com](https://console.groq.com/keys) |
+| Provider          | Cles Requises           | Lien d'inscription                                        |
+| ----------------- | ----------------------- | --------------------------------------------------------- |
+| **Groq**          | `GROQ_API_KEY`          | [console.groq.com](https://console.groq.com/keys)         |
 | **Google Gemini** | `GOOGLE_GEMINI_API_KEY` | [aistudio.google.com](https://aistudio.google.com/apikey) |
 
 ### Etape 3 : Configuration
@@ -214,6 +222,7 @@ irm https://raw.githubusercontent.com/Krigsexe/yggdrasil/main/scripts/setup.ps1 
 ```
 
 Ces scripts :
+
 1. Verifient les prerequis (Node.js, pnpm, Docker)
 2. Clonent le repository
 3. Installent les dependances
@@ -235,6 +244,7 @@ Ces scripts :
 6. Ajouter dans `.env` : `GROQ_API_KEY=gsk_xxxx...`
 
 **Modeles utilises :**
+
 - `qwen-qwq-32b` (NORNES) — Raisonnement avance
 - `llama-3.3-70b-versatile` (SAGA) — Connaissance generale
 - `deepseek-r1-distill-llama-70b` (LOKI) — Critique
@@ -249,6 +259,7 @@ Ces scripts :
 6. Ajouter dans `.env` : `GOOGLE_GEMINI_API_KEY=AIzaSy...`
 
 **Modeles utilises :**
+
 - `gemini-2.5-pro` (KVASIR, SYN) — Raisonnement profond
 - `gemini-2.5-flash-preview-05-20` (BRAGI) — Synthese rapide
 
@@ -324,13 +335,13 @@ yggdrasil/
 
 YGGDRASIL est un projet communautaire. Nous cherchons :
 
-| Profil | Contribution |
-|--------|--------------|
+| Profil          | Contribution                            |
+| --------------- | --------------------------------------- |
 | **Architectes** | Developpeurs, ingenieurs, chercheurs IA |
-| **Gardiens** | Ethiciens, philosophes, juristes |
-| **Eclaireurs** | Scientifiques de toutes disciplines |
-| **Critiques** | Sceptiques, red teamers, adversaires |
-| **Citoyens** | Utilisateurs, curieux, concernes |
+| **Gardiens**    | Ethiciens, philosophes, juristes        |
+| **Eclaireurs**  | Scientifiques de toutes disciplines     |
+| **Critiques**   | Sceptiques, red teamers, adversaires    |
+| **Citoyens**    | Utilisateurs, curieux, concernes        |
 
 **Lire le [Guide de Contribution](CONTRIBUTING.md)** pour commencer.
 
@@ -339,6 +350,7 @@ YGGDRASIL est un projet communautaire. Nous cherchons :
 ## Roadmap
 
 ### Phase 1 : Fondations (2024-2025)
+
 - [x] Publication du Manifeste
 - [x] Repository public
 - [x] Architecture complete implementee
@@ -349,12 +361,14 @@ YGGDRASIL est un projet communautaire. Nous cherchons :
 - [ ] Tests et validation
 
 ### Phase 2 : Construction (2025-2026)
+
 - [ ] MIMIR : Integration sources scientifiques (arXiv, PubMed)
 - [ ] ODIN : Validation 100% avec ancrage sources
 - [ ] MUNIN : Memoire chrono-semantique complete
 - [ ] Tests publics et bug bounty
 
 ### Phase 3 : Ouverture (2026-2027)
+
 - [ ] API publique
 - [ ] Instances federees
 - [ ] Gouvernance communautaire formalisee
@@ -362,6 +376,7 @@ YGGDRASIL est un projet communautaire. Nous cherchons :
 - [ ] Audit externe independant
 
 ### Phase 4 : Expansion (2027+)
+
 - [ ] Multilingue complet
 - [ ] Domaines specialises (medical, juridique, scientifique)
 - [ ] Standard international propose
@@ -394,7 +409,7 @@ Le code appartient a l'humanite. Aucune entite ne peut fermer, breveter, ou priv
 
 **"Nous ne construisons pas une machine. Nous posons les fondations de la pensee de demain."**
 
-*L'Arbre grandit avec ceux qui le nourrissent.*
+_L'Arbre grandit avec ceux qui le nourrissent._
 
 [Rejoindre la communaute](https://github.com/Krigsexe/yggdrasil/discussions) | [Signaler un bug](https://github.com/Krigsexe/yggdrasil/issues) | [Proposer une feature](https://github.com/Krigsexe/yggdrasil/issues/new)
 

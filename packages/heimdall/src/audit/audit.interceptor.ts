@@ -4,12 +4,7 @@
  * Automatically logs all HTTP requests for traceability.
  */
 
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuditService } from './audit.service.js';
@@ -106,9 +101,7 @@ export class AuditInterceptor implements NestInterceptor {
   private getResourceType(url: string): string {
     const segments = url.split('/').filter(Boolean);
     // Skip 'api' and 'v1' prefixes
-    const resourceSegment = segments.find(
-      (s) => !['api', 'v1', 'v2'].includes(s)
-    );
+    const resourceSegment = segments.find((s) => !['api', 'v1', 'v2'].includes(s));
     return resourceSegment ?? 'unknown';
   }
 

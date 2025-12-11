@@ -31,9 +31,7 @@ export interface MimirResult {
 export class MimirBridge {
   private readonly sourceService: SourceService;
 
-  constructor(
-    @Inject(DatabaseService) private readonly db: DatabaseService,
-  ) {
+  constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {
     const embeddingService = new EmbeddingService();
     this.sourceService = new SourceService(db, embeddingService);
   }
@@ -108,11 +106,46 @@ export class MimirBridge {
   private extractKeywords(query: string): string[] {
     // Simple keyword extraction - remove common words
     const stopWords = new Set([
-      'what', 'is', 'the', 'a', 'an', 'how', 'why', 'when', 'where',
-      'who', 'which', 'do', 'does', 'can', 'could', 'would', 'should',
-      'are', 'was', 'were', 'been', 'be', 'have', 'has', 'had',
-      'of', 'in', 'to', 'for', 'with', 'on', 'at', 'by', 'from',
-      'about', 'into', 'through', 'during', 'before', 'after',
+      'what',
+      'is',
+      'the',
+      'a',
+      'an',
+      'how',
+      'why',
+      'when',
+      'where',
+      'who',
+      'which',
+      'do',
+      'does',
+      'can',
+      'could',
+      'would',
+      'should',
+      'are',
+      'was',
+      'were',
+      'been',
+      'be',
+      'have',
+      'has',
+      'had',
+      'of',
+      'in',
+      'to',
+      'for',
+      'with',
+      'on',
+      'at',
+      'by',
+      'from',
+      'about',
+      'into',
+      'through',
+      'during',
+      'before',
+      'after',
     ]);
 
     return query
@@ -128,9 +161,7 @@ export class MimirBridge {
   ): string {
     // In production, this would use an LLM to synthesize the answer
     // from the verified sources. For now, we return a placeholder.
-    const sourceList = sources
-      .map((s) => `- ${s.title} (${s.identifier})`)
-      .join('\n');
+    const sourceList = sources.map((s) => `- ${s.title} (${s.identifier})`).join('\n');
 
     return `Based on verified sources:\n${sourceList}`;
   }

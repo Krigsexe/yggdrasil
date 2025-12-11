@@ -58,13 +58,13 @@ Pour nous aider a traiter rapidement votre signalement :
 
 ## Notre Processus
 
-| Etape | Delai | Description |
-|-------|-------|-------------|
-| Accuse de reception | 24h | Confirmation que nous avons recu votre rapport |
-| Triage | 72h | Evaluation de la severite et de la validite |
-| Investigation | 1-2 semaines | Analyse approfondie |
-| Correction | Variable | Developpement du fix |
-| Disclosure | Coordonne | Publication coordonnee avec le reporter |
+| Etape               | Delai        | Description                                    |
+| ------------------- | ------------ | ---------------------------------------------- |
+| Accuse de reception | 24h          | Confirmation que nous avons recu votre rapport |
+| Triage              | 72h          | Evaluation de la severite et de la validite    |
+| Investigation       | 1-2 semaines | Analyse approfondie                            |
+| Correction          | Variable     | Developpement du fix                           |
+| Disclosure          | Coordonne    | Publication coordonnee avec le reporter        |
 
 ## Vulnerabilites Critiques pour YGGDRASIL
 
@@ -72,28 +72,28 @@ En plus des vulnerabilites classiques, nous sommes particulierement vigilants su
 
 ### Integrite de la Verite
 
-| Categorie | Description | Criticite |
-|-----------|-------------|-----------|
-| **MIMIR Poisoning** | Injection de fausses informations dans la branche validee | Critique |
-| **ODIN Bypass** | Contournement de la validation finale | Critique |
-| **Source Spoofing** | Falsification des sources de validation | Critique |
-| **Epistemic Contamination** | Melange des branches MIMIR/VOLVA/HUGIN | Haute |
+| Categorie                   | Description                                               | Criticite |
+| --------------------------- | --------------------------------------------------------- | --------- |
+| **MIMIR Poisoning**         | Injection de fausses informations dans la branche validee | Critique  |
+| **ODIN Bypass**             | Contournement de la validation finale                     | Critique  |
+| **Source Spoofing**         | Falsification des sources de validation                   | Critique  |
+| **Epistemic Contamination** | Melange des branches MIMIR/VOLVA/HUGIN                    | Haute     |
 
 ### Memoire et Tracabilite
 
-| Categorie | Description | Criticite |
-|-----------|-------------|-----------|
-| **MUNIN Corruption** | Alteration de la memoire chrono-semantique | Critique |
-| **Trace Deletion** | Suppression des traces d'audit | Haute |
-| **Rollback Bypass** | Impossibilite de rollback sur erreur | Haute |
+| Categorie            | Description                                | Criticite |
+| -------------------- | ------------------------------------------ | --------- |
+| **MUNIN Corruption** | Alteration de la memoire chrono-semantique | Critique  |
+| **Trace Deletion**   | Suppression des traces d'audit             | Haute     |
+| **Rollback Bypass**  | Impossibilite de rollback sur erreur       | Haute     |
 
 ### Souverainete des Donnees
 
-| Categorie | Description | Criticite |
-|-----------|-------------|-----------|
-| **Data Exfiltration** | Fuite de donnees utilisateur | Critique |
-| **Consent Bypass** | Utilisation de donnees sans consentement | Haute |
-| **Federation Leak** | Fuite entre instances federees | Haute |
+| Categorie             | Description                              | Criticite |
+| --------------------- | ---------------------------------------- | --------- |
+| **Data Exfiltration** | Fuite de donnees utilisateur             | Critique  |
+| **Consent Bypass**    | Utilisation de donnees sans consentement | Haute     |
+| **Federation Leak**   | Fuite entre instances federees           | Haute     |
 
 ## Mesures de Securite
 
@@ -120,9 +120,9 @@ Nous reconnaissons publiquement (avec votre accord) les chercheurs en securite q
 
 ### Hall of Fame
 
-| Chercheur | Contribution | Date |
-|-----------|--------------|------|
-| *Vous ?* | *Soyez le premier !* | — |
+| Chercheur | Contribution         | Date |
+| --------- | -------------------- | ---- |
+| _Vous ?_  | _Soyez le premier !_ | —    |
 
 ### Recompenses
 
@@ -135,11 +135,11 @@ Bien que YGGDRASIL soit un projet open-source sans financement commercial :
 
 ## Versions Supportees
 
-| Version | Support Securite |
-|---------|------------------|
-| main (dev) | Actif |
-| v1.x (a venir) | Support complet |
-| < v1.0 | Best effort |
+| Version        | Support Securite |
+| -------------- | ---------------- |
+| main (dev)     | Actif            |
+| v1.x (a venir) | Support complet  |
+| < v1.0         | Best effort      |
 
 ## Ressources
 
@@ -151,6 +151,6 @@ Bien que YGGDRASIL soit un projet open-source sans financement commercial :
 
 <div align="center">
 
-*"La verite ne peut exister que dans un systeme digne de confiance."*
+_"La verite ne peut exister que dans un systeme digne de confiance."_
 
 </div>

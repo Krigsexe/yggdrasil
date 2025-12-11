@@ -5,13 +5,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import {
-  AuditLog,
-  AuditAction,
-  AuditQuery,
-  createLogger,
-  generateId,
-} from '@yggdrasil/shared';
+import { AuditLog, AuditAction, AuditQuery, createLogger, generateId } from '@yggdrasil/shared';
 
 const logger = createLogger('AuditService', 'info');
 

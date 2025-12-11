@@ -5,12 +5,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import {
-  CouncilDeliberation,
-  ValidationResult,
-  Source,
-  createLogger,
-} from '@yggdrasil/shared';
+import { CouncilDeliberation, ValidationResult, Source, createLogger } from '@yggdrasil/shared';
 
 const logger = createLogger('SynthesisService', 'info');
 
@@ -67,7 +62,8 @@ export class SynthesisService {
       content: `I do not know. ${messages[reason] ?? 'Validation failed.'}`,
       sources: [],
       confidence: 0,
-      disclaimer: 'This response indicates that YGGDRASIL could not verify the requested information to the required standard of certainty.',
+      disclaimer:
+        'This response indicates that YGGDRASIL could not verify the requested information to the required standard of certainty.',
     };
   }
 

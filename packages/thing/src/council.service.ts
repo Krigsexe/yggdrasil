@@ -81,7 +81,9 @@ export class CouncilService {
 
     // Default council members based on available adapters
     const members = request.members ?? this.getAvailableMembers();
-    const activeMembers = members.filter(m => m !== CouncilMember.LOKI && m !== CouncilMember.TYR);
+    const activeMembers = members.filter(
+      (m) => m !== CouncilMember.LOKI && m !== CouncilMember.TYR
+    );
 
     logger.info('Deliberation started', {
       id: deliberationId,
@@ -93,7 +95,11 @@ export class CouncilService {
     // Announce each member and gather responses with progress updates
     await onProgress('deliberating', `Le conseil se reunit: ${activeMembers.join(', ')}...`);
 
-    const responses = await this.gatherResponsesWithProgress(request.query, activeMembers, onProgress);
+    const responses = await this.gatherResponsesWithProgress(
+      request.query,
+      activeMembers,
+      onProgress
+    );
 
     // LOKI challenges the responses
     await onProgress('deliberating', `LOKI examine les reponses...`);
@@ -193,7 +199,10 @@ export class CouncilService {
       const response = await this.getMemberResponse(member, query);
 
       if (response) {
-        await onProgress('deliberating', `${member} a repondu (confiance: ${response.confidence}%)`);
+        await onProgress(
+          'deliberating',
+          `${member} a repondu (confiance: ${response.confidence}%)`
+        );
         return response;
       }
 
@@ -309,7 +318,10 @@ export class CouncilService {
       try {
         await onProgress('deliberating', `LOKI examine la reponse de ${response.member}...`);
 
-        let lokiResponse: { challenge: string; severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' } | null;
+        let lokiResponse: {
+          challenge: string;
+          severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+        } | null;
 
         // Use Groq adapter if available (DeepSeek R1 Distill)
         if (this.lokiGroq?.isAvailable()) {
@@ -320,7 +332,11 @@ export class CouncilService {
           if (legacyResponse) {
             lokiResponse = {
               challenge: legacyResponse.challenge,
-              severity: legacyResponse.severity.toUpperCase() as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
+              severity: legacyResponse.severity.toUpperCase() as
+                | 'LOW'
+                | 'MEDIUM'
+                | 'HIGH'
+                | 'CRITICAL',
             };
           } else {
             lokiResponse = null;
@@ -328,7 +344,10 @@ export class CouncilService {
         }
 
         if (lokiResponse) {
-          await onProgress('deliberating', `LOKI challenge ${response.member}: ${lokiResponse.severity}`);
+          await onProgress(
+            'deliberating',
+            `LOKI challenge ${response.member}: ${lokiResponse.severity}`
+          );
           challenges.push({
             id: generateId(),
             targetMember: response.member,
@@ -383,7 +402,7 @@ IMPORTANT: Tu DOIS repondre en FRANCAIS.
 Question originale: ${originalQuery}
 
 Reponses du conseil:
-${responses.map(r => `- ${r.member} (${r.confidence}% confiance): ${r.content.slice(0, 500)}`).join('\n')}
+${responses.map((r) => `- ${r.member} (${r.confidence}% confiance): ${r.content.slice(0, 500)}`).join('\n')}
 
 Verdict TYR: ${verdict.verdict} (${Object.values(verdict.voteCounts).reduce((a, b) => a + b, 0)} votes)
 

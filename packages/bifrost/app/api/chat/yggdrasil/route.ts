@@ -20,24 +20,28 @@ const YGGDRASIL_API_URL =
  * Phase labels (no emojis)
  */
 const phaseLabels: Record<string, string> = {
-  routing: 'Analyse',
-  gathering: 'Recherche',
-  deliberating: 'Deliberation',
-  validating: 'Validation',
-  responding: 'Reponse',
+  routing: "Analyse",
+  gathering: "Recherche",
+  deliberating: "Deliberation",
+  validating: "Validation",
+  responding: "Reponse"
 }
 
 /**
  * Extract text content from a message (handles both OpenAI and Gemini formats)
  */
-function extractMessageContent(message: { role: string; content?: string; parts?: Array<{ text?: string }> }): string {
+function extractMessageContent(message: {
+  role: string
+  content?: string
+  parts?: Array<{ text?: string }>
+}): string {
   if (message.content) {
     return message.content
   }
   if (message.parts && Array.isArray(message.parts)) {
     return message.parts
-      .filter((p) => p.text)
-      .map((p) => p.text)
+      .filter(p => p.text)
+      .map(p => p.text)
       .join("\n")
   }
   return ""
@@ -49,18 +53,22 @@ function extractMessageContent(message: { role: string; content?: string; parts?
  */
 function processSSELine(
   line: string,
-  state: { thinkingStarted: boolean; answerStarted: boolean; requestId: string },
+  state: {
+    thinkingStarted: boolean
+    answerStarted: boolean
+    requestId: string
+  },
   emit: (text: string) => void
 ): void {
-  if (!line.startsWith('data: ')) return
+  if (!line.startsWith("data: ")) return
 
   const dataStr = line.slice(6).trim()
-  if (!dataStr || dataStr === '[DONE]') return
+  if (!dataStr || dataStr === "[DONE]") return
 
   try {
     const data = JSON.parse(dataStr)
 
-    if (data.type === 'thinking') {
+    if (data.type === "thinking") {
       // Stream thinking step immediately with simple markdown (no HTML)
       if (!state.thinkingStarted) {
         emit(`**Raisonnement YGGDRASIL**\n\n`)
@@ -70,7 +78,7 @@ function processSSELine(
       const step = data.step
       const label = phaseLabels[step.phase] || step.phase
       emit(`> **${label}**: ${step.thought}\n\n`)
-    } else if (data.type === 'answer_chunk') {
+    } else if (data.type === "answer_chunk") {
       // Stream each word as it arrives from backend
       // Add separator before first chunk if coming from thinking
       if (state.thinkingStarted && !state.answerStarted) {
@@ -78,7 +86,7 @@ function processSSELine(
         state.answerStarted = true
       }
       emit(data.chunk)
-    } else if (data.type === 'response') {
+    } else if (data.type === "response") {
       // Final response metadata - answer already streamed via chunks
       const resp = data.response
       state.requestId = resp.requestId || ""
@@ -88,9 +96,11 @@ function processSSELine(
         if (state.thinkingStarted) {
           emit(`\n---\n\n`)
         }
-        emit(`Je n'ai pas d'information verifiee pour repondre a cette question avec certitude.`)
+        emit(
+          `Je n'ai pas d'information verifiee pour repondre a cette question avec certitude.`
+        )
       }
-    } else if (data.type === 'error') {
+    } else if (data.type === "error") {
       emit(`Erreur: ${data.message}`)
     }
   } catch {
@@ -102,14 +112,18 @@ export async function POST(request: Request) {
   const json = await request.json()
   const { chatSettings, messages } = json as {
     chatSettings: ChatSettings
-    messages: Array<{ role: string; content?: string; parts?: Array<{ text?: string }> }>
+    messages: Array<{
+      role: string
+      content?: string
+      parts?: Array<{ text?: string }>
+    }>
   }
 
   try {
     const profile = await getServerProfile()
 
     // Get the last user message as the query
-    const userMessages = messages.filter((m) => m.role === "user")
+    const userMessages = messages.filter(m => m.role === "user")
     const lastUserMessage = userMessages[userMessages.length - 1]
 
     if (!lastUserMessage) {
@@ -128,35 +142,40 @@ export async function POST(request: Request) {
     }
 
     // Build conversation context from previous messages
-    const context = messages.slice(0, -1).map((m) => ({
+    const context = messages.slice(0, -1).map(m => ({
       role: m.role,
-      content: extractMessageContent(m),
+      content: extractMessageContent(m)
     }))
 
     // Stream from YGGDRASIL via HEIMDALL SSE endpoint
-    const response = await fetch(`${YGGDRASIL_API_URL}/api/v1/yggdrasil/query/stream`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "text/event-stream",
-      },
-      body: JSON.stringify({
-        query: queryContent,
-        userId: profile.user_id,
-        sessionId: chatSettings.contextLength?.toString(),
-        context: {
-          conversationHistory: context,
-          model: chatSettings.model,
+    const response = await fetch(
+      `${YGGDRASIL_API_URL}/api/v1/yggdrasil/query/stream`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream"
         },
-        options: {
-          returnTrace: false,
-          returnReasoning: true,
-        },
-      }),
-    })
+        body: JSON.stringify({
+          query: queryContent,
+          userId: profile.user_id,
+          sessionId: chatSettings.contextLength?.toString(),
+          context: {
+            conversationHistory: context,
+            model: chatSettings.model
+          },
+          options: {
+            returnTrace: false,
+            returnReasoning: true
+          }
+        })
+      }
+    )
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: "Unknown error" }))
+      const error = await response
+        .json()
+        .catch(() => ({ message: "Unknown error" }))
       throw new Error(error.message || `YGGDRASIL error: ${response.status}`)
     }
 
@@ -165,7 +184,11 @@ export async function POST(request: Request) {
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
 
-    const state = { thinkingStarted: false, answerStarted: false, requestId: "" }
+    const state = {
+      thinkingStarted: false,
+      answerStarted: false,
+      requestId: ""
+    }
     let buffer = ""
 
     const stream = new ReadableStream({
@@ -189,7 +212,7 @@ export async function POST(request: Request) {
             buffer += decoder.decode(value, { stream: true })
 
             // Process complete lines immediately
-            const lines = buffer.split('\n')
+            const lines = buffer.split("\n")
             // Keep the last incomplete line in buffer
             buffer = lines.pop() || ""
 
@@ -206,11 +229,11 @@ export async function POST(request: Request) {
             processSSELine(buffer, state, emit)
           }
         } catch (error) {
-          console.error('Stream error:', error)
+          console.error("Stream error:", error)
         } finally {
           controller.close()
         }
-      },
+      }
     })
 
     // Return with streaming headers to prevent buffering
@@ -220,8 +243,8 @@ export async function POST(request: Request) {
         "Cache-Control": "no-cache, no-store, must-revalidate",
         "X-Accel-Buffering": "no",
         "Transfer-Encoding": "chunked",
-        "X-Yggdrasil-Request-Id": state.requestId,
-      },
+        "X-Yggdrasil-Request-Id": state.requestId
+      }
     })
   } catch (error: unknown) {
     const err = error as Error
@@ -233,7 +256,7 @@ export async function POST(request: Request) {
     }
 
     return new Response(JSON.stringify({ message: errorMessage }), {
-      status: 500,
+      status: 500
     })
   }
 }

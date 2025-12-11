@@ -7,41 +7,46 @@
  * Uses Bifrost Button and Badge components.
  */
 
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { IconTree, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ConfidenceBadge, UnknownBadge } from './confidence-badge';
-import { SourceList } from './source-card';
-import { OdinTraceToggle } from './odin-trace';
-import { ThinkingBlock } from './thinking-block';
-import type { YggdrasilResponse, YggdrasilResponseWithThinking, ThinkingStep } from '@/lib/yggdrasil/types';
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { IconTree, IconChevronDown, IconChevronUp } from "@tabler/icons-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ConfidenceBadge, UnknownBadge } from "./confidence-badge"
+import { SourceList } from "./source-card"
+import { OdinTraceToggle } from "./odin-trace"
+import { ThinkingBlock } from "./thinking-block"
+import type {
+  YggdrasilResponse,
+  YggdrasilResponseWithThinking,
+  ThinkingStep
+} from "@/lib/yggdrasil/types"
 
 interface YggdrasilMessageProps {
-  response: YggdrasilResponse | YggdrasilResponseWithThinking;
-  className?: string;
-  showDetails?: boolean;
-  isLoading?: boolean;
+  response: YggdrasilResponse | YggdrasilResponseWithThinking
+  className?: string
+  showDetails?: boolean
+  isLoading?: boolean
 }
 
 export function YggdrasilMessage({
   response,
   className,
   showDetails = true,
-  isLoading = false,
+  isLoading = false
 }: YggdrasilMessageProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false)
 
   // Check if response has thinking steps
-  const thinkingSteps: ThinkingStep[] = 'thinking' in response ? response.thinking : [];
+  const thinkingSteps: ThinkingStep[] =
+    "thinking" in response ? response.thinking : []
 
   // If answer is null, YGGDRASIL says "I don't know"
   if (response.answer === null) {
     return (
-      <div className={cn('mt-4 border-t pt-4', className)}>
+      <div className={cn("mt-4 border-t pt-4", className)}>
         {/* Thinking steps - shown first */}
         {thinkingSteps.length > 0 && (
           <ThinkingBlock steps={thinkingSteps} isLoading={isLoading} />
@@ -66,11 +71,11 @@ export function YggdrasilMessage({
           <OdinTraceToggle trace={response.trace} className="mt-3" />
         )}
       </div>
-    );
+    )
   }
 
   return (
-    <div className={cn('mt-4 border-t pt-4', className)}>
+    <div className={cn("mt-4 border-t pt-4", className)}>
       {/* Thinking steps - shown first, before the response */}
       {thinkingSteps.length > 0 && (
         <ThinkingBlock steps={thinkingSteps} isLoading={isLoading} />
@@ -106,7 +111,7 @@ export function YggdrasilMessage({
             ) : (
               <IconChevronDown size={14} className="mr-1" />
             )}
-            {isExpanded ? 'Hide details' : 'Show details'}
+            {isExpanded ? "Hide details" : "Show details"}
             <Badge variant="outline" className="ml-2 font-mono text-xs">
               {response.processingTimeMs}ms
             </Badge>
@@ -120,16 +125,13 @@ export function YggdrasilMessage({
               )}
 
               {/* ODIN Trace */}
-              {response.trace && (
-                <OdinTraceToggle trace={response.trace} />
-              )}
+              {response.trace && <OdinTraceToggle trace={response.trace} />}
 
               {/* Metadata */}
               <div className="text-xs text-muted-foreground space-y-1">
                 <div>Request ID: {response.requestId}</div>
                 <div>
-                  Timestamp:{' '}
-                  {new Date(response.timestamp).toLocaleString()}
+                  Timestamp: {new Date(response.timestamp).toLocaleString()}
                 </div>
               </div>
             </div>
@@ -137,7 +139,7 @@ export function YggdrasilMessage({
         </>
       )}
     </div>
-  );
+  )
 }
 
 /**
@@ -145,13 +147,13 @@ export function YggdrasilMessage({
  */
 export function YggdrasilInlineStatus({
   response,
-  className,
+  className
 }: {
-  response: YggdrasilResponse;
-  className?: string;
+  response: YggdrasilResponse
+  className?: string
 }) {
   if (response.answer === null) {
-    return <UnknownBadge className={className} />;
+    return <UnknownBadge className={className} />
   }
 
   return (
@@ -163,21 +165,21 @@ export function YggdrasilInlineStatus({
       showLabel={false}
       className={className}
     />
-  );
+  )
 }
 
 function formatRejectionReason(reason: string): string {
   const reasons: Record<string, string> = {
-    NO_SOURCE: 'No verified sources found',
-    CONTRADICTS_MEMORY: 'Conflicts with previous verified information',
-    FAILED_CRITIQUE: 'Failed LOKI adversarial review',
-    NO_CONSENSUS: 'Council could not reach consensus',
-    INSUFFICIENT_CONFIDENCE: 'Confidence level too low',
-    CONTAMINATION_DETECTED: 'Epistemic contamination detected',
-    TIMEOUT: 'Processing timeout',
-    INTERNAL_ERROR: 'Internal processing error',
-  };
-  return reasons[reason] || reason;
+    NO_SOURCE: "No verified sources found",
+    CONTRADICTS_MEMORY: "Conflicts with previous verified information",
+    FAILED_CRITIQUE: "Failed LOKI adversarial review",
+    NO_CONSENSUS: "Council could not reach consensus",
+    INSUFFICIENT_CONFIDENCE: "Confidence level too low",
+    CONTAMINATION_DETECTED: "Epistemic contamination detected",
+    TIMEOUT: "Processing timeout",
+    INTERNAL_ERROR: "Internal processing error"
+  }
+  return reasons[reason] || reason
 }
 
 /**
@@ -185,16 +187,25 @@ function formatRejectionReason(reason: string): string {
  */
 export function YggdrasilLoading({ className }: { className?: string }) {
   return (
-    <div className={cn('flex items-center gap-2 animate-pulse', className)}>
+    <div className={cn("flex items-center gap-2 animate-pulse", className)}>
       <IconTree size={16} className="text-muted-foreground" />
       <span className="text-sm text-muted-foreground">
         YGGDRASIL is processing...
       </span>
       <div className="flex gap-1">
-        <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '0ms' }} />
-        <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '150ms' }} />
-        <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '300ms' }} />
+        <div
+          className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce"
+          style={{ animationDelay: "0ms" }}
+        />
+        <div
+          className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce"
+          style={{ animationDelay: "150ms" }}
+        />
+        <div
+          className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce"
+          style={{ animationDelay: "300ms" }}
+        />
       </div>
     </div>
-  );
+  )
 }

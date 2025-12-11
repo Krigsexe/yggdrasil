@@ -60,11 +60,9 @@ describe('MemoryService', () => {
 
   describe('create', () => {
     it('should create a memory entry', async () => {
-      const memory = await service.create(
-        'test-user',
-        MemoryType.INTERACTION,
-        { query: 'What is the speed of light?' }
-      );
+      const memory = await service.create('test-user', MemoryType.INTERACTION, {
+        query: 'What is the speed of light?',
+      });
 
       expect(memory).toBeDefined();
       expect(memory.id).toBeDefined();
@@ -74,11 +72,9 @@ describe('MemoryService', () => {
     });
 
     it('should generate embedding for content', async () => {
-      const memory = await service.create(
-        'test-user',
-        MemoryType.DECISION,
-        { decision: 'approve' }
-      );
+      const memory = await service.create('test-user', MemoryType.DECISION, {
+        decision: 'approve',
+      });
 
       expect(memory.embedding).toBeDefined();
       expect(memory.embedding?.length).toBe(1536);
@@ -181,11 +177,7 @@ describe('MemoryService', () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([]);
 
-      const count = await service.cascadeInvalidate(
-        'root-mem',
-        'system',
-        'Root invalidation'
-      );
+      const count = await service.cascadeInvalidate('root-mem', 'system', 'Root invalidation');
 
       // Should invalidate root + 3 dependents
       expect(count).toBe(4);

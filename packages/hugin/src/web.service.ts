@@ -8,12 +8,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import {
-  Source,
-  SourceType,
-  createLogger,
-  generateId,
-} from '@yggdrasil/shared';
+import { Source, SourceType, createLogger, generateId } from '@yggdrasil/shared';
 import { DatabaseService } from '@yggdrasil/shared/database';
 import { FilterService } from './filter.service.js';
 import * as cheerio from 'cheerio';
@@ -83,7 +78,7 @@ export class WebService {
       const response = await fetch(url, {
         headers: {
           'User-Agent': USER_AGENT,
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
         },
         signal: controller.signal,
@@ -260,7 +255,10 @@ export class WebService {
   /**
    * Parse HTML and extract content
    */
-  private parseHtml(html: string, url: string): {
+  private parseHtml(
+    html: string,
+    url: string
+  ): {
     title: string;
     content: string;
     language?: string;
@@ -271,27 +269,31 @@ export class WebService {
     const $ = cheerio.load(html);
 
     // Extract title
-    const title = $('title').first().text().trim() ||
+    const title =
+      $('title').first().text().trim() ||
       $('meta[property="og:title"]').attr('content') ||
       $('h1').first().text().trim() ||
       new URL(url).hostname;
 
     // Extract language
-    const language = $('html').attr('lang') ||
-      $('meta[http-equiv="content-language"]').attr('content');
+    const language =
+      $('html').attr('lang') || $('meta[http-equiv="content-language"]').attr('content');
 
     // Extract author
-    const author = $('meta[name="author"]').attr('content') ||
+    const author =
+      $('meta[name="author"]').attr('content') ||
       $('meta[property="article:author"]').attr('content') ||
       $('[rel="author"]').first().text().trim();
 
     // Extract description
-    const description = $('meta[name="description"]').attr('content') ||
+    const description =
+      $('meta[name="description"]').attr('content') ||
       $('meta[property="og:description"]').attr('content');
 
     // Extract published date
     let publishedAt: Date | undefined;
-    const dateString = $('meta[property="article:published_time"]').attr('content') ||
+    const dateString =
+      $('meta[property="article:published_time"]').attr('content') ||
       $('meta[name="date"]').attr('content') ||
       $('time[datetime]').first().attr('datetime');
 
@@ -304,7 +306,9 @@ export class WebService {
 
     // Extract main content
     // Remove script, style, nav, header, footer, ads
-    $('script, style, nav, header, footer, aside, .ads, .advertisement, #ads, .sidebar, .comments').remove();
+    $(
+      'script, style, nav, header, footer, aside, .ads, .advertisement, #ads, .sidebar, .comments'
+    ).remove();
 
     // Try to find main content area
     let content = '';

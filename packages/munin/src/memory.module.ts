@@ -21,12 +21,7 @@ import { MemoryPersistenceService } from './memory-persistence.service.js';
 
 @Module({
   imports: [DatabaseModule, EmbeddingModule],
-  providers: [
-    MemoryService,
-    CheckpointService,
-    FactExtractorService,
-    MemoryPersistenceService,
-  ],
+  providers: [MemoryService, CheckpointService, FactExtractorService, MemoryPersistenceService],
   exports: [
     MemoryService,
     CheckpointService,

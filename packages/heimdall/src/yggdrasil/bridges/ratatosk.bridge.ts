@@ -6,11 +6,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import {
-  EpistemicBranch,
-  CouncilMember,
-  createLogger,
-} from '@yggdrasil/shared';
+import { EpistemicBranch, CouncilMember, createLogger } from '@yggdrasil/shared';
 import { RouterService, ClassifierService } from '@yggdrasil/ratatosk';
 
 const logger = createLogger('RatatoaskBridge', 'info');

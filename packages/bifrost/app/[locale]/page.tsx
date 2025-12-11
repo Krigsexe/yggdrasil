@@ -15,7 +15,9 @@ export default function HomePage() {
       </div>
 
       <div className="mt-2 text-4xl font-bold">Bifrost</div>
-      <div className="text-sm text-muted-foreground">The Rainbow Bridge to YGGDRASIL</div>
+      <div className="text-sm text-muted-foreground">
+        The Rainbow Bridge to YGGDRASIL
+      </div>
 
       <Link
         className="mt-4 flex w-[200px] items-center justify-center rounded-md bg-blue-500 p-2 font-semibold"

@@ -9,15 +9,8 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import {
-  ValidationResult,
-  CouncilDeliberation,
-  createLogger,
-} from '@yggdrasil/shared';
-import {
-  ValidationService,
-  AnchoringService,
-} from '@yggdrasil/odin';
+import { ValidationResult, CouncilDeliberation, createLogger } from '@yggdrasil/shared';
+import { ValidationService, AnchoringService } from '@yggdrasil/odin';
 
 const logger = createLogger('OdinBridge', 'info');
 

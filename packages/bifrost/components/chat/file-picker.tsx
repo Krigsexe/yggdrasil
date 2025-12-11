@@ -25,8 +25,7 @@ export const FilePicker: FC<FilePickerProps> = ({
   onSelectCollection,
   isFocused
 }) => {
-  const { files, collections, setIsFilePickerOpen } =
-    useContext(BifrostContext)
+  const { files, collections, setIsFilePickerOpen } = useContext(BifrostContext)
 
   const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 

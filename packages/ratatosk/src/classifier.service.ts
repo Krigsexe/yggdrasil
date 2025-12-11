@@ -17,7 +17,7 @@ export type QueryType =
   | 'current_events'
   | 'personal'
   | 'procedural'
-  | 'conversational'  // Greetings, simple chat, no verification needed
+  | 'conversational' // Greetings, simple chat, no verification needed
   | 'unknown';
 
 export type QueryDomain =
@@ -201,14 +201,65 @@ export class ClassifierService {
 
   private extractKeywords(query: string): string[] {
     const stopWords = new Set([
-      'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been',
-      'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will',
-      'would', 'could', 'should', 'may', 'might', 'must', 'shall',
-      'can', 'need', 'dare', 'ought', 'used', 'to', 'of', 'in',
-      'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into',
-      'through', 'during', 'before', 'after', 'above', 'below',
-      'between', 'under', 'again', 'further', 'then', 'once',
-      'what', 'who', 'when', 'where', 'why', 'how', 'which',
+      'the',
+      'a',
+      'an',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'being',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+      'will',
+      'would',
+      'could',
+      'should',
+      'may',
+      'might',
+      'must',
+      'shall',
+      'can',
+      'need',
+      'dare',
+      'ought',
+      'used',
+      'to',
+      'of',
+      'in',
+      'for',
+      'on',
+      'with',
+      'at',
+      'by',
+      'from',
+      'as',
+      'into',
+      'through',
+      'during',
+      'before',
+      'after',
+      'above',
+      'below',
+      'between',
+      'under',
+      'again',
+      'further',
+      'then',
+      'once',
+      'what',
+      'who',
+      'when',
+      'where',
+      'why',
+      'how',
+      'which',
     ]);
 
     return query

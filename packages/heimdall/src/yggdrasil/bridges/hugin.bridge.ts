@@ -58,9 +58,7 @@ export class HuginBridge {
     }
 
     // Filter out very low trust content
-    const validResults = searchResults.filter(
-      (r: WebContent) => r.trustScore > 10
-    );
+    const validResults = searchResults.filter((r: WebContent) => r.trustScore > 10);
 
     if (validResults.length === 0) {
       return {
@@ -74,7 +72,8 @@ export class HuginBridge {
 
     // Calculate average confidence (max 49% for HUGIN)
     const avgTrustScore = Math.round(
-      validResults.reduce((sum: number, r: WebContent) => sum + r.trustScore, 0) / validResults.length
+      validResults.reduce((sum: number, r: WebContent) => sum + r.trustScore, 0) /
+        validResults.length
     );
     const confidence = Math.min(avgTrustScore, 49); // HUGIN max is 49%
 
@@ -100,7 +99,9 @@ export class HuginBridge {
     const warnings: string[] = [];
 
     // Add warning about epistemic status
-    warnings.push('UNVERIFIED: This information comes from web sources and has not been scientifically validated.');
+    warnings.push(
+      'UNVERIFIED: This information comes from web sources and has not been scientifically validated.'
+    );
 
     // Count low trust sources
     const lowTrustCount = results.filter((r) => r.trustScore < 20).length;
@@ -121,9 +122,7 @@ export class HuginBridge {
   }
 
   private buildContent(results: WebContent[]): string {
-    const sourceList = results
-      .map((r) => `- ${r.title ?? 'Untitled'}: ${r.url}`)
-      .join('\n');
+    const sourceList = results.map((r) => `- ${r.title ?? 'Untitled'}: ${r.url}`).join('\n');
 
     return `Web sources (unverified):\n${sourceList}\n\nNote: This information has not been verified against scientific sources.`;
   }

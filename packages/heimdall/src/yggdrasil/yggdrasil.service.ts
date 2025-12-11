@@ -117,9 +117,7 @@ export class YggdrasilService {
       );
 
       // Check if primary branch has any content
-      const primaryResult = branchResults.find(
-        (r) => r.branch === routingDecision.primaryBranch
-      );
+      const primaryResult = branchResults.find((r) => r.branch === routingDecision.primaryBranch);
       const primaryBranchEmpty = !primaryResult?.content || primaryResult.content.length === 0;
 
       // Step 3: THING council deliberates
@@ -164,15 +162,17 @@ export class YggdrasilService {
             id: requestId,
             requestId,
             timestamp: new Date(),
-            steps: [{
-              stepNumber: 1,
-              component: 'ODIN',
-              action: 'conversational_bypass',
-              result: 'PASS',
-              details: { reason: 'Conversational query - no source verification required' },
-              timestamp: new Date(),
-              durationMs: 0,
-            }],
+            steps: [
+              {
+                stepNumber: 1,
+                component: 'ODIN',
+                action: 'conversational_bypass',
+                result: 'PASS',
+                details: { reason: 'Conversational query - no source verification required' },
+                timestamp: new Date(),
+                durationMs: 0,
+              },
+            ],
             finalDecision: 'APPROVED',
             processingTimeMs: 0,
             odinVersion: 'YGGDRASIL-0.1.0',
@@ -183,7 +183,8 @@ export class YggdrasilService {
           content: contentToValidate,
           deliberation,
           requestId,
-          requireMimirAnchor: request.options?.requireMimirAnchor ??
+          requireMimirAnchor:
+            request.options?.requireMimirAnchor ??
             routingDecision.primaryBranch === EpistemicBranch.MIMIR,
         });
       }
@@ -298,9 +299,7 @@ export class YggdrasilService {
     startTime: number,
     includeTrace: boolean
   ): YggdrasilResponse {
-    const primaryResult = branchResults.find(
-      (r) => r.branch === routingDecision.primaryBranch
-    );
+    const primaryResult = branchResults.find((r) => r.branch === routingDecision.primaryBranch);
 
     // If validated, return the answer with sources
     // If not validated, return "I don't know" with explanation
@@ -338,32 +337,37 @@ export class YggdrasilService {
           requiresDeliberation: routingDecision.requiresDeliberation,
         },
         branchResults: Object.fromEntries(
-          branchResults.map((r) => [r.branch, {
-            confidence: r.confidence,
-            contentLength: r.content?.length ?? 0,
-          }])
+          branchResults.map((r) => [
+            r.branch,
+            {
+              confidence: r.confidence,
+              contentLength: r.content?.length ?? 0,
+            },
+          ])
         ),
-        deliberation: deliberation ? {
-          verdict: deliberation.tyrVerdict.verdict,
-          responseCount: deliberation.responses.length,
-          challengeCount: deliberation.lokiChallenges.length,
-          // Include full council member responses for transparency
-          responses: deliberation.responses.map((r) => ({
-            member: r.member,
-            confidence: r.confidence,
-            content: r.content,
-            reasoning: r.reasoning,
-          })),
-          // Include LOKI challenges
-          challenges: deliberation.lokiChallenges.map((c) => ({
-            target: c.targetMember,
-            severity: c.severity,
-            challenge: c.challenge,
-            resolved: c.resolved,
-          })),
-          // Voting details
-          voteCounts: deliberation.tyrVerdict.voteCounts,
-        } : undefined,
+        deliberation: deliberation
+          ? {
+              verdict: deliberation.tyrVerdict.verdict,
+              responseCount: deliberation.responses.length,
+              challengeCount: deliberation.lokiChallenges.length,
+              // Include full council member responses for transparency
+              responses: deliberation.responses.map((r) => ({
+                member: r.member,
+                confidence: r.confidence,
+                content: r.content,
+                reasoning: r.reasoning,
+              })),
+              // Include LOKI challenges
+              challenges: deliberation.lokiChallenges.map((c) => ({
+                target: c.targetMember,
+                severity: c.severity,
+                challenge: c.challenge,
+                resolved: c.resolved,
+              })),
+              // Voting details
+              voteCounts: deliberation.tyrVerdict.voteCounts,
+            }
+          : undefined,
         validation: {
           decision: validation.trace.finalDecision,
           steps: validation.trace.steps.length,
@@ -388,10 +392,7 @@ export class YggdrasilService {
     const thinkingSteps: ThinkingStep[] = [];
 
     // Helper to add a thinking step
-    const addThought = (
-      phase: ThinkingStep['phase'],
-      thought: string
-    ): void => {
+    const addThought = (phase: ThinkingStep['phase'], thought: string): void => {
       thinkingSteps.push({
         id: `${requestId}-${thinkingSteps.length}`,
         phase,
@@ -409,16 +410,11 @@ export class YggdrasilService {
     try {
       // Step 1: Receive and analyze
       const shortQuery =
-        request.query.length > 50
-          ? request.query.slice(0, 50) + '...'
-          : request.query;
+        request.query.length > 50 ? request.query.slice(0, 50) + '...' : request.query;
       addThought('routing', `Je recois une question : "${shortQuery}"`);
 
       // Step 2: RATATOSK routes the query
-      const routingDecision = this.ratatosk.route(
-        request.query,
-        request.context
-      );
+      const routingDecision = this.ratatosk.route(request.query, request.context);
 
       if (routingDecision.isConversational) {
         addThought(
@@ -446,26 +442,16 @@ export class YggdrasilService {
         routingDecision.secondaryBranches
       );
 
-      const primaryResult = branchResults.find(
-        (r) => r.branch === routingDecision.primaryBranch
-      );
-      const primaryBranchEmpty =
-        !primaryResult?.content || primaryResult.content.length === 0;
+      const primaryResult = branchResults.find((r) => r.branch === routingDecision.primaryBranch);
+      const primaryBranchEmpty = !primaryResult?.content || primaryResult.content.length === 0;
 
       // Step 4: THING council deliberates
       let deliberation: CouncilDeliberation | undefined;
-      const shouldDeliberate =
-        routingDecision.requiresDeliberation || primaryBranchEmpty;
+      const shouldDeliberate = routingDecision.requiresDeliberation || primaryBranchEmpty;
 
       if (shouldDeliberate) {
-        if (
-          routingDecision.councilMembers.length === 1 &&
-          routingDecision.isConversational
-        ) {
-          addThought(
-            'deliberating',
-            `Je reflechis a la meilleure facon de repondre...`
-          );
+        if (routingDecision.councilMembers.length === 1 && routingDecision.isConversational) {
+          addThought('deliberating', `Je reflechis a la meilleure facon de repondre...`);
         } else {
           addThought(
             'deliberating',
@@ -488,8 +474,7 @@ export class YggdrasilService {
       }
 
       // Step 5: ODIN validates
-      const contentToValidate =
-        deliberation?.finalProposal ?? primaryResult?.content ?? '';
+      const contentToValidate = deliberation?.finalProposal ?? primaryResult?.content ?? '';
 
       let validation: ValidationResult;
 
@@ -535,15 +520,9 @@ export class YggdrasilService {
         });
 
         if (validation.isValid) {
-          addThought(
-            'validating',
-            `Validation reussie (confiance: ${validation.confidence}%)`
-          );
+          addThought('validating', `Validation reussie (confiance: ${validation.confidence}%)`);
         } else {
-          addThought(
-            'validating',
-            `Je ne peux pas confirmer cette information avec certitude.`
-          );
+          addThought('validating', `Je ne peux pas confirmer cette information avec certitude.`);
         }
       }
 
@@ -633,7 +612,7 @@ export class YggdrasilService {
         },
       } as MessageEvent);
       // Micro-delay to force event loop flush and SSE transmission
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
     };
 
     // Process asynchronously (intentionally fire-and-forget for SSE streaming)
@@ -641,16 +620,11 @@ export class YggdrasilService {
       try {
         // Step 1: Receive and analyze
         const shortQuery =
-          request.query.length > 50
-            ? request.query.slice(0, 50) + '...'
-            : request.query;
+          request.query.length > 50 ? request.query.slice(0, 50) + '...' : request.query;
         await emitThought('routing', `Je recois une question : "${shortQuery}"`);
 
         // Step 2: RATATOSK routes the query
-        const routingDecision = this.ratatosk.route(
-          request.query,
-          request.context
-        );
+        const routingDecision = this.ratatosk.route(request.query, request.context);
 
         if (routingDecision.isConversational) {
           await emitThought(
@@ -678,26 +652,16 @@ export class YggdrasilService {
           routingDecision.secondaryBranches
         );
 
-        const primaryResult = branchResults.find(
-          (r) => r.branch === routingDecision.primaryBranch
-        );
-        const primaryBranchEmpty =
-          !primaryResult?.content || primaryResult.content.length === 0;
+        const primaryResult = branchResults.find((r) => r.branch === routingDecision.primaryBranch);
+        const primaryBranchEmpty = !primaryResult?.content || primaryResult.content.length === 0;
 
         // Step 4: THING council deliberates
         let deliberation: CouncilDeliberation | undefined;
-        const shouldDeliberate =
-          routingDecision.requiresDeliberation || primaryBranchEmpty;
+        const shouldDeliberate = routingDecision.requiresDeliberation || primaryBranchEmpty;
 
         if (shouldDeliberate) {
-          if (
-            routingDecision.councilMembers.length === 1 &&
-            routingDecision.isConversational
-          ) {
-            await emitThought(
-              'deliberating',
-              `Je reflechis a la meilleure facon de repondre...`
-            );
+          if (routingDecision.councilMembers.length === 1 && routingDecision.isConversational) {
+            await emitThought('deliberating', `Je reflechis a la meilleure facon de repondre...`);
           } else {
             await emitThought(
               'deliberating',
@@ -727,8 +691,7 @@ export class YggdrasilService {
         }
 
         // Step 5: ODIN validates
-        const contentToValidate =
-          deliberation?.finalProposal ?? primaryResult?.content ?? '';
+        const contentToValidate = deliberation?.finalProposal ?? primaryResult?.content ?? '';
 
         let validation: ValidationResult;
 
@@ -836,7 +799,7 @@ export class YggdrasilService {
                 },
               } as MessageEvent);
               // Micro-delay between words for visible streaming effect
-              await new Promise(resolve => setTimeout(resolve, 15));
+              await new Promise((resolve) => setTimeout(resolve, 15));
             }
           }
         }

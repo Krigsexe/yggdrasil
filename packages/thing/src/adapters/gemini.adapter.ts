@@ -15,11 +15,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { CouncilMember, createLogger } from '@yggdrasil/shared';
-import {
-  ILLMAdapter,
-  CouncilMemberResponse,
-  COUNCIL_SYSTEM_PROMPTS,
-} from './llm.adapter.js';
+import { ILLMAdapter, CouncilMemberResponse, COUNCIL_SYSTEM_PROMPTS } from './llm.adapter.js';
 
 const logger = createLogger('GeminiAdapter', 'info');
 
@@ -87,7 +83,8 @@ export class GeminiAdapter implements ILLMAdapter {
 
   constructor(config: GeminiAdapterConfig) {
     this.member = config.member;
-    this.apiKey = process.env.GOOGLE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+    this.apiKey =
+      process.env.GOOGLE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
     this.modelId = config.modelEnvVar
       ? (process.env[config.modelEnvVar] ?? config.defaultModel)
       : config.defaultModel;
@@ -158,9 +155,7 @@ export class GeminiAdapter implements ILLMAdapter {
         throw new Error('No candidates in Gemini response');
       }
 
-      const content = data.candidates[0]?.content.parts
-        .map((p) => p.text)
-        .join('') ?? '';
+      const content = data.candidates[0]?.content.parts.map((p) => p.text).join('') ?? '';
 
       logger.info(`${this.member} Gemini response received`, {
         model: data.modelVersion || this.modelId,
@@ -190,8 +185,24 @@ export class GeminiAdapter implements ILLMAdapter {
   }
 
   private estimateConfidence(content: string): number {
-    const uncertainWords = ['might', 'maybe', 'possibly', 'uncertain', 'unclear', 'perhaps', 'could be'];
-    const confidentWords = ['definitely', 'certainly', 'clearly', 'verified', 'proven', 'confirmed', 'evidence shows'];
+    const uncertainWords = [
+      'might',
+      'maybe',
+      'possibly',
+      'uncertain',
+      'unclear',
+      'perhaps',
+      'could be',
+    ];
+    const confidentWords = [
+      'definitely',
+      'certainly',
+      'clearly',
+      'verified',
+      'proven',
+      'confirmed',
+      'evidence shows',
+    ];
 
     const lowerContent = content.toLowerCase();
     let confidence = 70;
@@ -228,7 +239,10 @@ export class KvasirGeminiAdapter extends GeminiAdapter {
    * Deep analysis capability for KVASIR
    * Extracts claims and evaluates their validity
    */
-  async analyze(content: string, context?: string): Promise<{
+  async analyze(
+    content: string,
+    context?: string
+  ): Promise<{
     claims: string[];
     confidence: number;
     concerns: string[];
@@ -261,9 +275,15 @@ Provide a structured analysis.`;
       for (const line of lines) {
         const trimmed = line.trim();
         if (trimmed.toLowerCase().includes('claim')) currentSection = 'claims';
-        else if (trimmed.toLowerCase().includes('concern') || trimmed.toLowerCase().includes('red flag'))
+        else if (
+          trimmed.toLowerCase().includes('concern') ||
+          trimmed.toLowerCase().includes('red flag')
+        )
           currentSection = 'concerns';
-        else if (trimmed.toLowerCase().includes('source') || trimmed.toLowerCase().includes('evidence'))
+        else if (
+          trimmed.toLowerCase().includes('source') ||
+          trimmed.toLowerCase().includes('evidence')
+        )
           currentSection = 'sources';
         else if (trimmed.startsWith('-') || trimmed.startsWith('*') || trimmed.match(/^\d+\./)) {
           const item = trimmed.replace(/^[-*\d.]+\s*/, '');

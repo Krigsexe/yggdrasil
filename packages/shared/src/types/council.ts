@@ -8,13 +8,13 @@
 import { Source } from './source.js';
 
 export enum CouncilMember {
-  KVASIR = 'KVASIR',   // Deep reasoning (Claude)
-  BRAGI = 'BRAGI',     // Creativity (Grok)
-  NORNES = 'NORNES',   // Calculation/Logic (DeepSeek)
-  SAGA = 'SAGA',       // General knowledge (Llama)
-  SYN = 'SYN',         // Vision/Multimodal (Gemini)
-  LOKI = 'LOKI',       // Adversarial critique
-  TYR = 'TYR',         // Arbitration/Voting
+  KVASIR = 'KVASIR', // Deep reasoning (Claude)
+  BRAGI = 'BRAGI', // Creativity (Grok)
+  NORNES = 'NORNES', // Calculation/Logic (DeepSeek)
+  SAGA = 'SAGA', // General knowledge (Llama)
+  SYN = 'SYN', // Vision/Multimodal (Gemini)
+  LOKI = 'LOKI', // Adversarial critique
+  TYR = 'TYR', // Arbitration/Voting
 }
 
 export type CouncilVerdict = 'CONSENSUS' | 'MAJORITY' | 'SPLIT' | 'DEADLOCK';
@@ -69,12 +69,7 @@ export interface CouncilConfig {
 }
 
 export const DEFAULT_COUNCIL_CONFIG: CouncilConfig = {
-  members: [
-    CouncilMember.KVASIR,
-    CouncilMember.SAGA,
-    CouncilMember.LOKI,
-    CouncilMember.TYR,
-  ],
+  members: [CouncilMember.KVASIR, CouncilMember.SAGA, CouncilMember.LOKI, CouncilMember.TYR],
   requiredMembers: [CouncilMember.KVASIR, CouncilMember.TYR],
   votingThreshold: 0.66,
   lokiEnabled: true,

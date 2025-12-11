@@ -5,62 +5,63 @@
  * Uses Bifrost Badge and Tooltip components.
  */
 
-'use client';
+"use client"
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils"
 import {
   IconCheck,
   IconFlask,
   IconAlertTriangle,
-  IconQuestionMark,
-} from '@tabler/icons-react';
-import { Badge } from '@/components/ui/badge';
+  IconQuestionMark
+} from "@tabler/icons-react"
+import { Badge } from "@/components/ui/badge"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { EpistemicBranch } from '@/lib/yggdrasil/types';
+  TooltipTrigger
+} from "@/components/ui/tooltip"
+import { EpistemicBranch } from "@/lib/yggdrasil/types"
 
 interface ConfidenceBadgeProps {
-  branch: EpistemicBranch;
-  confidence: number;
-  isVerified: boolean;
-  className?: string;
-  showLabel?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  branch: EpistemicBranch
+  confidence: number
+  isVerified: boolean
+  className?: string
+  showLabel?: boolean
+  size?: "sm" | "md" | "lg"
 }
 
 const branchConfig = {
   [EpistemicBranch.MIMIR]: {
-    label: 'VERIFIED',
-    description: 'Validated by MIMIR - 100% confidence with peer-reviewed sources',
+    label: "VERIFIED",
+    description:
+      "Validated by MIMIR - 100% confidence with peer-reviewed sources",
     icon: IconCheck,
-    variant: 'default' as const,
-    colorClass: 'bg-emerald-500 hover:bg-emerald-500/90',
+    variant: "default" as const,
+    colorClass: "bg-emerald-500 hover:bg-emerald-500/90"
   },
   [EpistemicBranch.VOLVA]: {
-    label: 'RESEARCH',
-    description: 'From VOLVA - Research-grade with 50-99% confidence',
+    label: "RESEARCH",
+    description: "From VOLVA - Research-grade with 50-99% confidence",
     icon: IconFlask,
-    variant: 'secondary' as const,
-    colorClass: 'bg-amber-500 hover:bg-amber-500/90 text-white',
+    variant: "secondary" as const,
+    colorClass: "bg-amber-500 hover:bg-amber-500/90 text-white"
   },
   [EpistemicBranch.HUGIN]: {
-    label: 'UNVERIFIED',
-    description: 'From HUGIN - Web sources with 0-49% confidence',
+    label: "UNVERIFIED",
+    description: "From HUGIN - Web sources with 0-49% confidence",
     icon: IconAlertTriangle,
-    variant: 'destructive' as const,
-    colorClass: '',
-  },
-};
+    variant: "destructive" as const,
+    colorClass: ""
+  }
+}
 
 const sizeConfig = {
-  sm: 'text-xs px-2 py-0.5',
-  md: 'text-sm px-2.5 py-0.5',
-  lg: 'text-base px-3 py-1',
-};
+  sm: "text-xs px-2 py-0.5",
+  md: "text-sm px-2.5 py-0.5",
+  lg: "text-base px-3 py-1"
+}
 
 export function ConfidenceBadge({
   branch,
@@ -68,10 +69,10 @@ export function ConfidenceBadge({
   isVerified,
   className,
   showLabel = true,
-  size = 'md',
+  size = "md"
 }: ConfidenceBadgeProps) {
-  const config = branchConfig[branch];
-  const Icon = config.icon;
+  const config = branchConfig[branch]
+  const Icon = config.icon
 
   const tooltipContent = (
     <div className="space-y-1">
@@ -86,7 +87,7 @@ export function ConfidenceBadge({
         </div>
       )}
     </div>
-  );
+  )
 
   return (
     <TooltipProvider>
@@ -95,13 +96,13 @@ export function ConfidenceBadge({
           <Badge
             variant={config.variant}
             className={cn(
-              'gap-1 cursor-default',
+              "gap-1 cursor-default",
               config.colorClass,
               sizeConfig[size],
               className
             )}
           >
-            <Icon size={size === 'sm' ? 12 : size === 'md' ? 14 : 16} />
+            <Icon size={size === "sm" ? 12 : size === "md" ? 14 : 16} />
             {showLabel && <span>{config.label}</span>}
             <span className="font-mono opacity-80">{confidence}%</span>
           </Badge>
@@ -111,7 +112,7 @@ export function ConfidenceBadge({
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-  );
+  )
 }
 
 /**
@@ -119,30 +120,30 @@ export function ConfidenceBadge({
  */
 export function ConfidenceIndicator({
   confidence,
-  className,
+  className
 }: {
-  confidence: number;
-  className?: string;
+  confidence: number
+  className?: string
 }) {
-  let variant: 'default' | 'secondary' | 'destructive' = 'destructive';
-  let icon = IconAlertTriangle;
+  let variant: "default" | "secondary" | "destructive" = "destructive"
+  let icon = IconAlertTriangle
 
   if (confidence >= 90) {
-    variant = 'default';
-    icon = IconCheck;
+    variant = "default"
+    icon = IconCheck
   } else if (confidence >= 50) {
-    variant = 'secondary';
-    icon = IconFlask;
+    variant = "secondary"
+    icon = IconFlask
   }
 
-  const Icon = icon;
+  const Icon = icon
 
   return (
-    <Badge variant={variant} className={cn('gap-1', className)}>
+    <Badge variant={variant} className={cn("gap-1", className)}>
       <Icon size={12} />
       <span className="font-mono text-xs">{confidence}%</span>
     </Badge>
-  );
+  )
 }
 
 /**
@@ -150,16 +151,16 @@ export function ConfidenceIndicator({
  */
 export function UnknownBadge({
   reason,
-  className,
+  className
 }: {
-  reason?: string;
-  className?: string;
+  reason?: string
+  className?: string
 }) {
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Badge variant="outline" className={cn('gap-1', className)}>
+          <Badge variant="outline" className={cn("gap-1", className)}>
             <IconQuestionMark size={14} />
             <span>I DON&apos;T KNOW</span>
           </Badge>
@@ -168,7 +169,7 @@ export function UnknownBadge({
           <div className="space-y-1">
             <div className="font-semibold">YGGDRASIL cannot verify this</div>
             <div className="text-xs text-muted-foreground">
-              {reason || 'No verified sources found for this query'}
+              {reason || "No verified sources found for this query"}
             </div>
             <div className="text-xs text-emerald-500">
               Honesty is a pillar of YGGDRASIL
@@ -177,5 +178,5 @@ export function UnknownBadge({
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-  );
+  )
 }

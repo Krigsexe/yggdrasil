@@ -215,9 +215,12 @@ export const handleHostedChat = async (
 
   let draftMessages = await buildFinalMessages(payload, profile, chatImages)
 
-  let formattedMessages : any[] = []
+  let formattedMessages: any[] = []
   if (provider === "google") {
-    formattedMessages = await adaptMessagesForGoogleGemini(payload, draftMessages)
+    formattedMessages = await adaptMessagesForGoogleGemini(
+      payload,
+      draftMessages
+    )
   } else {
     formattedMessages = draftMessages
   }
@@ -302,16 +305,22 @@ export const processResponse = async (
 
   // Extract YGGDRASIL metadata from headers
   const yggdrasilResponse: Partial<YggdrasilResponse> | undefined =
-    response.headers.get("X-Yggdrasil-Request-Id") ? {
-      requestId: response.headers.get("X-Yggdrasil-Request-Id") || "",
-      isVerified: response.headers.get("X-Yggdrasil-Verified") === "true",
-      epistemicBranch: (response.headers.get("X-Yggdrasil-Branch") || "HUGIN") as EpistemicBranch,
-      confidence: parseInt(response.headers.get("X-Yggdrasil-Confidence") || "0", 10),
-      answer: null, // Will be set to fullText after streaming
-      sources: [],
-      processingTimeMs: 0,
-      timestamp: new Date(),
-    } : undefined
+    response.headers.get("X-Yggdrasil-Request-Id")
+      ? {
+          requestId: response.headers.get("X-Yggdrasil-Request-Id") || "",
+          isVerified: response.headers.get("X-Yggdrasil-Verified") === "true",
+          epistemicBranch: (response.headers.get("X-Yggdrasil-Branch") ||
+            "HUGIN") as EpistemicBranch,
+          confidence: parseInt(
+            response.headers.get("X-Yggdrasil-Confidence") || "0",
+            10
+          ),
+          answer: null, // Will be set to fullText after streaming
+          sources: [],
+          processingTimeMs: 0,
+          timestamp: new Date()
+        }
+      : undefined
 
   if (response.body) {
     await consumeReadableStream(
@@ -348,10 +357,12 @@ export const processResponse = async (
                   content: fullText
                 },
                 fileItems: chatMessage.fileItems,
-                yggdrasilResponse: yggdrasilResponse ? {
-                  ...yggdrasilResponse,
-                  answer: fullText
-                } as YggdrasilResponse : undefined
+                yggdrasilResponse: yggdrasilResponse
+                  ? ({
+                      ...yggdrasilResponse,
+                      answer: fullText
+                    } as YggdrasilResponse)
+                  : undefined
               }
 
               return updatedChatMessage

@@ -11,17 +11,17 @@ function extractTextFromJSON(obj: unknown, texts: string[] = []): string[] {
     return texts
   }
 
-  if (typeof obj === 'string') {
+  if (typeof obj === "string") {
     if (obj.trim()) {
       texts.push(obj.trim())
     }
-  } else if (typeof obj === 'number' || typeof obj === 'boolean') {
+  } else if (typeof obj === "number" || typeof obj === "boolean") {
     texts.push(String(obj))
   } else if (Array.isArray(obj)) {
     for (const item of obj) {
       extractTextFromJSON(item, texts)
     }
-  } else if (typeof obj === 'object') {
+  } else if (typeof obj === "object") {
     for (const value of Object.values(obj)) {
       extractTextFromJSON(value, texts)
     }

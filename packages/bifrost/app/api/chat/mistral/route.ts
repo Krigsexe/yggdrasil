@@ -27,7 +27,8 @@ export async function POST(request: Request) {
     const result = streamText({
       model: mistral(chatSettings.model),
       messages,
-      maxTokens: CHAT_SETTING_LIMITS[chatSettings.model]?.MAX_TOKEN_OUTPUT_LENGTH
+      maxTokens:
+        CHAT_SETTING_LIMITS[chatSettings.model]?.MAX_TOKEN_OUTPUT_LENGTH
     })
 
     return result.toDataStreamResponse()

@@ -12,12 +12,12 @@ module.exports = withBundleAnalyzer(
     eslint: {
       // Warning: This allows production builds to successfully complete even if
       // your project has ESLint errors.
-      ignoreDuringBuilds: true,
+      ignoreDuringBuilds: true
     },
     typescript: {
       // WARNING: This allows production builds to successfully complete even if
       // your project has type errors. Supabase types need to be regenerated.
-      ignoreBuildErrors: true,
+      ignoreBuildErrors: true
     },
     images: {
       remotePatterns: [
@@ -36,14 +36,18 @@ module.exports = withBundleAnalyzer(
       ]
     },
     experimental: {
-      serverComponentsExternalPackages: ["sharp", "onnxruntime-node", "@xenova/transformers"]
+      serverComponentsExternalPackages: [
+        "sharp",
+        "onnxruntime-node",
+        "@xenova/transformers"
+      ]
     },
     webpack: (config, { isServer }) => {
       // Exclude native node modules from webpack bundling
       config.externals = config.externals || []
       config.externals.push({
         "onnxruntime-node": "commonjs onnxruntime-node",
-        "sharp": "commonjs sharp"
+        sharp: "commonjs sharp"
       })
 
       // Ignore .node binary files

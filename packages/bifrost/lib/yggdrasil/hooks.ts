@@ -4,9 +4,9 @@
  * Custom hooks for using the YGGDRASIL API in React components.
  */
 
-'use client';
+"use client"
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from "react"
 import {
   queryYggdrasil,
   streamYggdrasilQuery,
@@ -14,20 +14,20 @@ import {
   getMemoryGraph,
   createCheckpoint,
   rollbackToCheckpoint,
-  YggdrasilApiError,
-} from './client';
+  YggdrasilApiError
+} from "./client"
 import type {
   YggdrasilQuery,
   YggdrasilResponse,
   PipelineHealth,
-  MemoryGraph,
-} from './types';
+  MemoryGraph
+} from "./types"
 
 /** State for async operations */
 interface AsyncState<T> {
-  data: T | null;
-  loading: boolean;
-  error: YggdrasilApiError | null;
+  data: T | null
+  loading: boolean
+  error: YggdrasilApiError | null
 }
 
 /**
@@ -57,37 +57,37 @@ export function useYggdrasilQuery() {
   const [state, setState] = useState<AsyncState<YggdrasilResponse>>({
     data: null,
     loading: false,
-    error: null,
-  });
+    error: null
+  })
 
   const query = useCallback(async (request: YggdrasilQuery) => {
-    setState({ data: null, loading: true, error: null });
+    setState({ data: null, loading: true, error: null })
 
     try {
-      const response = await queryYggdrasil(request);
-      setState({ data: response, loading: false, error: null });
-      return response;
+      const response = await queryYggdrasil(request)
+      setState({ data: response, loading: false, error: null })
+      return response
     } catch (err) {
       const error =
         err instanceof YggdrasilApiError
           ? err
-          : new YggdrasilApiError('Unknown error', 500, undefined, err);
-      setState({ data: null, loading: false, error });
-      throw error;
+          : new YggdrasilApiError("Unknown error", 500, undefined, err)
+      setState({ data: null, loading: false, error })
+      throw error
     }
-  }, []);
+  }, [])
 
   const reset = useCallback(() => {
-    setState({ data: null, loading: false, error: null });
-  }, []);
+    setState({ data: null, loading: false, error: null })
+  }, [])
 
   return {
     query,
     reset,
     response: state.data,
     loading: state.loading,
-    error: state.error,
-  };
+    error: state.error
+  }
 }
 
 /**
@@ -112,53 +112,53 @@ export function useYggdrasilStream() {
     data: null,
     loading: false,
     error: null,
-    partialContent: '',
-  });
+    partialContent: ""
+  })
 
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const stream = useCallback(async (request: YggdrasilQuery) => {
     // Abort any existing stream
-    abortControllerRef.current?.abort();
-    abortControllerRef.current = new AbortController();
+    abortControllerRef.current?.abort()
+    abortControllerRef.current = new AbortController()
 
-    setState({ data: null, loading: true, error: null, partialContent: '' });
+    setState({ data: null, loading: true, error: null, partialContent: "" })
 
     try {
-      const response = await streamYggdrasilQuery(request, (chunk) => {
-        setState((prev) => ({
+      const response = await streamYggdrasilQuery(request, chunk => {
+        setState(prev => ({
           ...prev,
-          partialContent: prev.partialContent + chunk,
-        }));
-      });
+          partialContent: prev.partialContent + chunk
+        }))
+      })
 
       setState({
         data: response,
         loading: false,
         error: null,
-        partialContent: response.answer || '',
-      });
+        partialContent: response.answer || ""
+      })
 
-      return response;
+      return response
     } catch (err) {
       const error =
         err instanceof YggdrasilApiError
           ? err
-          : new YggdrasilApiError('Stream error', 500, undefined, err);
-      setState((prev) => ({ ...prev, loading: false, error }));
-      throw error;
+          : new YggdrasilApiError("Stream error", 500, undefined, err)
+      setState(prev => ({ ...prev, loading: false, error }))
+      throw error
     }
-  }, []);
+  }, [])
 
   const cancel = useCallback(() => {
-    abortControllerRef.current?.abort();
-    setState((prev) => ({ ...prev, loading: false }));
-  }, []);
+    abortControllerRef.current?.abort()
+    setState(prev => ({ ...prev, loading: false }))
+  }, [])
 
   const reset = useCallback(() => {
-    abortControllerRef.current?.abort();
-    setState({ data: null, loading: false, error: null, partialContent: '' });
-  }, []);
+    abortControllerRef.current?.abort()
+    setState({ data: null, loading: false, error: null, partialContent: "" })
+  }, [])
 
   return {
     stream,
@@ -167,8 +167,8 @@ export function useYggdrasilStream() {
     response: state.data,
     partialContent: state.partialContent,
     loading: state.loading,
-    error: state.error,
-  };
+    error: state.error
+  }
 }
 
 /**
@@ -181,44 +181,44 @@ export function usePipelineHealth(pollInterval?: number) {
   const [state, setState] = useState<AsyncState<PipelineHealth>>({
     data: null,
     loading: true,
-    error: null,
-  });
+    error: null
+  })
 
   const refresh = useCallback(async () => {
-    setState((prev) => ({ ...prev, loading: true }));
+    setState(prev => ({ ...prev, loading: true }))
 
     try {
-      const health = await checkPipelineHealth();
-      setState({ data: health, loading: false, error: null });
-      return health;
+      const health = await checkPipelineHealth()
+      setState({ data: health, loading: false, error: null })
+      return health
     } catch (err) {
       const error =
         err instanceof YggdrasilApiError
           ? err
-          : new YggdrasilApiError('Health check failed', 500, undefined, err);
-      setState({ data: null, loading: false, error });
-      throw error;
+          : new YggdrasilApiError("Health check failed", 500, undefined, err)
+      setState({ data: null, loading: false, error })
+      throw error
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    refresh().catch(() => {});
+    refresh().catch(() => {})
 
     if (pollInterval && pollInterval > 0) {
       const interval = setInterval(() => {
-        refresh().catch(() => {});
-      }, pollInterval);
+        refresh().catch(() => {})
+      }, pollInterval)
 
-      return () => clearInterval(interval);
+      return () => clearInterval(interval)
     }
-  }, [refresh, pollInterval]);
+  }, [refresh, pollInterval])
 
   return {
     health: state.data,
     loading: state.loading,
     error: state.error,
-    refresh,
-  };
+    refresh
+  }
 }
 
 /**
@@ -231,63 +231,63 @@ export function usePipelineHealth(pollInterval?: number) {
 export function useMuninMemory(
   userId: string,
   options?: {
-    limit?: number;
-    autoRefresh?: boolean;
+    limit?: number
+    autoRefresh?: boolean
   }
 ) {
   const [state, setState] = useState<AsyncState<MemoryGraph>>({
     data: null,
     loading: true,
-    error: null,
-  });
+    error: null
+  })
 
   const refresh = useCallback(async () => {
-    setState((prev) => ({ ...prev, loading: true }));
+    setState(prev => ({ ...prev, loading: true }))
 
     try {
-      const graph = await getMemoryGraph(userId, { limit: options?.limit });
-      setState({ data: graph, loading: false, error: null });
-      return graph;
+      const graph = await getMemoryGraph(userId, { limit: options?.limit })
+      setState({ data: graph, loading: false, error: null })
+      return graph
     } catch (err) {
       const error =
         err instanceof YggdrasilApiError
           ? err
           : new YggdrasilApiError(
-              'Failed to load memory graph',
+              "Failed to load memory graph",
               500,
               undefined,
               err
-            );
-      setState({ data: null, loading: false, error });
-      throw error;
+            )
+      setState({ data: null, loading: false, error })
+      throw error
     }
-  }, [userId, options?.limit]);
+  }, [userId, options?.limit])
 
   const checkpoint = useCallback(
     async (label: string, description?: string) => {
-      const result = await createCheckpoint(userId, label, description);
+      const result = await createCheckpoint(userId, label, description)
       if (options?.autoRefresh) {
-        await refresh();
+        await refresh()
       }
-      return result;
+      return result
     },
     [userId, options?.autoRefresh, refresh]
-  );
+  )
 
   const rollback = useCallback(
     async (checkpointId: string) => {
-      const result = await rollbackToCheckpoint(userId, checkpointId);
+      const result = await rollbackToCheckpoint(userId, checkpointId)
       if (options?.autoRefresh) {
-        await refresh();
+        await refresh()
       }
-      return result;
+      return result
     },
     [userId, options?.autoRefresh, refresh]
-  );
+  )
 
   useEffect(() => {
-    refresh().catch(() => {});
-  }, [refresh]);
+    refresh().catch(() => {})
+  }, [refresh])
 
   return {
     graph: state.data,
@@ -295,8 +295,8 @@ export function useMuninMemory(
     error: state.error,
     refresh,
     checkpoint,
-    rollback,
-  };
+    rollback
+  }
 }
 
 /**
@@ -305,19 +305,19 @@ export function useMuninMemory(
  * @returns History management functions
  */
 export function useYggdrasilHistory() {
-  const [history, setHistory] = useState<YggdrasilResponse[]>([]);
+  const [history, setHistory] = useState<YggdrasilResponse[]>([])
 
   const addResponse = useCallback((response: YggdrasilResponse) => {
-    setHistory((prev) => [...prev, response]);
-  }, []);
+    setHistory(prev => [...prev, response])
+  }, [])
 
   const clearHistory = useCallback(() => {
-    setHistory([]);
-  }, []);
+    setHistory([])
+  }, [])
 
   const removeResponse = useCallback((requestId: string) => {
-    setHistory((prev) => prev.filter((r) => r.requestId !== requestId));
-  }, []);
+    setHistory(prev => prev.filter(r => r.requestId !== requestId))
+  }, [])
 
   return {
     history,
@@ -325,10 +325,10 @@ export function useYggdrasilHistory() {
     clearHistory,
     removeResponse,
     totalResponses: history.length,
-    verifiedCount: history.filter((r) => r.isVerified).length,
+    verifiedCount: history.filter(r => r.isVerified).length,
     averageConfidence:
       history.length > 0
         ? history.reduce((sum, r) => sum + r.confidence, 0) / history.length
-        : 0,
-  };
+        : 0
+  }
 }

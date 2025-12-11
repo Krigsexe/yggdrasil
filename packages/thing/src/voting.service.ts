@@ -20,10 +20,7 @@ const logger = createLogger('VotingService', 'info');
 export class VotingService {
   private readonly consensusThreshold = 0.66;
 
-  renderVerdict(
-    responses: CouncilResponse[],
-    challenges: LokiChallenge[]
-  ): TyrVerdict {
+  renderVerdict(responses: CouncilResponse[], challenges: LokiChallenge[]): TyrVerdict {
     if (responses.length === 0) {
       return {
         verdict: 'DEADLOCK',
@@ -99,8 +96,7 @@ export class VotingService {
     const maxRatio = maxVotes / totalVotes;
 
     // Check confidence levels
-    const avgConfidence =
-      responses.reduce((sum, r) => sum + r.confidence, 0) / responses.length;
+    const avgConfidence = responses.reduce((sum, r) => sum + r.confidence, 0) / responses.length;
 
     if (avgConfidence < 50) {
       return 'DEADLOCK';
@@ -126,8 +122,7 @@ export class VotingService {
     challenges: LokiChallenge[],
     verdict: CouncilVerdict
   ): string {
-    const avgConfidence =
-      responses.reduce((sum, r) => sum + r.confidence, 0) / responses.length;
+    const avgConfidence = responses.reduce((sum, r) => sum + r.confidence, 0) / responses.length;
 
     const unresolvedChallenges = challenges.filter((c) => !c.resolved);
     const criticalChallenges = challenges.filter((c) => c.severity === 'CRITICAL');
@@ -146,17 +141,13 @@ export class VotingService {
     return reasoning;
   }
 
-  private collectDissent(
-    responses: CouncilResponse[],
-    verdict: CouncilVerdict
-  ): string[] {
+  private collectDissent(responses: CouncilResponse[], verdict: CouncilVerdict): string[] {
     if (verdict === 'CONSENSUS') {
       return [];
     }
 
     // Find responses that differ significantly from the majority
-    const avgConfidence =
-      responses.reduce((sum, r) => sum + r.confidence, 0) / responses.length;
+    const avgConfidence = responses.reduce((sum, r) => sum + r.confidence, 0) / responses.length;
 
     return responses
       .filter((r) => Math.abs(r.confidence - avgConfidence) > 20)

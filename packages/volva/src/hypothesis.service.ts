@@ -6,12 +6,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import {
-  Source,
-  createLogger,
-  generateId,
-  NotFoundError,
-} from '@yggdrasil/shared';
+import { Source, createLogger, generateId, NotFoundError } from '@yggdrasil/shared';
 
 const logger = createLogger('HypothesisService', 'info');
 
@@ -38,11 +33,7 @@ const hypotheses = new Map<string, Hypothesis>();
 
 @Injectable()
 export class HypothesisService {
-  create(
-    statement: string,
-    confidence: number,
-    supportingEvidence: Source[] = []
-  ): Hypothesis {
+  create(statement: string, confidence: number, supportingEvidence: Source[] = []): Hypothesis {
     // Validate confidence range for VOLVA (50-99)
     if (confidence < 50 || confidence > 99) {
       throw new Error('VOLVA confidence must be between 50 and 99');
@@ -85,11 +76,7 @@ export class HypothesisService {
       .sort((a, b) => b.confidence - a.confidence);
   }
 
-  addEvidence(
-    id: string,
-    evidence: Source,
-    supports: boolean
-  ): Hypothesis {
+  addEvidence(id: string, evidence: Source, supports: boolean): Hypothesis {
     const hypothesis = this.getById(id);
 
     if (supports) {

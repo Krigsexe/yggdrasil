@@ -5,10 +5,7 @@
  */
 
 import { NestFactory } from '@nestjs/core';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module.js';
 import { createLogger } from '@yggdrasil/shared';
@@ -36,9 +33,7 @@ async function bootstrap(): Promise<void> {
   );
 
   // CORS configuration
-  const allowedOrigins = process.env['CORS_ORIGINS']?.split(',') ?? [
-    'http://localhost:3000',
-  ];
+  const allowedOrigins = process.env['CORS_ORIGINS']?.split(',') ?? ['http://localhost:3000'];
   app.enableCors({
     origin: allowedOrigins,
     credentials: true,

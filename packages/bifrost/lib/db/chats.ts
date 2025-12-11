@@ -5,56 +5,61 @@
  * Replaces Supabase client from original Bifrost.
  */
 
-import { prisma } from './prisma';
-import type { Chat, Prisma } from '@prisma/client';
+import { prisma } from "./prisma"
+import type { Chat, Prisma } from "@prisma/client"
 
-export type ChatInsert = Prisma.ChatCreateInput;
-export type ChatUpdate = Prisma.ChatUpdateInput;
+export type ChatInsert = Prisma.ChatCreateInput
+export type ChatUpdate = Prisma.ChatUpdateInput
 
 export const getChatById = async (chatId: string): Promise<Chat | null> => {
   const chat = await prisma.chat.findUnique({
-    where: { id: chatId },
-  });
-  return chat;
-};
+    where: { id: chatId }
+  })
+  return chat
+}
 
-export const getChatsByWorkspaceId = async (workspaceId: string): Promise<Chat[]> => {
+export const getChatsByWorkspaceId = async (
+  workspaceId: string
+): Promise<Chat[]> => {
   const chats = await prisma.chat.findMany({
     where: { workspaceId },
-    orderBy: { createdAt: 'desc' },
-  });
-  return chats;
-};
+    orderBy: { createdAt: "desc" }
+  })
+  return chats
+}
 
 export const getChatsByUserId = async (userId: string): Promise<Chat[]> => {
   const chats = await prisma.chat.findMany({
     where: { userId },
-    orderBy: { createdAt: 'desc' },
-  });
-  return chats;
-};
+    orderBy: { createdAt: "desc" }
+  })
+  return chats
+}
 
 export const createChat = async (
-  data: Omit<Prisma.ChatUncheckedCreateInput, 'id' | 'createdAt' | 'updatedAt'>
+  data: Omit<Prisma.ChatUncheckedCreateInput, "id" | "createdAt" | "updatedAt">
 ): Promise<Chat> => {
   const chat = await prisma.chat.create({
-    data,
-  });
-  return chat;
-};
+    data
+  })
+  return chat
+}
 
 export const createChats = async (
-  chats: Omit<Prisma.ChatUncheckedCreateInput, 'id' | 'createdAt' | 'updatedAt'>[]
+  chats: Omit<
+    Prisma.ChatUncheckedCreateInput,
+    "id" | "createdAt" | "updatedAt"
+  >[]
 ): Promise<Chat[]> => {
   const createdChats = await prisma.$transaction(
-    chats.map((chat) =>
+    chats.map(chat =>
       prisma.chat.create({
-        data: chat,
+        data: chat
       })
     )
-  );
-  return createdChats;
-};
+  )
+  return createdChats
+}
 
 export const updateChat = async (
   chatId: string,
@@ -62,21 +67,23 @@ export const updateChat = async (
 ): Promise<Chat> => {
   const chat = await prisma.chat.update({
     where: { id: chatId },
-    data,
-  });
-  return chat;
-};
+    data
+  })
+  return chat
+}
 
 export const deleteChat = async (chatId: string): Promise<boolean> => {
   await prisma.chat.delete({
-    where: { id: chatId },
-  });
-  return true;
-};
+    where: { id: chatId }
+  })
+  return true
+}
 
-export const deleteChatsByWorkspaceId = async (workspaceId: string): Promise<boolean> => {
+export const deleteChatsByWorkspaceId = async (
+  workspaceId: string
+): Promise<boolean> => {
   await prisma.chat.deleteMany({
-    where: { workspaceId },
-  });
-  return true;
-};
+    where: { workspaceId }
+  })
+  return true
+}

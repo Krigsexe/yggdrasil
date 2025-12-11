@@ -27,9 +27,7 @@ export class HealthController {
   ready(): { ready: boolean } {
     // Check if all critical components are healthy
     const components = this.checkComponents();
-    const ready = components.every(
-      (c) => c.status === 'healthy' || c.status === 'degraded'
-    );
+    const ready = components.every((c) => c.status === 'healthy' || c.status === 'degraded');
     return { ready };
   }
 

@@ -15,12 +15,7 @@ import { PubmedAdapter } from './sources/pubmed.adapter.js';
 
 @Module({
   imports: [DatabaseModule, EmbeddingModule],
-  providers: [
-    SourceService,
-    QueryService,
-    ArxivAdapter,
-    PubmedAdapter,
-  ],
+  providers: [SourceService, QueryService, ArxivAdapter, PubmedAdapter],
   exports: [SourceService, QueryService, EmbeddingService],
 })
 export class MimirModule {}

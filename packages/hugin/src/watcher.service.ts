@@ -307,7 +307,9 @@ export class WatcherService implements OnModuleInit, OnModuleDestroy {
   /**
    * Execute a check for a watch
    */
-  private async executeCheck(watch: WatchConfig): Promise<{ changed: boolean; contentCount: number }> {
+  private async executeCheck(
+    watch: WatchConfig
+  ): Promise<{ changed: boolean; contentCount: number }> {
     logger.info('Executing watch check', { id: watch.id, type: watch.watchType });
 
     let changed = false;
@@ -344,7 +346,7 @@ export class WatcherService implements OnModuleInit, OnModuleDestroy {
       await this.db.$executeRaw`
         UPDATE web_watches
         SET last_checked_at = NOW(),
-            last_change_at = ${changed ? new Date() : watch.lastChangeAt ?? null},
+            last_change_at = ${changed ? new Date() : (watch.lastChangeAt ?? null)},
             updated_at = NOW()
         WHERE id = ${watch.id}
       `;

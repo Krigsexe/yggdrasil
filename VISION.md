@@ -33,6 +33,7 @@ YGGDRASIL n'est **pas** une IA conversationnelle améliorée. C'est un **systèm
 ### Vision
 
 Créer un système qui :
+
 - **Réfléchit** de manière continue et perpétuelle
 - **Mûrit** ses connaissances avec le temps
 - **Vit** comme un organisme cognitif autonome
@@ -44,19 +45,20 @@ Créer un système qui :
 
 ### Ce que YGGDRASIL résout
 
-| Problème Humain | Manifestation | Impact |
-|-----------------|---------------|--------|
-| **Temps limité** | Chercheurs contraints par deadlines | Explorations abandonnées prématurément |
-| **Budget fini** | "Ta recherche stagne depuis 3 ans, passe à autre chose" | Pistes prometteuses non explorées |
-| **Hiérarchie** | Décisions de chef d'équipe | Biais de sélection des sujets |
-| **Communication** | Silos disciplinaires | Connexions manquées entre domaines |
-| **Transmission** | Perte de connaissances tacites | Répétition des erreurs |
+| Problème Humain   | Manifestation                                           | Impact                                 |
+| ----------------- | ------------------------------------------------------- | -------------------------------------- |
+| **Temps limité**  | Chercheurs contraints par deadlines                     | Explorations abandonnées prématurément |
+| **Budget fini**   | "Ta recherche stagne depuis 3 ans, passe à autre chose" | Pistes prometteuses non explorées      |
+| **Hiérarchie**    | Décisions de chef d'équipe                              | Biais de sélection des sujets          |
+| **Communication** | Silos disciplinaires                                    | Connexions manquées entre domaines     |
+| **Transmission**  | Perte de connaissances tacites                          | Répétition des erreurs                 |
 
 ### Le Plus Gros Problème de l'Humanité
 
 > "La communication et la transmission sont les plus gros problèmes de l'humanité actuellement."
 
 YGGDRASIL est conçu pour résoudre ce problème en créant :
+
 - Une **base de données unifiée** de la connaissance
 - Un **système de réflexion perpétuelle** sans contraintes temporelles
 - Une **remise en question systématique** sans jugement hiérarchique
@@ -156,7 +158,7 @@ VRAI ─────────────────────────
 ### Flux de Connaissance
 
 ```
-[Source Externe] 
+[Source Externe]
        │
        ▼
 ┌──────────────┐
@@ -213,59 +215,59 @@ enum KnowledgeStatus {
   // ═══════════════════════════════════════════════════════════════
   // FAITS ÉTABLIS
   // ═══════════════════════════════════════════════════════════════
-  
+
   VERIFIED = 'VERIFIED',
   // Fait vérifié par ODIN, consensus multi-LLM atteint
   // Exemple: "La gravité fait tomber les objets vers le centre de masse"
   // Peut être RÉVISÉ si nouvelles données contradictoires
-  
+
   VERIFIED_TEMPORAL = 'VERIFIED_TEMPORAL',
   // Fait vérifié MAIS dépendant du temps/contexte
   // Exemple: "Emmanuel Macron est président de la France (2025)"
   // Nécessite re-vérification périodique
-  
+
   // ═══════════════════════════════════════════════════════════════
   // EXPLORATION ACTIVE
   // ═══════════════════════════════════════════════════════════════
-  
+
   THEORIZED_ACTIVE = 'THEORIZED_ACTIVE',
   // Hypothèse en cours d'exploration par VÖLVA
   // Ressources allouées, investigation en cours
   // Exemple: "La gravité quantique pourrait unifier relativité et MQ"
-  
+
   THEORIZED_STALLED = 'THEORIZED_STALLED',
   // Hypothèse dont l'exploration est bloquée
   // Manque de données, besoin de nouvelles sources
   // Exemple: "Impact des micro-variations gravitationnelles sur X"
-  
+
   // ═══════════════════════════════════════════════════════════════
   // EXPLORATION TERMINÉE
   // ═══════════════════════════════════════════════════════════════
-  
+
   THEORIZED_CONCLUDED = 'THEORIZED_CONCLUDED',
   // Exploration terminée, conclusions tirées
   // Toutes les branches explorées à fond
   // Exemple: "Étude complète du comportement de chute libre en atmosphère standard"
-  
+
   CLASSIFIED_EXHAUSTED = 'CLASSIFIED_EXHAUSTED',
   // Sujet entièrement épuisé
   // Aucune nouvelle piste identifiable
   // Le système a tout exploré dans l'état actuel des connaissances
-  
+
   // ═══════════════════════════════════════════════════════════════
   // STATUTS SPÉCIAUX
   // ═══════════════════════════════════════════════════════════════
-  
+
   REVIEW_SCHEDULED = 'REVIEW_SCHEDULED',
   // Marqué pour re-examen futur
   // Soit périodique, soit déclenché par nouvelle donnée
   // Exemple: "Revoir dans 1 an si nouvelles études publiées"
-  
+
   CONTRADICTED = 'CONTRADICTED',
   // Fait précédemment VERIFIED maintenant contredit
   // Nécessite arbitrage et mise à jour
   // Exemple: "Ancienne théorie réfutée par nouvelle découverte"
-  
+
   SUPERSEDED = 'SUPERSEDED',
   // Remplacé par une compréhension plus complète
   // Gardé pour historique mais plus considéré comme actuel
@@ -282,27 +284,27 @@ interface KnowledgeEntry {
   id: string;
   content: string;
   status: KnowledgeStatus;
-  
+
   // Timestamps critiques
-  createdAt: DateTime;           // Première entrée
-  verifiedAt: DateTime | null;   // Date de vérification ODIN
-  lastReviewedAt: DateTime;      // Dernière révision
+  createdAt: DateTime; // Première entrée
+  verifiedAt: DateTime | null; // Date de vérification ODIN
+  lastReviewedAt: DateTime; // Dernière révision
   scheduledReviewAt: DateTime | null; // Prochaine révision planifiée
-  
+
   // Contexte temporel
-  validFrom: DateTime;           // Début de validité
-  validUntil: DateTime | null;   // Fin de validité (si connue)
-  temporalContext: string;       // Ex: "Présidence Macron 2022-2027"
-  
+  validFrom: DateTime; // Début de validité
+  validUntil: DateTime | null; // Fin de validité (si connue)
+  temporalContext: string; // Ex: "Présidence Macron 2022-2027"
+
   // Traçabilité
   statusHistory: StatusChange[]; // Historique complet des changements
-  sources: Source[];             // Sources avec dates de publication
+  sources: Source[]; // Sources avec dates de publication
   contradictions: Contradiction[]; // Contradictions identifiées
-  
+
   // Exploration
   explorationBranches: Branch[]; // Branches explorées
-  exhaustionScore: number;       // 0-100, niveau d'épuisement du sujet
-  remainingQuestions: string[];  // Questions encore ouvertes
+  exhaustionScore: number; // 0-100, niveau d'épuisement du sujet
+  remainingQuestions: string[]; // Questions encore ouvertes
 }
 ```
 
@@ -414,33 +416,33 @@ interface KnowledgeEntry {
 interface DataFlowRules {
   // PUBLIC → CORE (avec filtrage extrême)
   publicToCore: {
-    enabled: true,
-    minimumConfidence: 0.1,           // Score initial très bas
-    requiredValidation: 'FULL_ODIN',  // Validation complète obligatoire
-    humanReviewRequired: true,        // Revue humaine pour entrée CORE
-    quarantinePeriod: '30_DAYS',      // Période d'observation
-  },
-  
+    enabled: true;
+    minimumConfidence: 0.1; // Score initial très bas
+    requiredValidation: 'FULL_ODIN'; // Validation complète obligatoire
+    humanReviewRequired: true; // Revue humaine pour entrée CORE
+    quarantinePeriod: '30_DAYS'; // Période d'observation
+  };
+
   // CORE → PUBLIC (lecture seule)
   coreToPublic: {
-    enabled: true,
-    accessLevel: 'READ_ONLY',
-    exposedStatuses: ['VERIFIED', 'VERIFIED_TEMPORAL'],
-    excludedDomains: ['CLASSIFIED', 'SENSITIVE'],
-  },
-  
+    enabled: true;
+    accessLevel: 'READ_ONLY';
+    exposedStatuses: ['VERIFIED', 'VERIFIED_TEMPORAL'];
+    excludedDomains: ['CLASSIFIED', 'SENSITIVE'];
+  };
+
   // PUBLIC → PUBLIC (interne)
   publicInternal: {
-    enabled: true,
+    enabled: true;
     // Pas de restrictions, base séparée
-  },
-  
+  };
+
   // CORE → CORE (interne)
   coreInternal: {
-    enabled: true,
-    auditRequired: true,
-    traceabilityLevel: 'FULL',
-  },
+    enabled: true;
+    auditRequired: true;
+    traceabilityLevel: 'FULL';
+  };
 }
 ```
 
@@ -450,14 +452,14 @@ interface DataFlowRules {
 
 ### Options de Financement
 
-| Modèle | Avantages | Risques | Recommandation |
-|--------|-----------|---------|----------------|
-| **Autofinancement** | Contrôle total | Ressources limitées | Phase MVP uniquement |
-| **Grants Recherche** | Pas de pression commerciale | Bureaucratie, délais | CORE uniquement |
-| **Open Source Participatif** | Communauté, transparence | Gouvernance complexe | Code, pas données |
-| **Commercial (PUBLIC)** | Revenus récurrents | Pression profit | Instance séparée |
-| **Fondation** | Mission long-terme | Trouver fondateurs | Idéal pour CORE |
-| **Consortium Institutionnel** | Crédibilité, ressources | Lenteur décisionnelle | Partenariats ciblés |
+| Modèle                        | Avantages                   | Risques               | Recommandation       |
+| ----------------------------- | --------------------------- | --------------------- | -------------------- |
+| **Autofinancement**           | Contrôle total              | Ressources limitées   | Phase MVP uniquement |
+| **Grants Recherche**          | Pas de pression commerciale | Bureaucratie, délais  | CORE uniquement      |
+| **Open Source Participatif**  | Communauté, transparence    | Gouvernance complexe  | Code, pas données    |
+| **Commercial (PUBLIC)**       | Revenus récurrents          | Pression profit       | Instance séparée     |
+| **Fondation**                 | Mission long-terme          | Trouver fondateurs    | Idéal pour CORE      |
+| **Consortium Institutionnel** | Crédibilité, ressources     | Lenteur décisionnelle | Partenariats ciblés  |
 
 ### Modèle Recommandé : Hybride
 
@@ -495,14 +497,14 @@ interface DataFlowRules {
 
 ### Ce que YGGDRASIL n'est PAS
 
-| IA Actuelle | YGGDRASIL |
-|-------------|-----------|
-| Répond aux questions | Questionne les réponses |
-| Optimise la satisfaction utilisateur | Optimise la vérité |
-| 99.9% de confiance acceptable | 0% de tolérance à l'erreur vérifiable |
-| Entraînement sur données massives | Curation rigoureuse des sources |
-| Modèle monolithique | Architecture modulaire spécialisée |
-| Amélioration par scaling | Amélioration par profondeur |
+| IA Actuelle                          | YGGDRASIL                             |
+| ------------------------------------ | ------------------------------------- |
+| Répond aux questions                 | Questionne les réponses               |
+| Optimise la satisfaction utilisateur | Optimise la vérité                    |
+| 99.9% de confiance acceptable        | 0% de tolérance à l'erreur vérifiable |
+| Entraînement sur données massives    | Curation rigoureuse des sources       |
+| Modèle monolithique                  | Architecture modulaire spécialisée    |
+| Amélioration par scaling             | Amélioration par profondeur           |
 
 ### Avantage Ressources
 
@@ -606,6 +608,7 @@ Technique       Validation       Production       Commercial       Recherche
 ### Principes Inviolables
 
 1. **Transparence Absolue**
+
    > "Je ferai toujours en sorte que ça soit transparent."
    - Chaque décision traçable
    - Chaque source identifiable
@@ -628,13 +631,13 @@ Technique       Validation       Production       Commercial       Recherche
 
 ### Risques Identifiés et Mitigations
 
-| Risque | Mitigation |
-|--------|------------|
-| Capture par intérêts commerciaux | Séparation légale CORE/PUBLIC |
-| Biais dans les sources | Diversité obligatoire, audit continu |
-| Utilisation malveillante | Logs d'audit, rate limiting, surveillance |
-| Dépendance aux LLMs tiers | Multi-provider, possibilité self-host |
-| Concentration du pouvoir | Gouvernance distribuée pour CORE |
+| Risque                           | Mitigation                                |
+| -------------------------------- | ----------------------------------------- |
+| Capture par intérêts commerciaux | Séparation légale CORE/PUBLIC             |
+| Biais dans les sources           | Diversité obligatoire, audit continu      |
+| Utilisation malveillante         | Logs d'audit, rate limiting, surveillance |
+| Dépendance aux LLMs tiers        | Multi-provider, possibilité self-host     |
+| Concentration du pouvoir         | Gouvernance distribuée pour CORE          |
 
 ---
 
@@ -654,18 +657,18 @@ La route est longue, mais chaque composant construit nous rapproche d'un outil q
 
 ### A. Glossaire
 
-| Terme | Définition |
-|-------|------------|
+| Terme         | Définition                                                  |
+| ------------- | ----------------------------------------------------------- |
 | **YGGDRASIL** | Arbre-monde de la mythologie nordique, métaphore du système |
-| **ODIN** | Module de validation (comme le dieu de la sagesse) |
-| **MUNIN** | Mémoire (corbeau de la mémoire d'Odin) |
-| **HUGIN** | Pensée/Internet (corbeau de la pensée d'Odin) |
-| **MÍMIR** | Faits vérifiés (géant gardien de la sagesse) |
-| **VÖLVA** | Hypothèses (prophétesse nordique) |
-| **THING** | Conseil délibératif (assemblée viking) |
-| **BIFROST** | Interface (pont arc-en-ciel vers les dieux) |
-| **HEIMDALL** | Gateway (gardien du Bifrost) |
-| **RATATOSK** | Router (écureuil messager de l'arbre) |
+| **ODIN**      | Module de validation (comme le dieu de la sagesse)          |
+| **MUNIN**     | Mémoire (corbeau de la mémoire d'Odin)                      |
+| **HUGIN**     | Pensée/Internet (corbeau de la pensée d'Odin)               |
+| **MÍMIR**     | Faits vérifiés (géant gardien de la sagesse)                |
+| **VÖLVA**     | Hypothèses (prophétesse nordique)                           |
+| **THING**     | Conseil délibératif (assemblée viking)                      |
+| **BIFROST**   | Interface (pont arc-en-ciel vers les dieux)                 |
+| **HEIMDALL**  | Gateway (gardien du Bifrost)                                |
+| **RATATOSK**  | Router (écureuil messager de l'arbre)                       |
 
 ### B. Références
 
@@ -682,5 +685,5 @@ La route est longue, mais chaque composant construit nous rapproche d'un outil q
 
 ---
 
-*Document généré le 2025-12-10. Version 1.0.0*
-*Ce document représente la vision fondatrice et ne doit être modifié qu'avec le consensus de l'équipe core.*
+_Document généré le 2025-12-10. Version 1.0.0_
+_Ce document représente la vision fondatrice et ne doit être modifié qu'avec le consensus de l'équipe core._

@@ -68,9 +68,7 @@ export class PubmedAdapter {
   /**
    * Fetch a specific article by PMID
    */
-  async getByPmid(
-    pmid: string
-  ): Promise<Omit<Source, 'id' | 'fetchedAt' | 'branch'> | null> {
+  async getByPmid(pmid: string): Promise<Omit<Source, 'id' | 'fetchedAt' | 'branch'> | null> {
     try {
       const articles = await this.efetch([pmid]);
 
@@ -88,9 +86,7 @@ export class PubmedAdapter {
   /**
    * Fetch article by DOI (searches for DOI in PubMed)
    */
-  async getByDoi(
-    doi: string
-  ): Promise<Omit<Source, 'id' | 'fetchedAt' | 'branch'> | null> {
+  async getByDoi(doi: string): Promise<Omit<Source, 'id' | 'fetchedAt' | 'branch'> | null> {
     try {
       // Search PubMed by DOI
       const pmids = await this.esearch(`${doi}[doi]`, 1);
@@ -138,7 +134,7 @@ export class PubmedAdapter {
       throw new Error(`PubMed esearch error: ${response.status}`);
     }
 
-    const data = await response.json() as {
+    const data = (await response.json()) as {
       esearchresult?: {
         idlist?: string[];
         count?: string;
@@ -208,7 +204,8 @@ export class PubmedAdapter {
 
       // Extract authors
       const authors: string[] = [];
-      const authorRegex = /<Author[^>]*>[\s\S]*?<LastName>([^<]+)<\/LastName>[\s\S]*?<ForeName>([^<]*)<\/ForeName>[\s\S]*?<\/Author>/g;
+      const authorRegex =
+        /<Author[^>]*>[\s\S]*?<LastName>([^<]+)<\/LastName>[\s\S]*?<ForeName>([^<]*)<\/ForeName>[\s\S]*?<\/Author>/g;
       let authorMatch;
       while ((authorMatch = authorRegex.exec(articleXml)) !== null) {
         const lastName = authorMatch[1] ?? '';
@@ -271,9 +268,7 @@ export class PubmedAdapter {
   /**
    * Convert PubMed article to YGGDRASIL Source format
    */
-  private pubmedToSource(
-    article: PubMedArticle
-  ): Omit<Source, 'id' | 'fetchedAt' | 'branch'> {
+  private pubmedToSource(article: PubMedArticle): Omit<Source, 'id' | 'fetchedAt' | 'branch'> {
     return {
       type: SourceType.PUBMED,
       identifier: article.pmid,
@@ -314,9 +309,18 @@ export class PubmedAdapter {
    */
   private parseMonth(month: string): string {
     const months: Record<string, string> = {
-      jan: '01', feb: '02', mar: '03', apr: '04',
-      may: '05', jun: '06', jul: '07', aug: '08',
-      sep: '09', oct: '10', nov: '11', dec: '12',
+      jan: '01',
+      feb: '02',
+      mar: '03',
+      apr: '04',
+      may: '05',
+      jun: '06',
+      jul: '07',
+      aug: '08',
+      sep: '09',
+      oct: '10',
+      nov: '11',
+      dec: '12',
     };
 
     const lower = month.toLowerCase().slice(0, 3);

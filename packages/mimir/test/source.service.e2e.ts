@@ -53,7 +53,8 @@ describe('MIMIR Source Service E2E - PostgreSQL Persistence', () => {
         trustScore: 100,
         metadata: {
           arxivId: '2312.00001',
-          abstract: 'This paper presents a novel approach to climate modeling using neural networks.',
+          abstract:
+            'This paper presents a novel approach to climate modeling using neural networks.',
           keywords: ['neural networks', 'climate', 'machine learning'],
           peerReviewed: false,
         },
@@ -184,7 +185,7 @@ describe('MIMIR Source Service E2E - PostgreSQL Persistence', () => {
       const results = await sourceService.search('deep learning');
 
       expect(results.length).toBeGreaterThanOrEqual(1);
-      const found = results.find(s => s.id === source1.id);
+      const found = results.find((s) => s.id === source1.id);
       expect(found).toBeDefined();
       expect(found?.title).toContain('Deep Learning');
     });
@@ -264,7 +265,8 @@ describe('MIMIR Source Service E2E - PostgreSQL Persistence', () => {
         title: 'Artificial Intelligence and Machine Learning Fundamentals',
         trustScore: 100,
         metadata: {
-          abstract: 'An introduction to AI and ML concepts including neural networks and deep learning.',
+          abstract:
+            'An introduction to AI and ML concepts including neural networks and deep learning.',
           keywords: ['artificial intelligence', 'machine learning', 'neural networks'],
         },
       });
@@ -321,7 +323,9 @@ describe('MIMIR Source Service E2E - PostgreSQL Persistence', () => {
       await expect(sourceService.getById(source.id)).rejects.toThrow(/not found/i);
 
       // But record still exists in DB with is_valid = false
-      const dbRecord = await db.$queryRaw<Array<{ is_valid: boolean; invalidated_at: Date | null }>>`
+      const dbRecord = await db.$queryRaw<
+        Array<{ is_valid: boolean; invalidated_at: Date | null }>
+      >`
         SELECT is_valid, invalidated_at FROM sources WHERE id = ${source.id}
       `;
       expect(dbRecord[0]?.is_valid).toBe(false);

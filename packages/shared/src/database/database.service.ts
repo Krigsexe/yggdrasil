@@ -12,10 +12,7 @@ import { PrismaClient } from '@prisma/client';
 const DEFAULT_DATABASE_URL = 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
 
 @Injectable()
-export class DatabaseService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class DatabaseService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor() {
     const databaseUrl = process.env['DATABASE_URL'] || DEFAULT_DATABASE_URL;
 
@@ -26,9 +23,7 @@ export class DatabaseService
         },
       },
       log:
-        process.env['NODE_ENV'] === 'development'
-          ? ['query', 'info', 'warn', 'error']
-          : ['error'],
+        process.env['NODE_ENV'] === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
     });
   }
 

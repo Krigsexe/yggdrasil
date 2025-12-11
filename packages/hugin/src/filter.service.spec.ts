@@ -27,10 +27,7 @@ describe('FilterService', () => {
     });
 
     it('should assign trust score below HUGIN threshold', () => {
-      const result = service.filter(
-        'https://example.com/article',
-        'Some web content'
-      );
+      const result = service.filter('https://example.com/article', 'Some web content');
 
       // HUGIN content should have trust score <= 49
       expect(result.trustScore).toBeLessThanOrEqual(49);
@@ -115,10 +112,7 @@ describe('FilterService', () => {
     });
 
     it('should process content from academic sources', () => {
-      const result = service.filter(
-        'https://arxiv.org/abs/2301.00001',
-        'Preprint research paper'
-      );
+      const result = service.filter('https://arxiv.org/abs/2301.00001', 'Preprint research paper');
 
       // Content from academic sources is processed normally
       expect(result).toBeDefined();

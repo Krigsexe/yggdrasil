@@ -5,11 +5,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import {
-  EpistemicBranch,
-  CouncilMember,
-  createLogger,
-} from '@yggdrasil/shared';
+import { EpistemicBranch, CouncilMember, createLogger } from '@yggdrasil/shared';
 import { ClassifierService, QueryClassification } from './classifier.service.js';
 
 const logger = createLogger('RouterService', 'info');

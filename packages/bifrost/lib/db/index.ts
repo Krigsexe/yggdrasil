@@ -5,7 +5,7 @@
  * Replaces Supabase from original Bifrost.
  */
 
-export { prisma } from './prisma';
+export { prisma } from "./prisma"
 
 // Chat operations
 export {
@@ -16,8 +16,8 @@ export {
   createChats,
   updateChat,
   deleteChat,
-  deleteChatsByWorkspaceId,
-} from './chats';
+  deleteChatsByWorkspaceId
+} from "./chats"
 
 // Message operations
 export {
@@ -30,8 +30,8 @@ export {
   deleteMessage,
   deleteMessagesByChatId,
   getNextSequenceNumber,
-  createYggdrasilMessage,
-} from './messages';
+  createYggdrasilMessage
+} from "./messages"
 
 // Re-export types
-export type { Chat, Message, Prisma } from '@prisma/client';
+export type { Chat, Message, Prisma } from "@prisma/client"

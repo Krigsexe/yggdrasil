@@ -66,7 +66,8 @@ export class VolvaBridge {
 
     // Calculate average confidence from hypotheses
     const avgConfidence = Math.round(
-      hypotheses.reduce((sum: number, h: HypothesisResult) => sum + h.confidence, 0) / hypotheses.length
+      hypotheses.reduce((sum: number, h: HypothesisResult) => sum + h.confidence, 0) /
+        hypotheses.length
     );
 
     // Build response from hypotheses
@@ -87,9 +88,31 @@ export class VolvaBridge {
 
   private extractKeywords(query: string): string[] {
     const stopWords = new Set([
-      'what', 'is', 'the', 'a', 'an', 'how', 'why', 'when', 'where',
-      'who', 'which', 'do', 'does', 'can', 'could', 'would', 'should',
-      'are', 'was', 'were', 'been', 'be', 'have', 'has', 'had',
+      'what',
+      'is',
+      'the',
+      'a',
+      'an',
+      'how',
+      'why',
+      'when',
+      'where',
+      'who',
+      'which',
+      'do',
+      'does',
+      'can',
+      'could',
+      'would',
+      'should',
+      'are',
+      'was',
+      'were',
+      'been',
+      'be',
+      'have',
+      'has',
+      'had',
     ]);
 
     return query

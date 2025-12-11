@@ -75,7 +75,10 @@ export class EmbeddingService implements OnModuleInit {
         });
       }
     } catch (err) {
-      logger.error('Failed to initialize EmbeddingService', err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Failed to initialize EmbeddingService',
+        err instanceof Error ? err : new Error(String(err))
+      );
       this.isAvailable = false;
     }
   }
@@ -124,9 +127,7 @@ export class EmbeddingService implements OnModuleInit {
 
       // Ensure correct dimension (MRL truncation)
       const truncated =
-        embedding.length > this.dimension
-          ? embedding.slice(0, this.dimension)
-          : embedding;
+        embedding.length > this.dimension ? embedding.slice(0, this.dimension) : embedding;
 
       // Normalize to unit vector
       const normalized = this.normalize(truncated);
@@ -147,7 +148,11 @@ export class EmbeddingService implements OnModuleInit {
       }
       return result;
     } catch (err) {
-      logger.error('Embedding generation failed', err instanceof Error ? err : new Error(String(err)), { textLength: text.length });
+      logger.error(
+        'Embedding generation failed',
+        err instanceof Error ? err : new Error(String(err)),
+        { textLength: text.length }
+      );
 
       // Fallback to dev mode on error
       if (process.env['NODE_ENV'] !== 'production') {
@@ -204,9 +209,7 @@ export class EmbeddingService implements OnModuleInit {
       const results = data.embeddings.map((item) => {
         const embedding = item.values;
         const truncated =
-          embedding.length > this.dimension
-            ? embedding.slice(0, this.dimension)
-            : embedding;
+          embedding.length > this.dimension ? embedding.slice(0, this.dimension) : embedding;
         const normalized = this.normalize(truncated);
 
         return {
@@ -223,7 +226,11 @@ export class EmbeddingService implements OnModuleInit {
 
       return results;
     } catch (err) {
-      logger.error('Batch embedding generation failed', err instanceof Error ? err : new Error(String(err)), { count: texts.length });
+      logger.error(
+        'Batch embedding generation failed',
+        err instanceof Error ? err : new Error(String(err)),
+        { count: texts.length }
+      );
 
       // Fallback to individual requests or dev mode
       if (process.env['NODE_ENV'] !== 'production') {
@@ -285,9 +292,7 @@ export class EmbeddingService implements OnModuleInit {
    * Normalize vector to unit length.
    */
   private normalize(embedding: number[]): number[] {
-    const magnitude = Math.sqrt(
-      embedding.reduce((sum, val) => sum + val * val, 0)
-    );
+    const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
 
     if (magnitude === 0) return embedding;
 
@@ -344,7 +349,7 @@ export class EmbeddingService implements OnModuleInit {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash);

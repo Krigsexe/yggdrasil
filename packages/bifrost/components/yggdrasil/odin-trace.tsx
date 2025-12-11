@@ -10,10 +10,10 @@
  * Uses Bifrost Collapsible, Card, and Badge components.
  */
 
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { useState } from "react"
+import { cn } from "@/lib/utils"
 import {
   IconChevronDown,
   IconChevronUp,
@@ -27,29 +27,29 @@ import {
   IconCheck,
   IconX,
   IconClock,
-  IconArrowRight,
-} from '@tabler/icons-react';
+  IconArrowRight
+} from "@tabler/icons-react"
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+  CollapsibleTrigger
+} from "@/components/ui/collapsible"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import type {
   ValidationTrace,
   CouncilVote,
   LokiChallenge,
   CouncilMember,
   CouncilVerdict,
-  TraceStep,
-} from '@/lib/yggdrasil/types';
+  TraceStep
+} from "@/lib/yggdrasil/types"
 
 interface OdinTraceProps {
-  trace: ValidationTrace;
-  className?: string;
-  defaultOpen?: boolean;
+  trace: ValidationTrace
+  className?: string
+  defaultOpen?: boolean
 }
 
 const memberConfig: Record<
@@ -57,59 +57,60 @@ const memberConfig: Record<
   { label: string; icon: typeof IconBrain; color: string; description: string }
 > = {
   KVASIR: {
-    label: 'KVASIR',
+    label: "KVASIR",
     icon: IconBrain,
-    color: 'text-purple-500',
-    description: 'Deep reasoning (Claude)',
+    color: "text-purple-500",
+    description: "Deep reasoning (Claude)"
   },
   BRAGI: {
-    label: 'BRAGI',
+    label: "BRAGI",
     icon: IconPalette,
-    color: 'text-pink-500',
-    description: 'Creativity (Grok)',
+    color: "text-pink-500",
+    description: "Creativity (Grok)"
   },
   NORNES: {
-    label: 'NORNES',
+    label: "NORNES",
     icon: IconMath,
-    color: 'text-blue-500',
-    description: 'Logic & Math (DeepSeek)',
+    color: "text-blue-500",
+    description: "Logic & Math (DeepSeek)"
   },
   SAGA: {
-    label: 'SAGA',
+    label: "SAGA",
     icon: IconBook,
-    color: 'text-amber-500',
-    description: 'Knowledge (Llama)',
+    color: "text-amber-500",
+    description: "Knowledge (Llama)"
   },
   SYN: {
-    label: 'SYN',
+    label: "SYN",
     icon: IconEye,
-    color: 'text-cyan-500',
-    description: 'Vision (Gemini)',
+    color: "text-cyan-500",
+    description: "Vision (Gemini)"
   },
   LOKI: {
-    label: 'LOKI',
+    label: "LOKI",
     icon: IconAlertTriangle,
-    color: 'text-red-500',
-    description: 'Adversarial Critic',
+    color: "text-red-500",
+    description: "Adversarial Critic"
   },
   TYR: {
-    label: 'TYR',
+    label: "TYR",
     icon: IconScale,
-    color: 'text-emerald-500',
-    description: 'Final Arbiter',
-  },
-};
+    color: "text-emerald-500",
+    description: "Final Arbiter"
+  }
+}
 
-const verdictConfig: Record<CouncilVerdict, { label: string; color: string }> = {
-  CONSENSUS: { label: 'Consensus', color: 'text-emerald-500' },
-  MAJORITY: { label: 'Majority', color: 'text-amber-500' },
-  SPLIT: { label: 'Split', color: 'text-orange-500' },
-  DEADLOCK: { label: 'Deadlock', color: 'text-red-500' },
-};
+const verdictConfig: Record<CouncilVerdict, { label: string; color: string }> =
+  {
+    CONSENSUS: { label: "Consensus", color: "text-emerald-500" },
+    MAJORITY: { label: "Majority", color: "text-amber-500" },
+    SPLIT: { label: "Split", color: "text-orange-500" },
+    DEADLOCK: { label: "Deadlock", color: "text-red-500" }
+  }
 
 function CouncilVoteCard({ vote }: { vote: CouncilVote }) {
-  const config = memberConfig[vote.member];
-  const Icon = config.icon;
+  const config = memberConfig[vote.member]
+  const Icon = config.icon
 
   return (
     <Card>
@@ -117,15 +118,15 @@ function CouncilVoteCard({ vote }: { vote: CouncilVote }) {
         <div className="flex items-center gap-2 mb-2">
           <div
             className={cn(
-              'flex h-6 w-6 items-center justify-center rounded',
-              'bg-secondary/50',
+              "flex h-6 w-6 items-center justify-center rounded",
+              "bg-secondary/50",
               config.color
             )}
           >
             <Icon size={14} />
           </div>
           <div>
-            <span className={cn('text-sm font-medium', config.color)}>
+            <span className={cn("text-sm font-medium", config.color)}>
               {config.label}
             </span>
             <span className="text-xs text-muted-foreground ml-2">
@@ -136,10 +137,10 @@ function CouncilVoteCard({ vote }: { vote: CouncilVote }) {
             <Badge
               variant={
                 vote.confidence >= 80
-                  ? 'default'
+                  ? "default"
                   : vote.confidence >= 50
-                    ? 'secondary'
-                    : 'destructive'
+                    ? "secondary"
+                    : "destructive"
               }
               className="font-mono text-xs"
             >
@@ -150,7 +151,9 @@ function CouncilVoteCard({ vote }: { vote: CouncilVote }) {
             </span>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-2">{vote.content}</p>
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {vote.content}
+        </p>
         {vote.reasoning && (
           <p className="text-xs text-muted-foreground/70 mt-1 italic">
             {vote.reasoning}
@@ -158,34 +161,42 @@ function CouncilVoteCard({ vote }: { vote: CouncilVote }) {
         )}
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function LokiChallengeCard({ challenge }: { challenge: LokiChallenge }) {
-  const targetConfig = memberConfig[challenge.targetMember];
-  const TargetIcon = targetConfig.icon;
+  const targetConfig = memberConfig[challenge.targetMember]
+  const TargetIcon = targetConfig.icon
 
-  const severityVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-    LOW: 'outline',
-    MEDIUM: 'secondary',
-    HIGH: 'secondary',
-    CRITICAL: 'destructive',
-  };
+  const severityVariant: Record<
+    string,
+    "default" | "secondary" | "destructive" | "outline"
+  > = {
+    LOW: "outline",
+    MEDIUM: "secondary",
+    HIGH: "secondary",
+    CRITICAL: "destructive"
+  }
 
   return (
     <Card className="border-red-500/30 bg-red-500/5">
       <CardContent className="p-3">
         <div className="flex items-center gap-2 mb-2">
           <IconAlertTriangle size={16} className="text-red-500" />
-          <span className="text-sm font-medium text-red-500">LOKI Challenge</span>
+          <span className="text-sm font-medium text-red-500">
+            LOKI Challenge
+          </span>
           <IconArrowRight size={12} className="text-muted-foreground" />
           <div className="flex items-center gap-1">
             <TargetIcon size={14} className={targetConfig.color} />
-            <span className={cn('text-sm', targetConfig.color)}>
+            <span className={cn("text-sm", targetConfig.color)}>
               {targetConfig.label}
             </span>
           </div>
-          <Badge variant={severityVariant[challenge.severity]} className="ml-auto text-xs">
+          <Badge
+            variant={severityVariant[challenge.severity]}
+            className="ml-auto text-xs"
+          >
             {challenge.severity}
           </Badge>
         </div>
@@ -208,7 +219,7 @@ function LokiChallengeCard({ challenge }: { challenge: LokiChallenge }) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function ProcessingTimeline({ steps }: { steps: TraceStep[] }) {
@@ -218,30 +229,39 @@ function ProcessingTimeline({ steps }: { steps: TraceStep[] }) {
         <div key={index} className="flex items-center gap-2 text-xs">
           <div
             className={cn(
-              'w-1.5 h-1.5 rounded-full',
-              step.status === 'success'
-                ? 'bg-emerald-500'
-                : step.status === 'warning'
-                  ? 'bg-amber-500'
-                  : 'bg-red-500'
+              "w-1.5 h-1.5 rounded-full",
+              step.status === "success"
+                ? "bg-emerald-500"
+                : step.status === "warning"
+                  ? "bg-amber-500"
+                  : "bg-red-500"
             )}
           />
           <span className="text-muted-foreground w-20 truncate">
             {step.component}
           </span>
           <span className="flex-1 truncate">{step.step}</span>
-          <span className="font-mono text-muted-foreground">{step.durationMs}ms</span>
+          <span className="font-mono text-muted-foreground">
+            {step.durationMs}ms
+          </span>
         </div>
       ))}
     </div>
-  );
+  )
 }
 
-export function OdinTrace({ trace, className, defaultOpen = false }: OdinTraceProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  const verdictInfo = verdictConfig[trace.tyrVerdict];
+export function OdinTrace({
+  trace,
+  className,
+  defaultOpen = false
+}: OdinTraceProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen)
+  const verdictInfo = verdictConfig[trace.tyrVerdict]
 
-  const totalTime = trace.processingSteps.reduce((sum, s) => sum + s.durationMs, 0);
+  const totalTime = trace.processingSteps.reduce(
+    (sum, s) => sum + s.durationMs,
+    0
+  )
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className={className}>
@@ -254,11 +274,11 @@ export function OdinTrace({ trace, className, defaultOpen = false }: OdinTracePr
           <span className="text-sm font-medium">ODIN Trace</span>
           <Badge
             variant={
-              trace.tyrVerdict === 'CONSENSUS'
-                ? 'default'
-                : trace.tyrVerdict === 'MAJORITY'
-                  ? 'secondary'
-                  : 'destructive'
+              trace.tyrVerdict === "CONSENSUS"
+                ? "default"
+                : trace.tyrVerdict === "MAJORITY"
+                  ? "secondary"
+                  : "destructive"
             }
             className="text-xs"
           >
@@ -306,14 +326,16 @@ export function OdinTrace({ trace, className, defaultOpen = false }: OdinTracePr
           <CardContent className="p-3">
             <div className="flex items-center gap-2">
               <IconScale size={18} className="text-emerald-500" />
-              <span className="text-sm font-medium text-emerald-500">TYR Verdict</span>
+              <span className="text-sm font-medium text-emerald-500">
+                TYR Verdict
+              </span>
               <Badge
                 variant={
-                  trace.tyrVerdict === 'CONSENSUS'
-                    ? 'default'
-                    : trace.tyrVerdict === 'MAJORITY'
-                      ? 'secondary'
-                      : 'destructive'
+                  trace.tyrVerdict === "CONSENSUS"
+                    ? "default"
+                    : trace.tyrVerdict === "MAJORITY"
+                      ? "secondary"
+                      : "destructive"
                 }
                 className="ml-auto"
               >
@@ -335,7 +357,7 @@ export function OdinTrace({ trace, className, defaultOpen = false }: OdinTracePr
         </Card>
       </CollapsibleContent>
     </Collapsible>
-  );
+  )
 }
 
 /**
@@ -343,13 +365,13 @@ export function OdinTrace({ trace, className, defaultOpen = false }: OdinTracePr
  */
 export function OdinTraceToggle({
   trace,
-  className,
+  className
 }: {
-  trace: ValidationTrace;
-  className?: string;
+  trace: ValidationTrace
+  className?: string
 }) {
-  const [showTrace, setShowTrace] = useState(false);
-  const verdictInfo = verdictConfig[trace.tyrVerdict];
+  const [showTrace, setShowTrace] = useState(false)
+  const verdictInfo = verdictConfig[trace.tyrVerdict]
 
   return (
     <div className={className}>
@@ -359,7 +381,7 @@ export function OdinTraceToggle({
         onClick={() => setShowTrace(!showTrace)}
         className="text-xs text-muted-foreground hover:text-foreground h-auto py-1 px-2"
       >
-        <IconScale size={12} className={cn('mr-1', verdictInfo.color)} />
+        <IconScale size={12} className={cn("mr-1", verdictInfo.color)} />
         <span>Show ODIN trace</span>
         {showTrace ? (
           <IconChevronUp size={12} className="ml-1" />
@@ -369,5 +391,5 @@ export function OdinTraceToggle({
       </Button>
       {showTrace && <OdinTrace trace={trace} className="mt-2" defaultOpen />}
     </div>
-  );
+  )
 }
