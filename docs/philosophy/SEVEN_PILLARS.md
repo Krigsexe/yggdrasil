@@ -13,6 +13,7 @@ Ce document decrit en profondeur les sept piliers fondamentaux sur lesquels repo
 **Toute reponse doit etre ancree dans une source verifiable ou etre explicitement rejetee.**
 
 YGGDRASIL ne "croit" pas, ne "suppose" pas, ne "devine" pas. Le systeme :
+
 - Retourne une reponse **avec sources MIMIR** (confiance 100%)
 - Retourne une hypothese **flaggee VOLVA** (confiance 50-99%)
 - Retourne "Je ne sais pas" avec **transparence totale**
@@ -23,29 +24,29 @@ YGGDRASIL ne "croit" pas, ne "suppose" pas, ne "devine" pas. Le systeme :
 // packages/odin/src/validation.service.ts
 interface ValidationResult {
   isValid: boolean;
-  confidence: number;        // 0-100
-  sources: Source[];         // MIMIR anchors required for isValid=true
+  confidence: number; // 0-100
+  sources: Source[]; // MIMIR anchors required for isValid=true
   rejectionReason?: RejectionReason;
 }
 
 // Rejection si aucune source MIMIR
-if (sources.filter(s => s.branch === 'MIMIR').length === 0) {
+if (sources.filter((s) => s.branch === 'MIMIR').length === 0) {
   return {
     isValid: false,
     confidence: 0,
     sources: [],
-    rejectionReason: 'NO_SOURCE'
+    rejectionReason: 'NO_SOURCE',
   };
 }
 ```
 
 ### Metriques
 
-| Metrique | Cible | Mesure |
-|----------|-------|--------|
-| Taux de hallucination | <1% | Audit manuel sur echantillon |
-| Ancrage source | 100% | Automatise via ValidationTrace |
-| Rejet explicite | 100% des cas sans source | Logs ODIN |
+| Metrique              | Cible                    | Mesure                         |
+| --------------------- | ------------------------ | ------------------------------ |
+| Taux de hallucination | <1%                      | Audit manuel sur echantillon   |
+| Ancrage source        | 100%                     | Automatise via ValidationTrace |
+| Rejet explicite       | 100% des cas sans source | Logs ODIN                      |
 
 ### Consequences Architecturales
 
@@ -62,6 +63,7 @@ if (sources.filter(s => s.branch === 'MIMIR').length === 0) {
 **Chaque decision, chaque reponse, chaque modification doit etre explicable et auditable.**
 
 Aucune "boite noire". Un utilisateur doit pouvoir comprendre :
+
 - Pourquoi cette reponse ?
 - Quelles sources consultees ?
 - Quel membre du conseil a dit quoi ?
@@ -171,10 +173,10 @@ interface KnowledgeLedgerEntry {
 
 ### Regles de Promotion
 
-| De | Vers | Condition |
-|----|------|-----------|
-| HUGIN | VOLVA | Correlation avec 2+ sources VOLVA |
-| VOLVA | MIMIR | Publication peer-reviewed + validation ODIN |
+| De    | Vers       | Condition                                     |
+| ----- | ---------- | --------------------------------------------- |
+| HUGIN | VOLVA      | Correlation avec 2+ sources VOLVA             |
+| VOLVA | MIMIR      | Publication peer-reviewed + validation ODIN   |
 | MIMIR | DEPRECATED | Contradiction detectee + cascade invalidation |
 
 ### Implementation Technique
@@ -182,9 +184,9 @@ interface KnowledgeLedgerEntry {
 ```typescript
 // packages/shared/src/types/epistemic.ts
 enum EpistemicBranch {
-  MIMIR = 'MIMIR',   // 100% verified - arXiv, PubMed, ISO
-  VOLVA = 'VOLVA',   // 50-99% theoretical - preprints, reviews
-  HUGIN = 'HUGIN',   // 0-49% unverified - web, news
+  MIMIR = 'MIMIR', // 100% verified - arXiv, PubMed, ISO
+  VOLVA = 'VOLVA', // 50-99% theoretical - preprints, reviews
+  HUGIN = 'HUGIN', // 0-49% unverified - web, news
 }
 
 // packages/shared/src/constants/epistemic.ts
@@ -211,6 +213,7 @@ export const EPISTEMIC_THRESHOLDS = {
 **La memoire n'est pas un simple stockage, c'est un systeme vivant qui evolue, se corrige, et apprend.**
 
 Triple indexation :
+
 - **Temporelle** : Quand un fait a ete appris/modifie
 - **Semantique** : Similarite vectorielle (embeddings)
 - **Causale** : Graphe de dependances entre faits
@@ -227,7 +230,7 @@ interface KnowledgeNode {
   currentState: MemoryState;
   epistemicBranch: EpistemicBranch;
   confidenceScore: number;
-  epistemicVelocity: number;  // v_ε = Δκ/Δt
+  epistemicVelocity: number; // v_ε = Δκ/Δt
   priorityQueue: PriorityQueue;
   auditTrail: KnowledgeLedgerEntry[];
 }
@@ -242,17 +245,17 @@ interface KnowledgeNode {
 ```typescript
 export const PRIORITY_QUEUE_CONFIG = {
   HOT: {
-    intervalMs: 3600000,    // 1 heure
-    description: 'High epistemic velocity, frequent changes'
+    intervalMs: 3600000, // 1 heure
+    description: 'High epistemic velocity, frequent changes',
   },
   WARM: {
-    intervalMs: 86400000,   // 24 heures
-    description: 'Moderate velocity, daily review'
+    intervalMs: 86400000, // 24 heures
+    description: 'Moderate velocity, daily review',
   },
   COLD: {
-    intervalMs: 604800000,  // 7 jours
-    description: 'Stable facts, weekly verification'
-  }
+    intervalMs: 604800000, // 7 jours
+    description: 'Stable facts, weekly verification',
+  },
 };
 ```
 
@@ -305,7 +308,7 @@ interface Checkpoint {
   timestamp: Date;
   type: 'MANUAL' | 'AUTO' | 'PRE_CASCADE';
   scope: 'FULL' | 'PARTIAL';
-  nodes: string[];  // IDs des nodes captures
+  nodes: string[]; // IDs des nodes captures
   metadata: Record<string, unknown>;
 }
 ```
@@ -336,12 +339,20 @@ interface Checkpoint {
 // packages/thing/src/adapters/
 
 // Gemini (Google)
-export class KvasirAdapter { /* Claude/Gemini */ }
-export class BragiAdapter { /* Grok/Gemini */ }
+export class KvasirAdapter {
+  /* Claude/Gemini */
+}
+export class BragiAdapter {
+  /* Grok/Gemini */
+}
 
 // Groq (open models)
-export class NornesAdapter { /* DeepSeek/Groq */ }
-export class SagaAdapter { /* Llama/Groq */ }
+export class NornesAdapter {
+  /* DeepSeek/Groq */
+}
+export class SagaAdapter {
+  /* Llama/Groq */
+}
 
 // Adapters interchangeables
 interface CouncilAdapter {
@@ -409,12 +420,12 @@ export class EmbeddingService {
 
 ### Metriques de Cout
 
-| Operation | Cout estimatif |
-|-----------|----------------|
-| Query simple | ~$0.01 |
-| Query avec conseil complet | ~$0.05 |
-| Embedding (1000 tokens) | ~$0.0001 |
-| Stockage (1GB/mois) | ~$0.02 |
+| Operation                  | Cout estimatif |
+| -------------------------- | -------------- |
+| Query simple               | ~$0.01         |
+| Query avec conseil complet | ~$0.05         |
+| Embedding (1000 tokens)    | ~$0.0001       |
+| Stockage (1GB/mois)        | ~$0.02         |
 
 ### Consequences Architecturales
 
@@ -426,15 +437,15 @@ export class EmbeddingService {
 
 ## Resume
 
-| Pilier | Gardien | Mecanisme |
-|--------|---------|-----------|
-| I. Veracite | ODIN | ValidationResult.isValid |
-| II. Tracabilite | Tous | ValidationTrace |
-| III. Separation | RATATOSK | EpistemicBranch enum |
-| IV. Memoire | MUNIN | KnowledgeLedger |
-| V. Reversibilite | MUNIN | Soft delete + Checkpoints |
-| VI. Souverainete | Config | Adapters + Docker |
-| VII. Soutenabilite | HEIMDALL | Rate limiting + Caching |
+| Pilier             | Gardien  | Mecanisme                 |
+| ------------------ | -------- | ------------------------- |
+| I. Veracite        | ODIN     | ValidationResult.isValid  |
+| II. Tracabilite    | Tous     | ValidationTrace           |
+| III. Separation    | RATATOSK | EpistemicBranch enum      |
+| IV. Memoire        | MUNIN    | KnowledgeLedger           |
+| V. Reversibilite   | MUNIN    | Soft delete + Checkpoints |
+| VI. Souverainete   | Config   | Adapters + Docker         |
+| VII. Soutenabilite | HEIMDALL | Rate limiting + Caching   |
 
 ---
 

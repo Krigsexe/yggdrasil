@@ -247,15 +247,15 @@ flowchart LR
 
 **Membres du conseil (Configuration Actuelle) :**
 
-| Membre     | Modele                   | Provider | Specialite            |
-| ---------- | ------------------------ | -------- | --------------------- |
-| **KVASIR** | Gemini 2.5 Pro           | Google   | Raisonnement profond  |
-| **BRAGI**  | Gemini 2.5 Flash         | Google   | Synthese creative     |
-| **SYN**    | Gemini 2.5 Pro           | Google   | Vision multimodale    |
-| **NORNES** | Qwen QWQ-32B             | Groq     | Raisonnement avance   |
-| **SAGA**   | Llama 3.3 70B            | Groq     | Connaissance generale |
-| **LOKI**   | DeepSeek R1 Distill 70B  | Groq     | Critique adversariale |
-| **TYR**    | Systeme de vote          | Local    | Arbitrage final       |
+| Membre     | Modele                  | Provider | Specialite            |
+| ---------- | ----------------------- | -------- | --------------------- |
+| **KVASIR** | Gemini 2.5 Pro          | Google   | Raisonnement profond  |
+| **BRAGI**  | Gemini 2.5 Flash        | Google   | Synthese creative     |
+| **SYN**    | Gemini 2.5 Pro          | Google   | Vision multimodale    |
+| **NORNES** | Qwen QWQ-32B            | Groq     | Raisonnement avance   |
+| **SAGA**   | Llama 3.3 70B           | Groq     | Connaissance generale |
+| **LOKI**   | DeepSeek R1 Distill 70B | Groq     | Critique adversariale |
+| **TYR**    | Systeme de vote         | Local    | Arbitrage final       |
 
 **Processus de deliberation :**
 

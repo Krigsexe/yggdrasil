@@ -13,6 +13,7 @@ Ce document définit les sept lois fondamentales qui régissent le comportement 
 **Le système ne produira jamais une affirmation fausse présentée comme vraie.**
 
 YGGDRASIL préfère :
+
 - Dire "Je ne sais pas" plutôt que deviner
 - Citer ses sources plutôt qu'affirmer
 - Exprimer son incertitude plutôt que simuler la confiance
@@ -53,6 +54,7 @@ Quand YGGDRASIL dit quelque chose, c'est vérifiable. Quand il ne sait pas, il l
 **Chaque décision doit être explicable et compréhensible par un humain.**
 
 Pas de "boîte noire". L'utilisateur peut toujours demander :
+
 - Pourquoi cette réponse ?
 - Quelles sources consultées ?
 - Quel membre du conseil a dit quoi ?
@@ -83,7 +85,7 @@ interface YggdrasilResponse {
   answer: string;
   sources: Source[];
   confidence: number;
-  trace: ValidationTrace;  // TOUJOURS présent
+  trace: ValidationTrace; // TOUJOURS présent
 }
 ```
 
@@ -91,7 +93,7 @@ interface YggdrasilResponse {
 
 ```typescript
 // L'utilisateur peut demander l'explication complète
-GET /api/query/{requestId}/trace
+GET / api / query / { requestId } / trace;
 
 // Retourne la trace complète avec :
 // - Classification de la question
@@ -115,20 +117,20 @@ Vous n'avez jamais à "faire confiance aveuglément". Chaque réponse peut être
 
 La séparation épistémique est sacrée :
 
-| Branche | Confiance | Sources | Usage |
-|---------|-----------|---------|-------|
-| MIMIR | 100% | arXiv, PubMed, ISO, RFC | Faits établis |
-| VOLVA | 50-99% | Preprints, reviews, théories | Hypothèses flaggées |
-| HUGIN | 0-49% | Web, news, forums | Information brute |
+| Branche | Confiance | Sources                      | Usage               |
+| ------- | --------- | ---------------------------- | ------------------- |
+| MIMIR   | 100%      | arXiv, PubMed, ISO, RFC      | Faits établis       |
+| VOLVA   | 50-99%    | Preprints, reviews, théories | Hypothèses flaggées |
+| HUGIN   | 0-49%     | Web, news, forums            | Information brute   |
 
 ### Implémentation
 
 ```typescript
 // packages/shared/src/types/epistemic.ts
 enum EpistemicBranch {
-  MIMIR = 'MIMIR',   // Vérité prouvée
-  VOLVA = 'VOLVA',   // Hypothèse raisonnable
-  HUGIN = 'HUGIN',   // Bruit potentiel
+  MIMIR = 'MIMIR', // Vérité prouvée
+  VOLVA = 'VOLVA', // Hypothèse raisonnable
+  HUGIN = 'HUGIN', // Bruit potentiel
 }
 
 // JAMAIS de contamination croisée
@@ -157,6 +159,7 @@ Quand YGGDRASIL dit "selon MIMIR", c'est un fait vérifié. Quand il dit "selon 
 **L'utilisateur a le contrôle total sur ses données et peut demander leur suppression.**
 
 Le système respecte :
+
 - Le RGPD et équivalents internationaux
 - Le droit à l'effacement
 - Le droit à la portabilité
@@ -216,6 +219,7 @@ Vos données vous appartiennent. Vous pouvez les voir, les exporter, les corrige
 **L'utilisateur est propriétaire de ses données. YGGDRASIL n'est qu'un gardien temporaire.**
 
 Principes :
+
 - Aucune vente de données
 - Aucun partage sans consentement explicite
 - Stockage local préféré
@@ -273,6 +277,7 @@ Vos conversations, vos faits, vos préférences ne quittent jamais votre contrô
 **Le système doit être économiquement et écologiquement responsable.**
 
 YGGDRASIL :
+
 - N'entraîne pas de modèles (utilise les existants)
 - Optimise les appels API (caching, batching)
 - Scale to zero quand non utilisé
@@ -315,7 +320,7 @@ ThrottlerModule.forRoot([
 interface ConsumptionMetrics {
   apiCalls: {
     total: number;
-    cached: number;      // % économisé
+    cached: number; // % économisé
     costUSD: number;
   };
   compute: {
@@ -348,6 +353,7 @@ YGGDRASIL ne gaspille pas. Les coûts sont prévisibles. L'empreinte écologique
 **YGGDRASIL est et restera open-source pour toujours.**
 
 Licences :
+
 - **MIT** pour le code principal (liberté maximale)
 - **Copyleft** pour les améliorations (elles restent publiques)
 - **Documentation libre** (CC-BY)
@@ -395,15 +401,15 @@ Vous pouvez lire chaque ligne de code. Vous pouvez contribuer. Vous pouvez forke
 
 ## Résumé des Lois
 
-| Loi | Énoncé | Gardien |
-|-----|--------|---------|
-| I | Ne ment jamais | ODIN |
-| II | Montre le raisonnement | ValidationTrace |
-| III | Sépare prouvé/supposé/bruit | RATATOSK |
-| IV | Droit à l'oubli | MUNIN |
-| V | Données au créateur | Config |
-| VI | Consomme le nécessaire | HEIMDALL |
-| VII | Code à l'humanité | LICENSE |
+| Loi | Énoncé                      | Gardien         |
+| --- | --------------------------- | --------------- |
+| I   | Ne ment jamais              | ODIN            |
+| II  | Montre le raisonnement      | ValidationTrace |
+| III | Sépare prouvé/supposé/bruit | RATATOSK        |
+| IV  | Droit à l'oubli             | MUNIN           |
+| V   | Données au créateur         | Config          |
+| VI  | Consomme le nécessaire      | HEIMDALL        |
+| VII | Code à l'humanité           | LICENSE         |
 
 ---
 
@@ -412,6 +418,7 @@ Vous pouvez lire chaque ligne de code. Vous pouvez contribuer. Vous pouvez forke
 ### Qu'est-ce qu'une violation ?
 
 Une violation se produit quand le système :
+
 - Présente une information non-sourcée comme fait (Loi I)
 - Retourne une réponse sans trace (Loi II)
 - Mélange MIMIR et HUGIN (Loi III)

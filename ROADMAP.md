@@ -140,7 +140,7 @@ Construire les composants principaux et atteindre un systeme fonctionnel.
 #### M2.6 : AGI v2.0 Features (Q2-Q3 2026) - COMPLETE
 
 - [x] **Knowledge Ledger** : Audit trail temporel immutable
-- [x] **Epistemic Velocity** : v_ε(t) = (κ_t - κ_{t-1}) / Δt
+- [x] **Epistemic Velocity** : v*ε(t) = (κ_t - κ*{t-1}) / Δt
 - [x] **Priority Queues** : HOT (1h) / WARM (24h) / COLD (7d)
 - [x] **Cascade Invalidation** : O(|V| + |E|) avec forces
 - [x] **HUGIN Watcher Daemon** : Surveillance proactive avec priority queues

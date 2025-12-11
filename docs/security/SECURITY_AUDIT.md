@@ -183,19 +183,19 @@ export const passwordSchema = z
 
 ## Conformite
 
-| Standard       | Statut      | Notes                       |
-| -------------- | ----------- | --------------------------- |
-| OWASP Top 10   | Partiel     | A1, A3, A7 couverts         |
-| CWE Top 25     | Partiel     | 4 vulnerabilites corrigees  |
-| NIST Cybersec  | En cours    | Identification complete     |
+| Standard      | Statut   | Notes                      |
+| ------------- | -------- | -------------------------- |
+| OWASP Top 10  | Partiel  | A1, A3, A7 couverts        |
+| CWE Top 25    | Partiel  | 4 vulnerabilites corrigees |
+| NIST Cybersec | En cours | Identification complete    |
 
 ---
 
 ## Historique des Modifications
 
-| Date         | Version | Description                    |
-| ------------ | ------- | ------------------------------ |
-| Dec 2025     | 1.0     | Audit initial, fixes CRITICAL  |
+| Date     | Version | Description                   |
+| -------- | ------- | ----------------------------- |
+| Dec 2025 | 1.0     | Audit initial, fixes CRITICAL |
 
 ---
 
