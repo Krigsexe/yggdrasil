@@ -120,8 +120,12 @@ Construire les composants principaux et atteindre un systeme fonctionnel.
 - [x] **MUNIN** : Memoire chrono-semantique (PGVector)
 - [x] **MUNIN** : EmbeddingService partage (Gemini)
 - [x] **MUNIN** : Extraction de faits automatique
-- [ ] **MUNIN** : Graphe de dependances complet
-- [ ] **MUNIN** : Systeme de checkpoints
+- [x] **MUNIN** : Knowledge Ledger avec audit trail immutable
+- [x] **MUNIN** : Epistemic Velocity tracking (v_ε = Δκ/Δt)
+- [x] **MUNIN** : Cascade invalidation algorithm (force-based)
+- [x] **MUNIN** : Priority queues (HOT/WARM/COLD)
+- [x] **MUNIN** : Graphe de dependances avec forces
+- [ ] **MUNIN** : Systeme de checkpoints complet
 - [ ] **MUNIN** : Rollback fonctionnel
 - [ ] Tests de persistance et coherence
 
@@ -133,12 +137,24 @@ Construire les composants principaux et atteindre un systeme fonctionnel.
 - [ ] Audit de securite interne
 - [ ] Bug bounty (soft launch)
 
+#### M2.6 : AGI v2.0 Features (Q2-Q3 2026)
+
+- [x] **Knowledge Ledger** : Audit trail temporel immutable
+- [x] **Epistemic Velocity** : v_ε(t) = (κ_t - κ_{t-1}) / Δt
+- [x] **Priority Queues** : HOT (1h) / WARM (24h) / COLD (7d)
+- [x] **Cascade Invalidation** : O(|V| + |E|) avec forces
+- [ ] **HUGIN Watcher Daemon** : Surveillance proactive
+- [ ] **Shapley Attribution** : Responsabilite du conseil THING
+- [ ] **Contradiction Detection** : Detection proactive
+- [ ] **Proactive Alerts** : Notifications temps reel
+
 ### Livrables Phase 2
 
 - MIMIR avec sources scientifiques
 - THING consortium multi-modeles
 - ODIN validation 100%
-- MUNIN memoire fonctionnelle
+- MUNIN memoire fonctionnelle avec Knowledge Ledger
+- AGI v2.0 features (velocity, cascade, queues)
 - Suite de tests complete
 
 ---
