@@ -1,0 +1,1048 @@
+openapi: 3.1.0
+info:
+  title: YGGDRASIL API
+  description: |
+    L'Arbre-Monde de l'Intelligence Artificielle — Une AGI éthique, souveraine et vérifiable.
+
+    ## Architecture Nordique
+
+    YGGDRASIL orchestre plusieurs composants pour garantir la véracité des réponses :
+
+    - **HEIMDALL** : Gateway (auth, rate limit, audit)
+    - **RATATOSK** : Routage intelligent
+    - **MIMIR** : Connaissances vérifiées (100%)
+    - **VOLVA** : Hypothèses (50-99%)
+    - **HUGIN** : Web non-vérifié (0-49%)
+    - **THING** : Conseil multi-modèles
+    - **ODIN** : Validation finale
+    - **MUNIN** : Mémoire chrono-sémantique
+
+    ## Les 7 Piliers
+
+    1. **Véracité Absolue** : Source MIMIR ou REJET
+    2. **Traçabilité Totale** : ValidationTrace sur chaque réponse
+    3. **Séparation Épistémique** : MIMIR/VOLVA/HUGIN strictement séparés
+    4. **Mémoire Vivante** : Triple indexation
+    5. **Réversibilité** : Checkpoints, rollback
+    6. **Souveraineté** : Open-source, auto-hébergeable
+    7. **Soutenabilité** : Zero entraînement
+  version: 0.1.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  contact:
+    name: YGGDRASIL Contributors
+    url: https://github.com/Krigsexe/yggdrasil
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+  - url: https://api.yggdrasil.ai/api/v1
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Health
+    description: Service health monitoring
+  - name: Query
+    description: YGGDRASIL query endpoints with validation
+  - name: Memory
+    description: MUNIN memory management
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ============ AUTHENTICATION ============
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDto'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already exists
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login with email and password
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshDto'
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tokens:
+                    $ref: '#/components/schemas/TokenPair'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout and invalidate refresh token
+      operationId: logout
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutDto'
+      responses:
+        '204':
+          description: Logged out successfully
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user profile
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============ HEALTH ============
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Get system health status
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  /health/ready:
+    get:
+      tags:
+        - Health
+      summary: Kubernetes readiness probe
+      operationId: getReadiness
+      security: []
+      responses:
+        '200':
+          description: Readiness status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ready:
+                    type: boolean
+
+  /health/live:
+    get:
+      tags:
+        - Health
+      summary: Kubernetes liveness probe
+      operationId: getLiveness
+      security: []
+      responses:
+        '200':
+          description: Liveness status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  live:
+                    type: boolean
+
+  # ============ YGGDRASIL QUERY ============
+  /yggdrasil/query:
+    post:
+      tags:
+        - Query
+      summary: Submit a query to YGGDRASIL (public)
+      description: |
+        Soumet une question au système YGGDRASIL. La réponse est validée par ODIN
+        et ancrée dans les sources MIMIR quand possible.
+
+        Le système peut répondre "Je ne sais pas" si aucune source fiable n'est trouvée.
+      operationId: queryPublic
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryDto'
+      responses:
+        '201':
+          description: Query processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YggdrasilResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /yggdrasil/query/secure:
+    post:
+      tags:
+        - Query
+      summary: Submit a query (authenticated)
+      description: Version authentifiée. Le userId est extrait du JWT.
+      operationId: querySecure
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryDto'
+      responses:
+        '200':
+          description: Query processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YggdrasilResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /yggdrasil/query/thinking:
+    post:
+      tags:
+        - Query
+      summary: Query with reasoning steps
+      description: |
+        Retourne les étapes de raisonnement du conseil THING pour affichage UI.
+      operationId: queryWithThinking
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryDto'
+      responses:
+        '200':
+          description: Query with thinking steps
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/YggdrasilResponse'
+                  - type: object
+                    properties:
+                      thinking:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ThinkingStep'
+
+  /yggdrasil/query/stream:
+    post:
+      tags:
+        - Query
+      summary: Stream query response (SSE)
+      description: |
+        Streaming Server-Sent Events pour affichage temps réel du raisonnement.
+      operationId: queryStream
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryDto'
+      responses:
+        '200':
+          description: SSE stream
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/StreamEvent'
+
+  /yggdrasil/health:
+    post:
+      tags:
+        - Health
+      summary: YGGDRASIL components health
+      operationId: getYggdrasilHealth
+      security: []
+      responses:
+        '200':
+          description: Component health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy]
+                  components:
+                    type: object
+                    properties:
+                      ratatosk:
+                        type: string
+                      mimir:
+                        type: string
+                      volva:
+                        type: string
+                      hugin:
+                        type: string
+                      thing:
+                        type: string
+                      odin:
+                        type: string
+                      munin:
+                        type: string
+
+  # ============ MEMORY ============
+  /yggdrasil/memory/process:
+    post:
+      tags:
+        - Memory
+      summary: Process and store message facts
+      description: Extrait et persiste les faits d'un message dans MUNIN.
+      operationId: processMessage
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessMessageDto'
+      responses:
+        '200':
+          description: Facts processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersistenceResult'
+
+  /yggdrasil/memory/context:
+    post:
+      tags:
+        - Memory
+      summary: Get user context for query
+      description: Retourne le contexte utilisateur pour personnalisation.
+      operationId: getContext
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - query
+              properties:
+                userId:
+                  type: string
+                query:
+                  type: string
+      responses:
+        '200':
+          description: User context
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identity:
+                    $ref: '#/components/schemas/StoredFact'
+                  relevantFacts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StoredFact'
+
+  /yggdrasil/memory/facts/{userId}:
+    get:
+      tags:
+        - Memory
+      summary: Get user facts
+      operationId: getUserFacts
+      security: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            $ref: '#/components/schemas/MemoryState'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: User facts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StoredFact'
+
+  /yggdrasil/memory/verify:
+    post:
+      tags:
+        - Memory
+      summary: Verify/reject a fact (Admin only)
+      operationId: verifyFact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyFactDto'
+      responses:
+        '200':
+          description: Fact verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from /auth/login
+
+  schemas:
+    # ============ AUTH ============
+    RegisterDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+          description: Must contain uppercase, lowercase, and number
+          example: SecurePass123
+        name:
+          type: string
+          maxLength: 255
+          example: John Doe
+
+    LoginDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    RefreshDto:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
+    LogoutDto:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/Role'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        lastLoginAt:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+        metadata:
+          $ref: '#/components/schemas/UserMetadata'
+
+    UserMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+        organization:
+          type: string
+        timezone:
+          type: string
+        locale:
+          type: string
+
+    Role:
+      type: string
+      enum:
+        - USER
+        - ADMIN
+        - SYSTEM
+
+    TokenPair:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          description: Seconds until expiry
+        tokenType:
+          type: string
+          enum: [Bearer]
+
+    # ============ HEALTH ============
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+            - degraded
+            - unhealthy
+        version:
+          type: string
+          example: 0.1.0
+        uptime:
+          type: integer
+          description: Seconds since start
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentHealth'
+        timestamp:
+          type: string
+          format: date-time
+
+    ComponentHealth:
+      type: object
+      properties:
+        name:
+          type: string
+          enum:
+            - HEIMDALL
+            - DATABASE
+            - REDIS
+        status:
+          type: string
+          enum:
+            - healthy
+            - degraded
+            - unhealthy
+        latencyMs:
+          type: number
+        message:
+          type: string
+
+    # ============ QUERY ============
+    QueryDto:
+      type: object
+      required:
+        - query
+        - userId
+      properties:
+        query:
+          type: string
+          description: The question to ask YGGDRASIL
+          example: What is the speed of light?
+        userId:
+          type: string
+          description: User identifier
+        sessionId:
+          type: string
+        context:
+          $ref: '#/components/schemas/QueryContext'
+        includeTrace:
+          type: boolean
+          default: false
+        options:
+          $ref: '#/components/schemas/QueryOptions'
+
+    QueryContext:
+      type: object
+      properties:
+        previousMessageId:
+          type: string
+        conversationHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationMessage'
+        userPreferences:
+          $ref: '#/components/schemas/UserPreferences'
+        metadata:
+          type: object
+
+    ConversationMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum:
+            - user
+            - assistant
+            - system
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    UserPreferences:
+      type: object
+      properties:
+        language:
+          type: string
+          example: fr
+        verbosityLevel:
+          type: string
+          enum:
+            - concise
+            - normal
+            - detailed
+        includeTraceInResponse:
+          type: boolean
+        preferredBranch:
+          $ref: '#/components/schemas/EpistemicBranch'
+
+    QueryOptions:
+      type: object
+      properties:
+        requireMimirAnchor:
+          type: boolean
+          description: Require MIMIR source or reject
+        maxTimeMs:
+          type: integer
+          description: Maximum processing time
+        returnTrace:
+          type: boolean
+
+    YggdrasilResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        requestId:
+          type: string
+        content:
+          type: string
+          description: The answer or "Je ne sais pas"
+        validation:
+          $ref: '#/components/schemas/ValidationResult'
+        memoryUpdated:
+          type: boolean
+        processingTimeMs:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+        metadata:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    ValidationResult:
+      type: object
+      properties:
+        isValid:
+          type: boolean
+        confidence:
+          type: integer
+          minimum: 0
+          maximum: 100
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+        trace:
+          $ref: '#/components/schemas/ValidationTrace'
+        rejectionReason:
+          $ref: '#/components/schemas/RejectionReason'
+
+    ValidationTrace:
+      type: object
+      properties:
+        requestId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        intake:
+          type: object
+        routing:
+          type: object
+        branches:
+          type: object
+        council:
+          type: object
+        validation:
+          type: object
+        memory:
+          type: object
+        totalDurationMs:
+          type: integer
+
+    RejectionReason:
+      type: string
+      enum:
+        - NO_SOURCE
+        - CONTRADICTS_MEMORY
+        - FAILED_CRITIQUE
+        - NO_CONSENSUS
+        - INSUFFICIENT_CONFIDENCE
+        - CONTAMINATION_DETECTED
+        - TIMEOUT
+        - INTERNAL_ERROR
+
+    ResponseMetadata:
+      type: object
+      properties:
+        tokensUsed:
+          type: integer
+        modelVersions:
+          type: object
+        cacheHit:
+          type: boolean
+        branchesConsulted:
+          type: array
+          items:
+            $ref: '#/components/schemas/EpistemicBranch'
+        councilMembersConsulted:
+          type: array
+          items:
+            $ref: '#/components/schemas/CouncilMember'
+
+    ThinkingStep:
+      type: object
+      properties:
+        phase:
+          type: string
+        thought:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    StreamEvent:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - thinking
+            - response
+            - error
+        phase:
+          type: string
+        thought:
+          type: string
+        data:
+          $ref: '#/components/schemas/YggdrasilResponse'
+        message:
+          type: string
+
+    # ============ EPISTEMIC ============
+    EpistemicBranch:
+      type: string
+      enum:
+        - MIMIR
+        - VOLVA
+        - HUGIN
+      description: |
+        - MIMIR: 100% verified knowledge
+        - VOLVA: 50-99% theoretical
+        - HUGIN: 0-49% unverified
+
+    Source:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/SourceType'
+        identifier:
+          type: string
+          example: arxiv:2301.00001
+        url:
+          type: string
+          format: uri
+        title:
+          type: string
+        authors:
+          type: array
+          items:
+            type: string
+        publishedAt:
+          type: string
+          format: date-time
+        fetchedAt:
+          type: string
+          format: date-time
+        trustScore:
+          type: integer
+          minimum: 0
+          maximum: 100
+        branch:
+          $ref: '#/components/schemas/EpistemicBranch'
+
+    SourceType:
+      type: string
+      enum:
+        - arxiv
+        - pubmed
+        - iso
+        - rfc
+        - wikidata
+        - web
+        - book
+        - journal
+        - other
+
+    # ============ COUNCIL ============
+    CouncilMember:
+      type: string
+      enum:
+        - KVASIR
+        - BRAGI
+        - NORNES
+        - SAGA
+        - SYN
+        - LOKI
+        - TYR
+      description: |
+        - KVASIR: Deep reasoning (Claude)
+        - BRAGI: Creativity (Grok)
+        - NORNES: Calculation (DeepSeek)
+        - SAGA: Knowledge (Llama)
+        - SYN: Vision (Gemini)
+        - LOKI: Adversarial critique
+        - TYR: Final arbitration
+
+    # ============ MEMORY ============
+    MemoryState:
+      type: string
+      enum:
+        - VERIFIED
+        - REJECTED
+        - PENDING_PROOF
+        - WATCHING
+        - DEPRECATED
+
+    ProcessMessageDto:
+      type: object
+      required:
+        - userId
+        - chatId
+        - content
+        - userEmail
+      properties:
+        userId:
+          type: string
+        chatId:
+          type: string
+        messageId:
+          type: string
+        content:
+          type: string
+        userEmail:
+          type: string
+          format: email
+
+    PersistenceResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        factsExtracted:
+          type: integer
+        factsVerified:
+          type: integer
+        newIdentityFacts:
+          type: integer
+
+    StoredFact:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        statement:
+          type: string
+        state:
+          $ref: '#/components/schemas/MemoryState'
+        confidence:
+          type: integer
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    VerifyFactDto:
+      type: object
+      required:
+        - factId
+        - approve
+      properties:
+        factId:
+          type: string
+        verifiedBy:
+          type: string
+        approve:
+          type: boolean
+
+    # ============ ERRORS ============
+    Error:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        message:
+          type: string
+        error:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

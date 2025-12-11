@@ -64,7 +64,7 @@ Etablir les bases du projet : vision, communaute, et premier prototype fonctionn
 - [x] Streaming temps reel des reflexions
 - [x] Base de donnees Supabase PostgreSQL
 - [x] Tests unitaires complets (115+ tests, AGI v2.0 services couverts)
-- [ ] Documentation API OpenAPI
+- [x] Documentation API OpenAPI (docs/api/openapi.yaml)
 
 ### Livrables Phase 1
 
