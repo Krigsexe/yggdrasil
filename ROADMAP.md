@@ -125,8 +125,8 @@ Construire les composants principaux et atteindre un systeme fonctionnel.
 - [x] **MUNIN** : Cascade invalidation algorithm (force-based)
 - [x] **MUNIN** : Priority queues (HOT/WARM/COLD)
 - [x] **MUNIN** : Graphe de dependances avec forces
-- [ ] **MUNIN** : Systeme de checkpoints complet
-- [ ] **MUNIN** : Rollback fonctionnel
+- [x] **MUNIN** : Systeme de checkpoints complet (CheckpointService)
+- [x] **MUNIN** : Rollback fonctionnel (state restoration + audit trail)
 - [ ] Tests de persistance et coherence
 
 #### M2.5 : Qualite et Securite (Q2 2026)
