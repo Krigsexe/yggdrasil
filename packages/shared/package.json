@@ -37,6 +37,10 @@
     "./embedding": {
       "types": "./dist/embedding/index.d.ts",
       "import": "./dist/embedding/index.js"
+    },
+    "./services": {
+      "types": "./dist/services/index.d.ts",
+      "import": "./dist/services/index.js"
     }
   },
   "files": [

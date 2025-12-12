@@ -25,7 +25,9 @@ import {
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { usePipelineHealth, useMuninMemory } from "@/lib/yggdrasil/hooks"
-import { MuninGraph, MuninStats } from "@/components/yggdrasil"
+import { MuninGraph, MuninStats, DaemonControl } from "@/components/yggdrasil"
+import { useContext } from "react"
+import { BifrostContext } from "@/context/context"
 
 // Bifrost Components
 import { Button } from "@/components/ui/button"
@@ -168,6 +170,10 @@ export default function AdminDashboard() {
     refresh: refreshGraph
   } = useMuninMemory(userId, { limit: 100 })
 
+  // Get user context for daemon control
+  const { profile } = useContext(BifrostContext)
+  const userEmail = profile?.user_id // This would be the actual email in production
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -280,6 +286,14 @@ export default function AdminDashboard() {
                     />
                   ))}
           </div>
+        </div>
+
+        <Separator />
+
+        {/* Cognitive Daemon */}
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Daemon Cognitif</h2>
+          <DaemonControl userEmail={userEmail} />
         </div>
 
         <Separator />

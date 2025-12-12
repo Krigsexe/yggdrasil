@@ -9,10 +9,12 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { DatabaseModule } from '@yggdrasil/shared/database';
+import { RedisModule } from '@yggdrasil/shared/services';
 import { AuthModule } from './auth/auth.module.js';
 import { AuditModule } from './audit/audit.module.js';
 import { HealthModule } from './health/health.module.js';
 import { YggdrasilModule } from './yggdrasil/yggdrasil.module.js';
+import { DaemonModule } from './daemon/daemon.module.js';
 
 @Module({
   imports: [
@@ -24,6 +26,9 @@ import { YggdrasilModule } from './yggdrasil/yggdrasil.module.js';
 
     // Database (Prisma)
     DatabaseModule,
+
+    // Redis for caching and daemon state
+    RedisModule,
 
     // Rate limiting
     ThrottlerModule.forRoot([
@@ -51,6 +56,9 @@ import { YggdrasilModule } from './yggdrasil/yggdrasil.module.js';
 
     // Main YGGDRASIL pipeline
     YggdrasilModule,
+
+    // Cognitive Daemon (local LLM processing)
+    DaemonModule,
   ],
 })
 export class AppModule {}

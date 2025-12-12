@@ -31,3 +31,6 @@ export {
   YggdrasilInlineStatus,
   YggdrasilLoading
 } from "./yggdrasil-message"
+
+// Daemon control
+export { DaemonControl } from "./daemon-control"

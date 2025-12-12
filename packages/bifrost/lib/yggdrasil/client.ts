@@ -11,7 +11,11 @@ import type {
   YggdrasilResponseWithThinking,
   PipelineHealth,
   MemoryGraph,
-  ThinkingStep
+  ThinkingStep,
+  DaemonStats,
+  DaemonEvent,
+  DaemonCommandResult,
+  DaemonAuthCheck
 } from "./types"
 
 const YGGDRASIL_API_BASE =
@@ -324,4 +328,79 @@ export async function rollbackToCheckpoint(
   return handleResponse<{ success: boolean; restoredMemories: number }>(
     response
   )
+}
+
+// ============= Daemon API =============
+
+/**
+ * Get daemon status and stats
+ *
+ * @returns Current daemon status and statistics
+ */
+export async function getDaemonStatus(): Promise<DaemonStats> {
+  const response = await fetch(`${YGGDRASIL_API_URL}/daemon/status`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+
+  return handleResponse<DaemonStats>(response)
+}
+
+/**
+ * Get daemon events log
+ *
+ * @returns Recent daemon events
+ */
+export async function getDaemonEvents(): Promise<{ events: DaemonEvent[] }> {
+  const response = await fetch(`${YGGDRASIL_API_URL}/daemon/events`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+
+  return handleResponse<{ events: DaemonEvent[] }>(response)
+}
+
+/**
+ * Check if current user is authorized to control daemon
+ *
+ * @param token - JWT token for authentication
+ * @returns Authorization status
+ */
+export async function checkDaemonAuth(token: string): Promise<DaemonAuthCheck> {
+  const response = await fetch(`${YGGDRASIL_API_URL}/daemon/authorized`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  return handleResponse<DaemonAuthCheck>(response)
+}
+
+/**
+ * Send a command to the daemon
+ *
+ * @param action - The command action (start, stop, pause, resume)
+ * @param token - JWT token for authentication
+ * @returns Command result
+ */
+export async function sendDaemonCommand(
+  action: "start" | "stop" | "pause" | "resume" | "clear_queue",
+  token: string
+): Promise<DaemonCommandResult> {
+  const response = await fetch(`${YGGDRASIL_API_URL}/daemon/command`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ action })
+  })
+
+  return handleResponse<DaemonCommandResult>(response)
 }

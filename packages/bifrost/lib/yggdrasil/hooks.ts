@@ -14,13 +14,18 @@ import {
   getMemoryGraph,
   createCheckpoint,
   rollbackToCheckpoint,
+  getDaemonStatus,
+  getDaemonEvents,
+  sendDaemonCommand,
   YggdrasilApiError
 } from "./client"
 import type {
   YggdrasilQuery,
   YggdrasilResponse,
   PipelineHealth,
-  MemoryGraph
+  MemoryGraph,
+  DaemonStats,
+  DaemonEvent
 } from "./types"
 
 /** State for async operations */
@@ -330,5 +335,93 @@ export function useYggdrasilHistory() {
       history.length > 0
         ? history.reduce((sum, r) => sum + r.confidence, 0) / history.length
         : 0
+  }
+}
+
+/**
+ * Hook for controlling the Cognitive Daemon
+ *
+ * @param pollInterval - Optional interval in ms to poll daemon status
+ * @returns Daemon status, events, and control functions
+ */
+export function useDaemon(pollInterval?: number) {
+  const [status, setStatus] = useState<DaemonStats | null>(null)
+  const [events, setEvents] = useState<DaemonEvent[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<YggdrasilApiError | null>(null)
+  const [commandLoading, setCommandLoading] = useState(false)
+
+  const refreshStatus = useCallback(async () => {
+    try {
+      const data = await getDaemonStatus()
+      setStatus(data)
+      setError(null)
+    } catch (err) {
+      const apiError =
+        err instanceof YggdrasilApiError
+          ? err
+          : new YggdrasilApiError("Failed to get daemon status", 500)
+      setError(apiError)
+    }
+  }, [])
+
+  const refreshEvents = useCallback(async () => {
+    try {
+      const data = await getDaemonEvents()
+      setEvents(data.events)
+    } catch {
+      // Events are non-critical, don't set error
+    }
+  }, [])
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+    await Promise.all([refreshStatus(), refreshEvents()])
+    setLoading(false)
+  }, [refreshStatus, refreshEvents])
+
+  const executeCommand = useCallback(
+    async (
+      action: "start" | "stop" | "pause" | "resume" | "clear_queue",
+      token: string
+    ) => {
+      setCommandLoading(true)
+      try {
+        const result = await sendDaemonCommand(action, token)
+        if (result.status) {
+          setStatus(result.status)
+        }
+        await refreshEvents()
+        return result
+      } finally {
+        setCommandLoading(false)
+      }
+    },
+    [refreshEvents]
+  )
+
+  useEffect(() => {
+    refresh().catch(() => {})
+
+    if (pollInterval && pollInterval > 0) {
+      const interval = setInterval(() => {
+        refreshStatus().catch(() => {})
+      }, pollInterval)
+
+      return () => clearInterval(interval)
+    }
+  }, [refresh, refreshStatus, pollInterval])
+
+  return {
+    status,
+    events,
+    loading,
+    error,
+    commandLoading,
+    refresh,
+    executeCommand,
+    isRunning: status?.status === "running",
+    isPaused: status?.status === "paused",
+    isStopped: status?.status === "stopped"
   }
 }

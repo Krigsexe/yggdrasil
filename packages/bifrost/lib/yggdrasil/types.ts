@@ -210,3 +210,57 @@ export interface ThinkingStep {
 export interface YggdrasilResponseWithThinking extends YggdrasilResponse {
   thinking: ThinkingStep[]
 }
+
+// ============= Daemon Types =============
+
+/** Daemon status */
+export type DaemonStatusType = "running" | "paused" | "stopped" | "error"
+
+/** Daemon statistics */
+export interface DaemonStats {
+  status: DaemonStatusType
+  uptime: number
+  tasksCompleted: number
+  tasksFailed: number
+  tasksQueued: number
+  lastCycleAt?: string
+  lastTaskAt?: string
+  ollamaAvailable: boolean
+  ollamaModel: string
+  memoryUsageMb: number
+  errorRate: number
+  config?: {
+    superadminEmail: string
+    cycleIntervalMs: number
+  }
+}
+
+/** Daemon event */
+export interface DaemonEvent {
+  id: string
+  type:
+    | "start"
+    | "stop"
+    | "pause"
+    | "resume"
+    | "task_complete"
+    | "task_failed"
+    | "error"
+  message: string
+  details?: Record<string, unknown>
+  timestamp: string
+}
+
+/** Daemon command result */
+export interface DaemonCommandResult {
+  success: boolean
+  message: string
+  status?: DaemonStats
+}
+
+/** Daemon authorization check result */
+export interface DaemonAuthCheck {
+  authorized: boolean
+  superadminEmail: string
+  userEmail: string
+}
